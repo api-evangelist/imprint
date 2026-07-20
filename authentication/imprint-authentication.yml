@@ -1,0 +1,33 @@
+generated: '2026-07-19'
+method: searched
+source: openapi/imprint-openapi-original.yml
+docs: https://docs.imprint.co/authentication
+model: >-
+  API-key auth, environment-specific keys managed in the Imprint Dashboard.
+  Provide the API key as the HTTP Basic username (empty password), or as a Bearer
+  token. Multi-product partners target a co-branded product with the
+  x-imprint-merchant-key header.
+multi_product_header:
+  name: x-imprint-merchant-key
+  required: false
+key_management:
+  create: POST /v2/keys (createKey)
+  delete: DELETE /v2/keys (deleteKey)
+  rotation_docs: https://docs.imprint.co/api-key-rotation
+summary:
+  types:
+  - http
+schemes:
+- name: basicAuth
+  type: http
+  scheme: basic
+  description: 'Basic HTTP authentication. Allowed headers-- Authorization: Basic <base64(api_key_id:api_key_secret)>'
+  sources:
+  - openapi/imprint-openapi-original.yml
+- name: bearerAuth
+  type: http
+  scheme: bearer
+  bearerFormat: auth-scheme
+  description: 'Bearer HTTP authentication. Allowed headers-- Authorization: Bearer <api_key>'
+  sources:
+  - openapi/imprint-openapi-original.yml
