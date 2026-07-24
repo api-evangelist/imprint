@@ -1,0 +1,272 @@
+openapi: 3.1.0
+info:
+  title: Public Imprint Customer Links Customer Sessions API
+  version: '2.0'
+servers:
+- url: https://dev.sbx.imprint.co
+  description: Imprint public api sandbox
+security:
+- basicAuth: []
+- bearerAuth: []
+tags:
+- name: Customer Sessions
+paths:
+  /v2/customer_sessions:
+    post:
+      tags:
+      - Customer Sessions
+      summary: Create a new customer session
+      description: Creates a new session for a customer with a client_secret that can be passed to the SDK, providing client access to modify their own profile, card, or card/loan application. If required, a new customer will be created to attach this session to. Customer history can be attached to this session and will be included in the customer's profile if created, or attached to the application the customer creates during the session
+      operationId: createSession
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                customer_id:
+                  type: string
+                  description: Unique identifier for the Imprint customer, if creating a customer session for a known imprint customer that the id is available for
+                  example: AD87A18A-A4BE-49FF-BC46-BF6F0779DBAA
+                partner_customer_id:
+                  type: string
+                  description: The unique identifier for the customer in the partner's system
+                  example: CUST_03476998
+                transaction_amount:
+                  type: integer
+                  description: The current transaction amount, if the session is currently executing a transaction. integer value in the min currency unit (cents for USD)
+                  example: 34000
+                transaction_currency:
+                  type: string
+                  description: The 3 char currency code of the amount in iso-4217
+                  example: USD
+                customer_history:
+                  $ref: '#/components/schemas/CustomerAccountHistory'
+                source:
+                  type: string
+                  description: The source where the session is initiated
+                metadata:
+                  type: object
+                  description: Additional linking metadata
+                  additionalProperties: true
+                  example:
+                    store_number: '123'
+                customer_metadata:
+                  type: object
+                  description: A set of key-value pairs attached to the customer. These values will be included in webhook event payloads for the partner to receive information about the customer.
+                  additionalProperties:
+                    type: string
+                  example:
+                    loyalty_id: '840012345678'
+                    membership_tier: gold
+      responses:
+        '201':
+          description: Customer session created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CustomerSession'
+        '400':
+          description: Invalid request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InvalidRequestError'
+  /v2/customer_sessions/{session_id}:
+    get:
+      tags:
+      - Customer Sessions
+      summary: Retrieve a session
+      operationId: getSession
+      parameters:
+      - name: session_id
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Customer session retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CustomerSession'
+        '404':
+          description: Session not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SessionNotFoundError'
+components:
+  schemas:
+    CustomerSession:
+      type: object
+      description: Represents a session created on behalf of an Imprint customer
+      required:
+      - id
+      - client_secret
+      - expires_at
+      properties:
+        id:
+          type: string
+          example: 2EE24580-B97B-4949-A65C-929CCB9B9B8D
+          description: The unique ID Imprint assigns to the session.
+        client_secret:
+          type: string
+          example: QzMyNzg4QzgtNEUwOS00QkU4LThDMjEtMkU5OUQ3QzkwRDhGCg==
+          description: Not to be logged or stored. Provide this one time use token to the Imprint SDK or other client side code to allow the customer access to edit their own account or apply
+        expires_at:
+          type: string
+          description: the RFC-3339 timestamp when the `client_secret` will expire.
+          example: 2025-02-13 19:08:07+00:00
+        metadata:
+          type: object
+          description: Set of key-value pairs for storing additional information about the customer session.
+          additionalProperties: true
+          example:
+            store_number: '123'
+        customer_metadata:
+          type: object
+          description: A set of key-value pairs attached to the customer. These values will be included in webhook event payloads for the partner to receive information about the customer.
+          additionalProperties:
+            type: string
+          example:
+            loyalty_id: '840012345678'
+            membership_tier: gold
+        source:
+          type: string
+          description: The source where the session was initiated
+          example: web_signup
+    CustomerAccountHistory:
+      type: object
+      description: A Customer's account history with the partner
+      properties:
+        email:
+          type: string
+          format: email
+          description: Customer's email address
+          example: customer@example.com
+        phone:
+          type: string
+          description: Customer's phone number in E.164 format
+          example: '+14155552671'
+        first_name:
+          type: string
+          description: The customer's first name
+          example: John
+        last_name:
+          type: string
+          description: The customer's last name
+          example: Doe
+        preferred_language:
+          type: string
+          description: Customer's preferred language code as defined by ISO 639-1
+          example: en
+        address:
+          $ref: '#/components/schemas/Address'
+        account_tenure:
+          type: integer
+          description: The customer's account tenure with the partner, in months
+          example: 13
+        ltv_amount:
+          type: integer
+          description: The Life Time Value for the customer's account, in the min currency unit (cents for USD)
+          example: 34000
+        ltv_currency:
+          type: string
+          description: The 3 char currency code of the amount in iso-4217
+          example: USD
+        loyalty_tier:
+          type: string
+          description: The customer's current loyalty tier
+          example: GOLD
+        account_created_at:
+          type: string
+          description: The RFC-3339 timestamp when the customer's account was created with the partner
+          example: 2025-02-13 19:08:07+00:00
+        transaction_count:
+          type: integer
+          description: The number of lifetime transactions the customer has made with the partner
+          example: 100
+    Address:
+      type: object
+      description: Mailing address information
+      properties:
+        street_line1:
+          type: string
+          description: Primary street address
+          example: 123 Main St
+        street_line2:
+          type: string
+          description: Secondary street address (apartment, suite, etc.)
+          example: Apt 4B
+        city:
+          type: string
+          description: City name
+          example: San Francisco
+        state:
+          type: string
+          description: State or province
+          example: CA
+        postal_code:
+          type: string
+          description: ZIP or postal code
+          example: '94105'
+        country:
+          type: string
+          description: ISO-3166-1 alpha-3 Country Code
+          example: USA
+    InvalidRequestError:
+      type: object
+      properties:
+        path:
+          type: string
+          description: The path of the endpoint returning the error
+          example: /v2/customers
+        details:
+          type: array
+          items:
+            type: string
+          description: The details of the error being returned
+          example:
+          - 'email: must be a well-formed email address'
+        error:
+          type: string
+          description: The category of error being returned
+          example: Bad Request
+        status:
+          type: integer
+          description: The HTTP status code of the error
+          example: 400
+        timestamp:
+          type: string
+          description: The timestamp that the error occurred
+          example: '2025-01-20T18:18:22.923+00:00'
+    SessionNotFoundError:
+      type: object
+      required:
+      - type
+      - message
+      properties:
+        type:
+          type: string
+          description: The category of error being returned
+          example: SESSION_NOT_FOUND_ERROR
+        message:
+          type: string
+          description: A message describing the cause of the error
+          example: 'Session not found for provided ID: cs_123'
+        param:
+          type: string
+          description: The param causing the error
+          example: session_id
+  securitySchemes:
+    basicAuth:
+      type: http
+      scheme: basic
+      description: 'Basic HTTP authentication. Allowed headers-- Authorization: Basic <base64(api_key_id:api_key_secret)>'
+    bearerAuth:
+      bearerFormat: auth-scheme
+      description: 'Bearer HTTP authentication. Allowed headers-- Authorization: Bearer <api_key>'
+      scheme: bearer
+      type: http

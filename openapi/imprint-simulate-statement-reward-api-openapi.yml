@@ -1,0 +1,94 @@
+openapi: 3.1.0
+info:
+  title: Public Imprint Customer Links Simulate Statement Reward API
+  version: '2.0'
+servers:
+- url: https://dev.sbx.imprint.co
+  description: Imprint public api sandbox
+security:
+- basicAuth: []
+- bearerAuth: []
+tags:
+- name: Simulate Statement Reward
+paths:
+  /v2/simulate_statement_reward:
+    post:
+      tags:
+      - Simulate Statement Reward
+      summary: Simulate Statement Reward
+      description: Initiate a statement reward webhook to be sent in sandbox environment
+      deprecated: true
+      operationId: simulateStatementReward
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - customer_id
+              properties:
+                customer_id:
+                  type: string
+                  example: e2806932-5f1b-4518-8b15-156d773e9496
+      responses:
+        '200':
+          description: Statement reward webhook initiated
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  debugging_id:
+                    type: string
+                    description: If you received an unexpected webhook or did not receive a webhook, send debugging id to your imprint team
+                    example: E777214A-2D11-4CAD-9E8F-E1BD71D9FE67
+        '400':
+          description: Product is not configured for statement rewards
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+        '403':
+          description: Endpoint is only available in sandbox environments
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+        '404':
+          description: Customer not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+components:
+  schemas:
+    ApiError:
+      type: object
+      required:
+      - error
+      properties:
+        error:
+          type: object
+          required:
+          - type
+          - message
+          properties:
+            type:
+              type: string
+              description: The category of error being returned
+              example: BAD_REQUEST_ERROR
+            message:
+              type: string
+              description: A message describing the cause of the error
+              example: 'unsupported reward_type: INVALID, must be STATEMENT or DELAYED'
+  securitySchemes:
+    basicAuth:
+      type: http
+      scheme: basic
+      description: 'Basic HTTP authentication. Allowed headers-- Authorization: Basic <base64(api_key_id:api_key_secret)>'
+    bearerAuth:
+      bearerFormat: auth-scheme
+      description: 'Bearer HTTP authentication. Allowed headers-- Authorization: Bearer <api_key>'
+      scheme: bearer
+      type: http

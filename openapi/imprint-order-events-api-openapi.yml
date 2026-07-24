@@ -1,0 +1,227 @@
+openapi: 3.1.0
+info:
+  title: Public Imprint Customer Links Order Events API
+  version: '2.0'
+servers:
+- url: https://dev.sbx.imprint.co
+  description: Imprint public api sandbox
+security:
+- basicAuth: []
+- bearerAuth: []
+tags:
+- name: Order Events
+paths:
+  /v2/order_events:
+    get:
+      tags:
+      - Order Events
+      summary: Retrieve order events
+      description: Get a list of order events
+      operationId: listOrderEvents
+      parameters:
+      - name: order_event_id
+        in: query
+        description: An order event ID. If provided, the response will only have a maximum of one result.
+        schema:
+          type: string
+        example: 7622c07d-eb2b-4345-a9a9-345d61d32bc2
+      - name: order_id
+        in: query
+        description: Enables searching for events by order ID
+        schema:
+          type: string
+        example: 77f60af4-185e-4867-b113-34e3cf7c6acd
+      - name: partner_event_id
+        in: query
+        description: The identifier of the order event in the partner system. If provided, the response will only have a maximum of one result.
+        schema:
+          type: string
+      - name: network_transaction_id
+        description: The network's unique identifier for the transaction. Examples include Visa Transaction ID, Mastercard Trace ID, and American Express Network Reference ID
+        in: query
+        schema:
+          type: string
+        example: txn-123456
+      - name: limit
+        $ref: '#/components/parameters/limitParam'
+      - name: starting_after
+        $ref: '#/components/parameters/startingAfterParam'
+      responses:
+        '200':
+          description: List of order events
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OrderEventsResponse'
+    post:
+      tags:
+      - Order Events
+      summary: Create order events
+      description: Create new order events
+      operationId: postOrderEvent
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/OrderEventBase'
+      responses:
+        '200':
+          description: Order event created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OrderEvent'
+  /v2/order_events/{order_event_id}:
+    delete:
+      tags:
+      - Order Events
+      summary: Delete order event
+      description: Delete an existing order event
+      operationId: deleteOrderEvent
+      parameters:
+      - name: order_event_id
+        in: path
+        required: true
+        schema:
+          type: string
+        description: Unique identifier for the order event
+        example: 7622c07d-eb2b-4345-a9a9-345d61d32bc2
+      responses:
+        '204':
+          description: Order event deleted successfully
+components:
+  schemas:
+    CurrencyAmount:
+      type: integer
+      description: Amount in the smallest currency unit (e.g., cents for USD)
+    OrderEventBase:
+      type: object
+      required:
+      - order_id
+      - type
+      - amount
+      - network_transaction_id
+      properties:
+        order_event_id:
+          type: string
+          description: The ID of the order event
+          example: 77f60af4-185e-4867-b113-34e3cf7c6acd
+        order_id:
+          type: string
+          description: The ID of the order to which the event is related
+          example: 77f60af4-185e-4867-b113-34e3cf7c6acd
+        partner_event_id:
+          type: string
+          description: Partner's event identifier
+          example: 7622c07d-eb2b-4345-a9a9-345d61d32bc2
+        type:
+          type: string
+          enum:
+          - CAPTURED
+          - REFUNDED
+          description: Type of order event
+          example: CAPTURED
+        amount:
+          allOf:
+          - $ref: '#/components/schemas/CurrencyAmount'
+          - example: 274999
+            description: Total event amount ($2,699.99 + $50.00)
+        rewards_amount:
+          allOf:
+          - $ref: '#/components/schemas/CurrencyAmount'
+          - example: 2500
+            description: Total rewards amount for the event ($25 + $0)
+        currency:
+          type: string
+          description: The 3-character currency code of the amount in ISO 4217 format (e.g., "USD")
+          example: USD
+        network_transaction_id:
+          type: string
+          description: Card network transaction identifier
+          example: 615e3ba0-6b99-495b-ade4-1f584c40f376
+        order_lines:
+          type: array
+          items:
+            $ref: '#/components/schemas/OrderLine'
+          description: 'When provided, the API will require that the calculated sum of all the rates and rewards rates within (taking quantities into account) are equal to the `amount` and `rewards_amount`, respectively.
+
+            It is important to note that the sums of all *event* amounts and *event* rewards amounts belonging to an order do not need to be equal to `total_order_amount` and `total_rewards_amount` in the order, as the data contained in events will serve as the final source of truth for the lifecycle of the order, as it actually transpired.'
+          example:
+          - name: Couch Supreme
+            product_url: www.restassured.com/couch-supreme
+            quantity: 1
+            rate: 274999
+            rewards_rate: 2500
+    OrderEventsResponse:
+      type: object
+      required:
+      - data
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/OrderEvent'
+          description: List of order events
+        has_more:
+          type: boolean
+        total:
+          type: integer
+    OrderLine:
+      type: object
+      required:
+      - name
+      - quantity
+      - rate
+      - rewards_rate
+      properties:
+        name:
+          type: string
+          description: Name of the order line item
+          example: Couch Supreme
+        product_url:
+          type: string
+          nullable: true
+          description: URL to the product
+          example: www.restassured.com/couch-supreme
+        quantity:
+          type: integer
+          description: Quantity of the item
+          example: 1
+        rate:
+          allOf:
+          - $ref: '#/components/schemas/CurrencyAmount'
+          - example: 274999
+        rewards_rate:
+          allOf:
+          - $ref: '#/components/schemas/CurrencyAmount'
+          - example: 2500
+    OrderEvent:
+      allOf:
+      - $ref: '#/components/schemas/OrderEventBase'
+  parameters:
+    startingAfterParam:
+      name: starting_after
+      in: query
+      description: A cursor for use in pagination. An id that defines your place in the list.
+      schema:
+        type: string
+    limitParam:
+      name: limit
+      in: query
+      description: Limits the number of returned results
+      schema:
+        type: integer
+        minimum: 1
+        default: 10
+        format: int32
+  securitySchemes:
+    basicAuth:
+      type: http
+      scheme: basic
+      description: 'Basic HTTP authentication. Allowed headers-- Authorization: Basic <base64(api_key_id:api_key_secret)>'
+    bearerAuth:
+      bearerFormat: auth-scheme
+      description: 'Bearer HTTP authentication. Allowed headers-- Authorization: Bearer <api_key>'
+      scheme: bearer
+      type: http

@@ -1,0 +1,905 @@
+openapi: 3.1.0
+info:
+  title: Public Imprint Customer Links Customers API
+  version: '2.0'
+servers:
+- url: https://dev.sbx.imprint.co
+  description: Imprint public api sandbox
+security:
+- basicAuth: []
+- bearerAuth: []
+tags:
+- name: Customers
+paths:
+  /v2/customers:
+    get:
+      tags:
+      - Customers
+      summary: Search for customers
+      operationId: searchCustomers
+      parameters:
+      - name: partner_customer_id
+        in: query
+        description: The unique identifier for the customer in the partner's system
+        schema:
+          type: string
+      - name: limit
+        $ref: '#/components/parameters/limitParam'
+      - name: starting_after
+        $ref: '#/components/parameters/startingAfterParam'
+      responses:
+        '200':
+          description: List of customers
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CustomerListResponse'
+    post:
+      tags:
+      - Customers
+      summary: Search for customers
+      operationId: searchCustomersPost
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                partner_customer_id:
+                  description: The unique identifier for the customer in the partner's system
+                  type: string
+                ssn:
+                  description: The ssn of the customer without hyphens
+                  example: '123456789'
+                  type: string
+                date_of_birth:
+                  $ref: '#/components/schemas/DateOfBirth'
+                limit:
+                  description: Limits the number of returned results
+                  type: integer
+                  minimum: 1
+                  default: 10
+                  format: int32
+                starting_after:
+                  description: A cursor for use in pagination. An id that defines your place in the list.
+                  type: string
+      responses:
+        '200':
+          description: List of customers
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CustomerListResponse'
+  /v2/customers/{customer_id}:
+    get:
+      tags:
+      - Customers
+      summary: Retrieve a customer
+      description: Retrieves the details of an existing customer by ID
+      operationId: getCustomer
+      parameters:
+      - name: customer_id
+        in: path
+        required: true
+        description: The unique identifier for the customer
+        schema:
+          type: string
+          example: BBB815E9-F654-438D-9AD3-3F7BB8136FC0
+      responses:
+        '200':
+          description: Customer retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Customer'
+        '404':
+          description: Customer not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CustomerNotFoundError'
+  /v2/customers/{customer_id}/rewards_balance:
+    get:
+      tags:
+      - Customers
+      summary: Get customer's current rewards balance
+      operationId: getRewardsBalance
+      parameters:
+      - name: customer_id
+        $ref: '#/components/parameters/customerIdParam'
+      responses:
+        '200':
+          description: Customer rewards balance
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                - customer_id
+                - reward_balance
+                - reward_symbol
+                properties:
+                  customer_id:
+                    type: string
+                    description: The unique identifier for the customer
+                    example: 2EE24580-B97B-4949-A65C-929CCB9B9B8D
+                  reward_balance:
+                    type: integer
+                    description: The integer value of the customer's rewards balance
+                    example: 120000
+                  reward_symbol:
+                    type: string
+                    description: The symbol for the rewards. Can be in currency like `$` or things like `points`
+                  reward_description:
+                    type: string
+                    description: The description of the rewards, can be displayed to the customer
+        '404':
+          description: Customer not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CustomerNotFoundError'
+  /v2/customers/{customer_id}/payment_methods:
+    get:
+      tags:
+      - Customers
+      summary: List customer's payment methods
+      operationId: getPaymentMethods
+      parameters:
+      - name: customer_id
+        $ref: '#/components/parameters/customerIdParam'
+      responses:
+        '200':
+          description: Customer rewards balance
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/PaymentMethod'
+        '404':
+          description: Customer not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CustomerNotFoundError'
+  /v2/customers/{customer_id}/transaction_intents:
+    get:
+      tags:
+      - Customers
+      summary: List customer's transaction intents
+      operationId: getTransactionIntents
+      parameters:
+      - name: customer_id
+        in: path
+        $ref: '#/components/parameters/customerIdParam'
+      responses:
+        '200':
+          description: Customer transaction intents
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/TransactionIntent'
+        '404':
+          description: Transaction not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TransactionNotFoundError'
+  /v2/customers/{customer_id}/transactions:
+    get:
+      tags:
+      - Customers
+      summary: List customer's transactions
+      operationId: getTransactions
+      parameters:
+      - name: customer_id
+        $ref: '#/components/parameters/customerIdParam'
+      - name: limit
+        $ref: '#/components/parameters/limitParam'
+      - name: starting_after
+        $ref: '#/components/parameters/startingAfterParam'
+      responses:
+        '200':
+          description: List of customer transactions
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Transaction'
+                  has_more:
+                    type: boolean
+                  total:
+                    type: integer
+        '404':
+          description: Customer not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CustomerNotFoundError'
+  /v2/customers/{customer_id}/rewards:
+    get:
+      tags:
+      - Customers
+      summary: List customer's rewards
+      description: List customer's rewards in descending order by the reward's updated at timestamp
+      operationId: getRewards
+      parameters:
+      - name: customer_id
+        $ref: '#/components/parameters/customerIdParam'
+      - name: limit
+        $ref: '#/components/parameters/limitParam'
+      - name: starting_after
+        $ref: '#/components/parameters/startingAfterParam'
+      responses:
+        '200':
+          description: List of customer rewards
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Reward'
+                  has_more:
+                    type: boolean
+                  total:
+                    type: integer
+        '404':
+          description: Customer not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CustomerNotFoundError'
+components:
+  schemas:
+    PaymentMethod:
+      type: object
+      required:
+      - id
+      - type
+      - customer_id
+      - created_at
+      - status
+      - metadata
+      properties:
+        id:
+          type: string
+          example: DCBFC736-2286-42DD-897D-160DCA80AED2
+          description: The unique ID Imprint assigns to the payment method.
+        type:
+          type: string
+          description: The type of payment method
+          enum:
+          - CARD
+          - BANK_ACCOUNT
+          - LOAN
+        customer_id:
+          type: string
+          description: The `id` of the Imprint customer that the payment method belongs to.
+          example: B40A789E-BD46-4BB9-B63E-F9919582694C
+        card:
+          type: object
+          description: When payment method is a `CARD` type, this object will have card specific data.
+          required:
+          - last4
+          - brand
+          properties:
+            last4:
+              type: string
+              example: '1234'
+              minLength: 4
+              maxLength: 4
+              description: The last 4 digits of the card PAN
+            network:
+              type: string
+              description: Name of the card issuer
+              enum:
+              - VISA
+              - MASTERCARD
+              - AMEX
+              - ''
+            card_type:
+              $ref: '#/components/schemas/CardType'
+            card_design_id:
+              $ref: '#/components/schemas/CardDesignID'
+            exp_month:
+              type: string
+              description: The month the card expires (MM format).
+              example: '06'
+            exp_year:
+              type: string
+              description: The year the card expires (YYYY format).
+              example: '2027'
+            pci_details:
+              type: object
+              description: The pci details of the returned card. Only verified PCI compliant partners will be able to retrieve pci details in production environments.
+              properties:
+                pan:
+                  type: string
+                  description: The unique 16-digit number printed on the front of a payment card, used to identify the cardholder's account.
+                  example: '5105105105105100'
+                exp_month:
+                  type: string
+                  description: The month the card expires
+                  example: '06'
+                exp_year:
+                  type: string
+                  description: The year the card expires
+                  example: '26'
+                cvv:
+                  type: string
+                  description: A three- or four-digit security code used to verify card-not-present transactions and prevent fraud.
+                  example: '123'
+            tokens:
+              type: array
+              description: Payment method tokens that are defined by a third-party provider are included in this array by Imprint.
+              items:
+                $ref: '#/components/schemas/PaymentMethodToken'
+        bank_account:
+          type: object
+          description: When payment method is a `BANK_ACCOUNT` type, this object will have bank account specific data.
+          required:
+          - last4
+          - routing_number
+          - bank_name
+          properties:
+            last4:
+              type: string
+              example: '1234'
+              description: Last 4 numbers of the account.
+              minLength: 4
+              maxLength: 4
+            routing_number:
+              type: string
+              description: The bank routing number assigned to this account.
+            bank_name:
+              type: string
+              example: Wells Fargo
+              description: Name of the banking institution
+            account_type:
+              type: string
+              description: Type of the account.
+              enum:
+              - CHECKING
+              - SAVINGS
+        loan:
+          type: object
+          description: When payment method is a `LOAN` type, this object will have loan specific data.
+          required:
+          - amount
+          - term_months
+          properties:
+            amount:
+              type: integer
+              description: Amount in min units.
+              example: 10000
+            currency:
+              $ref: '#/components/schemas/TransactionCurrency'
+            remaining_balance:
+              type: integer
+              description: remaining unspent balance on the loan
+            term_months:
+              type: integer
+              description: Length of the loan term in months
+              example: 12
+            apr:
+              type: string
+              description: Annual percentage rate of the loan in floating point
+              example: '5.89'
+            loan_status:
+              type: string
+              description: Current status of the loan
+              enum:
+              - PENDING
+              - APPROVED
+              - REJECTED
+              - ACTIVE
+              - CLOSED
+        created_at:
+          type: string
+          description: the RFC-3339 timestamp when the payment method was created
+          example: 2025-02-13 19:08:07+00:00
+        updated_at:
+          type: string
+          description: the RFC-3339 timestamp when the payment method was last updated
+          example: 2025-02-13 19:08:07+00:00
+        status:
+          type: string
+          description: Current status of the payment method
+          enum:
+          - ACTIVE
+          - INACTIVE
+          - CANCELED
+        metadata:
+          type: object
+          additionalProperties: true
+          description: Additional metadata for the payment method
+          example:
+            platform_version: 2.1.0
+    RewardStatus:
+      type: string
+      enum:
+      - PENDING
+      - AVAILABLE
+      - PENDING_DEDUCTION
+      - DEDUCTED
+      example: PENDING
+    PurchaseMethod:
+      type: string
+      enum:
+      - CHIP
+      - CONTACTLESS
+      - KEYEDIN
+      - ONLINE
+      - SWIPE
+      - QRCODE
+      - OCR
+      - UNKNOWN
+      nullable: true
+      description: How the purchase was completed.
+      example: CHIP
+    RewardType:
+      type: string
+      enum:
+      - OFFER
+      - TRANSACTION
+      - ONE_TIME
+      - STATEMENT
+      - REFERRAL
+      example: TRANSACTION
+    TransactionIntentStatus:
+      type: string
+      enum:
+      - CONFIRMED
+      - CANCELED
+      example: CONFIRMED
+    Customer:
+      type: object
+      description: Represents a customer in the Imprint system
+      required:
+      - id
+      properties:
+        id:
+          type: string
+          description: Unique identifier for the customer
+          example: 9B5E1EE0-2E1C-46E7-81B9-3C3917204BE4
+        email:
+          type: string
+          format: email
+          description: Customer's email address
+          example: customer@example.com
+        phone:
+          type: string
+          description: Customer's phone number in E.164 format
+          example: '+14155552671'
+        statuses:
+          type: object
+          description: Map of the customer's enrolled card program name to the customer's status.
+          additionalProperties:
+            $ref: '#/components/schemas/CustomerProgramStatus'
+          example:
+            Card Program Name: OPEN
+        first_name:
+          type: string
+          description: The customer's first name.
+          example: John
+        last_name:
+          type: string
+          description: The customer's last name.
+          example: Doe
+        preferred_language:
+          type: string
+          description: Customer's preferred language code as defined by ISO 639-1
+          example: en
+        ssn4:
+          type: string
+          description: Customer's Social Security Number in 4 digits
+          example: '1234'
+        date_of_birth:
+          $ref: '#/components/schemas/DateOfBirth'
+        address:
+          $ref: '#/components/schemas/Address'
+        partner_customer_id:
+          $ref: '#/components/schemas/PartnerCustomerId'
+        metadata:
+          type: object
+          description: Set of key-value pairs for storing additional information about the customer.
+          additionalProperties: true
+          example:
+            preferred_language: en
+        created_at:
+          type: string
+          description: the RFC-3339 date when the customer was created
+          example: 2025-02-13 19:08:07+00:00
+        updated_at:
+          type: string
+          description: the RFC-3339 date when the customer was created
+          example: 2025-02-13 19:08:07+00:00
+    CustomerListResponse:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/Customer'
+        has_more:
+          type: boolean
+        total:
+          type: integer
+    Merchant:
+      type: object
+      properties:
+        network_id:
+          type: string
+          description: Unique identifier of the merchant assigned by the payment network.
+          example: '234923454545'
+        name:
+          type: string
+          description: Name of the merchant where the transaction occurred.
+          example: Target
+        category:
+          type: string
+          nullable: true
+          description: Name of the merchant category.
+          example: Grocery Stores
+        category_code:
+          type: string
+          nullable: true
+          description: Code associated with the merchant category.
+          example: '5411'
+        address:
+          $ref: '#/components/schemas/Address'
+          type: object
+    CustomerProgramStatus:
+      type: string
+      description: Status of a customer within a card program.
+      enum:
+      - OPEN
+      - CLOSED
+    CardType:
+      type: string
+      description: The type of card
+      enum:
+      - PHYSICAL
+      - VIRTUAL
+      - UNIFIED
+    TransactionCurrency:
+      type: string
+      description: The 3-character currency code of the amount in ISO 4217 format (e.g., "USD")
+      example: USD
+    DateOfBirth:
+      type: object
+      description: Customer's date of birth
+      properties:
+        year:
+          type: integer
+          description: Year of birth
+          minimum: 1900
+          example: 1990
+        month:
+          type: integer
+          description: Month of birth
+          minimum: 1
+          maximum: 12
+          example: 1
+        day:
+          type: integer
+          description: Day of birth
+          minimum: 1
+          maximum: 31
+          example: 1
+    Address:
+      type: object
+      description: Mailing address information
+      properties:
+        street_line1:
+          type: string
+          description: Primary street address
+          example: 123 Main St
+        street_line2:
+          type: string
+          description: Secondary street address (apartment, suite, etc.)
+          example: Apt 4B
+        city:
+          type: string
+          description: City name
+          example: San Francisco
+        state:
+          type: string
+          description: State or province
+          example: CA
+        postal_code:
+          type: string
+          description: ZIP or postal code
+          example: '94105'
+        country:
+          type: string
+          description: ISO-3166-1 alpha-3 Country Code
+          example: USA
+    Reward:
+      type: object
+      required:
+      - id
+      - customer_id
+      - amount
+      - status
+      - type
+      - created_at
+      properties:
+        id:
+          type: string
+          example: 2EE24580-B97B-4949-A65C-929CCB9B9B8D
+        customer_id:
+          type: string
+          example: 9B5E1EE0-2E1C-46E7-81B9-3C3917204BE4
+        transaction_event_id:
+          type: string
+          description: transaction that generated this reward, if applicable.
+          example: E777214A-2D11-4CAD-9E8F-E1BD71D9FE67
+        amount:
+          type: integer
+          description: reward amount in min units.
+        type:
+          $ref: '#/components/schemas/RewardType'
+        currency:
+          $ref: '#/components/schemas/RewardCurrency'
+        status:
+          $ref: '#/components/schemas/RewardStatus'
+        created_at:
+          type: string
+          description: the RFC-3339 timestamp when the reward was created
+          example: 2025-02-13 19:08:07+00:00
+        updated_at:
+          type: string
+          description: the RFC-3339 timestamp when the reward was last updated
+          example: 2025-02-13 19:08:07+00:00
+        metadata:
+          type: object
+          additionalProperties: true
+          example:
+            platform_version: 2.1.0
+    PaymentMethodToken:
+      type: object
+      required:
+      - type
+      - token
+      - created_at
+      - updated_at
+      properties:
+        type:
+          type: string
+          enum:
+          - ADYEN
+          - APPLE_WALLET
+          - CYBERSOURCE
+          - WORLDPAY
+        token:
+          type: string
+          description: The token, as defined by the processor
+        pan_reference_id:
+          type: string
+          description: An ID that represents the PAN and is defined by the processor
+        created_at:
+          type: string
+          description: the RFC-3339 timestamp when the payment method was created
+          example: 2025-02-13 19:08:07+00:00
+        updated_at:
+          type: string
+          example: 2025-02-13 19:08:07+00:00
+          description: the RFC-3339 timestamp when the payment method was updated
+    TransactionNotFoundError:
+      type: object
+      required:
+      - type
+      - message
+      properties:
+        type:
+          type: string
+          description: The category of error being returned.
+          example: TRANSACTION_FOUND_ERROR
+        message:
+          type: string
+          description: A message describing the cause of the error.
+          example: 'Transaction intent not found for provided ID: txn_123'
+        param:
+          type: string
+          description: The param causing the error.
+          example: transaction_id
+    RewardCurrency:
+      type: string
+      description: The 3-character currency code of the amount in ISO 4217 format (e.g., "USD") or a reward unit (e.g., "POINTS")
+      example: POINTS
+    Transaction:
+      type: object
+      required:
+      - id
+      - customer_id
+      - payment_method_id
+      - amount
+      - currency
+      - status
+      - network_transaction_id
+      - created_at
+      properties:
+        id:
+          type: string
+          example: E777214A-2D11-4CAD-9E8F-E1BD71D9FE67
+        intent_id:
+          type: string
+          description: Reference to the original transaction intent
+          example: 5B30532B-5B5B-4826-8DE2-429C57B705FD
+        customer_id:
+          type: string
+          description: The imprint customer ID for the transaction
+          example: 9B5E1EE0-2E1C-46E7-81B9-3C3917204BE4
+        authorization_code:
+          type: string
+          description: Code authorizing the transaction.
+          example: ABCD
+        payment_method_id:
+          type: string
+          description: Identifies the payment method used for the transaction
+          example: DCBFC736-2286-42DD-897D-160DCA80AED2
+        purchase_method:
+          $ref: '#/components/schemas/PurchaseMethod'
+        amount:
+          type: integer
+          description: Transaction amount in min units.
+        currency:
+          $ref: '#/components/schemas/TransactionCurrency'
+        status:
+          $ref: '#/components/schemas/TransactionStatus'
+        network_transaction_id:
+          type: string
+          description: The network's unique identifier for the transaction. Examples include Visa Transaction ID, Mastercard Trace ID, and American Express Network Reference ID
+        partner_transaction_id:
+          type: string
+          description: The partner's unique transaction id
+        created_at:
+          type: string
+          description: the RFC-3339 timestamp when the transaction was created
+          example: 2025-02-13 19:08:07+00:00
+        updated_at:
+          type: string
+          description: the RFC-3339 timestamp when the transaction was last updated
+          example: 2025-02-13 19:08:07+00:00
+        merchant:
+          $ref: '#/components/schemas/Merchant'
+        metadata:
+          type: object
+          additionalProperties: true
+          example:
+            platform_version: 2.1.0
+    CustomerNotFoundError:
+      type: object
+      required:
+      - type
+      - message
+      properties:
+        type:
+          type: string
+          description: The category of error being returned
+          example: CUSTOMER_NOT_FOUND_ERROR
+        message:
+          type: string
+          description: A message describing the cause of the error
+          example: 'Customer not found for provided ID: CSMR-v1-123'
+        param:
+          type: string
+          description: The param causing the error
+          example: customer_id
+    TransactionStatus:
+      type: string
+      enum:
+      - APPROVED
+      - UPDATED
+      - VOIDED
+      - CAPTURED
+      - REFUNDED
+      example: APPROVED
+    TransactionIntent:
+      type: object
+      required:
+      - id
+      - customer_id
+      - amount
+      - currency
+      - status
+      - created_at
+      properties:
+        id:
+          type: string
+          example: 5B30532B-5B5B-4826-8DE2-429C57B705FD
+        customer_id:
+          type: string
+          example: 9B5E1EE0-2E1C-46E7-81B9-3C3917204BE4
+        payment_method_id:
+          type: string
+          description: The `payment_method_id` that this `transaction_intent` was executed with.
+          example: DCBFC736-2286-42DD-897D-160DCA80AED2
+        amount:
+          type: integer
+          description: Currency amount
+          example: 10000
+        currency:
+          $ref: '#/components/schemas/TransactionCurrency'
+        status:
+          $ref: '#/components/schemas/TransactionIntentStatus'
+        network_transaction_id:
+          type: string
+          description: The network's unique identifier for the transaction. Examples include Visa Transaction ID, Mastercard Trace ID, and American Express Network Reference ID
+        partner_transaction_id:
+          type: string
+          description: The partner's unique transaction id
+        created_at:
+          type: string
+          description: the RFC-3339 timestamp when the transaction intent was created
+          example: 2025-02-13 19:08:07+00:00
+        updated_at:
+          type: string
+          description: the RFC-3339 timestamp when the transaction intent was last updated
+          example: 2025-02-13 19:08:07+00:00
+        metadata:
+          type: object
+          description: Additional transaction intent data
+          additionalProperties: true
+          example:
+            platform_version: 2.1.0
+    CardDesignID:
+      type: string
+      description: Imprint ID for the graphic design printed on the card
+      example: 3b9c1f3e-52a0-44c1-b131-a7ab0099a214
+    PartnerCustomerId:
+      type: string
+      description: The unique identifier for the customer in the partner's system
+      example: PARTNER_USER_456
+  parameters:
+    startingAfterParam:
+      name: starting_after
+      in: query
+      description: A cursor for use in pagination. An id that defines your place in the list.
+      schema:
+        type: string
+    customerIdParam:
+      name: customer_id
+      in: path
+      required: true
+      description: The unique identifier for the Imprint customer
+      schema:
+        type: string
+        example: 2EE24580-B97B-4949-A65C-929CCB9B9B8D
+    limitParam:
+      name: limit
+      in: query
+      description: Limits the number of returned results
+      schema:
+        type: integer
+        minimum: 1
+        default: 10
+        format: int32
+  securitySchemes:
+    basicAuth:
+      type: http
+      scheme: basic
+      description: 'Basic HTTP authentication. Allowed headers-- Authorization: Basic <base64(api_key_id:api_key_secret)>'
+    bearerAuth:
+      bearerFormat: auth-scheme
+      description: 'Bearer HTTP authentication. Allowed headers-- Authorization: Bearer <api_key>'
+      scheme: bearer
+      type: http

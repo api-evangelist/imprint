@@ -1,0 +1,361 @@
+openapi: 3.1.0
+info:
+  title: Public Imprint Customer Links Transaction Intents API
+  version: '2.0'
+servers:
+- url: https://dev.sbx.imprint.co
+  description: Imprint public api sandbox
+security:
+- basicAuth: []
+- bearerAuth: []
+tags:
+- name: Transaction Intents
+paths:
+  /v2/transaction_intents:
+    post:
+      tags:
+      - Transaction Intents
+      summary: Create a transaction intent
+      description: Creates a transaction intent object that represents a pending financial transaction. Transaction intents are used to initiate, validate, and track the lifecycle of a transaction before it is finalized.
+      operationId: createTransactionIntent
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - customer_id
+              - amount
+              - currency
+              properties:
+                customer_id:
+                  type: string
+                  description: The Imprint Customer ID of the customer making the transaction intent
+                  example: F9B5A5E8-C8B0-4B7A-8E6B-0C8EE90A62CF
+                payment_method_id:
+                  type: string
+                amount:
+                  type: integer
+                  description: Amount in min units.
+                  example: 10000
+                currency:
+                  $ref: '#/components/schemas/TransactionCurrency'
+                network_transaction_id:
+                  type: string
+                  description: The network's unique identifier for the transaction. Examples include Visa Transaction ID, Mastercard Trace ID, and American Express Network Reference ID
+                merchant_name:
+                  type: string
+                  description: The name of the merchant this transaction intent will be
+                  example: walmart
+                merchant_address:
+                  $ref: '#/components/schemas/Address'
+                merchant_id:
+                  type: string
+                merchant_code:
+                  type: string
+                expected_date:
+                  type: string
+                  description: the RFC-3339 date when the transaction is expected to process. This does not have to be exact but it will be used as a data point to help link a transaction with a transaction intent. This example includes date and time to be explict, any RFC3339 date or date+time will be accepted
+                  example: 2025-02-13 19:08:07+00:00
+                metadata:
+                  type: object
+                  additionalProperties: true
+                  example:
+                    platform_version: 2.1.0
+      responses:
+        '200':
+          description: Transaction intent created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TransactionIntent'
+        '400':
+          description: Invalid request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InvalidRequestError'
+    get:
+      tags:
+      - Transaction Intents
+      summary: List transaction intents
+      description: Retrieves a list of transaction intents.
+      operationId: searchTransactionIntents
+      parameters:
+      - name: type
+        in: query
+        description: The type of transaction intent to filter by.
+        schema:
+          type: string
+          enum:
+          - CONFIRMED
+          - CANCELED
+          example: CONFIRMED
+      - name: limit
+        $ref: '#/components/parameters/limitParam'
+      - name: starting_after
+        $ref: '#/components/parameters/startingAfterParam'
+      responses:
+        '200':
+          description: List of transaction intents
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/TransactionIntent'
+                  has_more:
+                    type: boolean
+                  total:
+                    type: integer
+  /v2/transaction_intents/{intent_id}:
+    get:
+      tags:
+      - Transaction Intents
+      summary: Retrieve a transaction intent
+      description: Retrieves the details of an existing transaction intent by `id`.
+      operationId: getTransactionIntent
+      parameters:
+      - name: intent_id
+        in: path
+        required: true
+        description: The unique identifier for the transaction intent.
+        schema:
+          type: string
+          example: 3E4F0CCD-ACBF-42F3-A459-6DF92AF632D1
+      responses:
+        '200':
+          description: Transaction intent retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TransactionIntent'
+        '404':
+          description: Transaction intent not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TransactionIntentFoundError'
+    post:
+      tags:
+      - Transaction Intents
+      summary: Update a transaction intent
+      description: Updates the details of the transaction intent associated with the supplied intent_id
+      operationId: updateTransactionIntent
+      parameters:
+      - name: intent_id
+        in: path
+        required: true
+        description: The unique identifier for the transaction intent
+        schema:
+          type: string
+          example: 3E4F0CCD-ACBF-42F3-A459-6DF92AF632D1
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - customer_id
+              - amount
+              - status
+              - created_at
+              properties:
+                customer_id:
+                  type: string
+                  example: D8CD2346-9A02-4ABB-A388-AB3DACC57DCF
+                amount:
+                  type: integer
+                  example: 100
+                status:
+                  $ref: '#/components/schemas/TransactionIntentStatus'
+                currency:
+                  $ref: '#/components/schemas/TransactionCurrency'
+                network_transaction_id:
+                  type: string
+                  description: The network's unique identifier for the transaction. Examples include Visa Transaction ID, Mastercard Trace ID, and American Express Network Reference ID
+                partner_transaction_id:
+                  type: string
+                  description: The partner's unique transaction id
+                metadata:
+                  type: object
+                  description: Additional transaction intent data
+                  additionalProperties: true
+                  example:
+                    platform_version: 2.1.0
+      responses:
+        '200':
+          description: Transaction intent updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TransactionIntent'
+        '400':
+          description: Invalid request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InvalidRequestError'
+components:
+  schemas:
+    TransactionIntentFoundError:
+      type: object
+      required:
+      - type
+      - message
+      properties:
+        type:
+          type: string
+          description: The category of error being returned.
+          example: TRANSACTION_INTENT_FOUND_ERROR
+        message:
+          type: string
+          description: A message describing the cause of the error.
+          example: 'Transaction intent not found for provided ID: txint_123'
+        param:
+          type: string
+          description: The param causing the error.
+          example: intent_id
+    InvalidRequestError:
+      type: object
+      properties:
+        path:
+          type: string
+          description: The path of the endpoint returning the error
+          example: /v2/customers
+        details:
+          type: array
+          items:
+            type: string
+          description: The details of the error being returned
+          example:
+          - 'email: must be a well-formed email address'
+        error:
+          type: string
+          description: The category of error being returned
+          example: Bad Request
+        status:
+          type: integer
+          description: The HTTP status code of the error
+          example: 400
+        timestamp:
+          type: string
+          description: The timestamp that the error occurred
+          example: '2025-01-20T18:18:22.923+00:00'
+    TransactionIntent:
+      type: object
+      required:
+      - id
+      - customer_id
+      - amount
+      - currency
+      - status
+      - created_at
+      properties:
+        id:
+          type: string
+          example: 5B30532B-5B5B-4826-8DE2-429C57B705FD
+        customer_id:
+          type: string
+          example: 9B5E1EE0-2E1C-46E7-81B9-3C3917204BE4
+        payment_method_id:
+          type: string
+          description: The `payment_method_id` that this `transaction_intent` was executed with.
+          example: DCBFC736-2286-42DD-897D-160DCA80AED2
+        amount:
+          type: integer
+          description: Currency amount
+          example: 10000
+        currency:
+          $ref: '#/components/schemas/TransactionCurrency'
+        status:
+          $ref: '#/components/schemas/TransactionIntentStatus'
+        network_transaction_id:
+          type: string
+          description: The network's unique identifier for the transaction. Examples include Visa Transaction ID, Mastercard Trace ID, and American Express Network Reference ID
+        partner_transaction_id:
+          type: string
+          description: The partner's unique transaction id
+        created_at:
+          type: string
+          description: the RFC-3339 timestamp when the transaction intent was created
+          example: 2025-02-13 19:08:07+00:00
+        updated_at:
+          type: string
+          description: the RFC-3339 timestamp when the transaction intent was last updated
+          example: 2025-02-13 19:08:07+00:00
+        metadata:
+          type: object
+          description: Additional transaction intent data
+          additionalProperties: true
+          example:
+            platform_version: 2.1.0
+    TransactionCurrency:
+      type: string
+      description: The 3-character currency code of the amount in ISO 4217 format (e.g., "USD")
+      example: USD
+    TransactionIntentStatus:
+      type: string
+      enum:
+      - CONFIRMED
+      - CANCELED
+      example: CONFIRMED
+    Address:
+      type: object
+      description: Mailing address information
+      properties:
+        street_line1:
+          type: string
+          description: Primary street address
+          example: 123 Main St
+        street_line2:
+          type: string
+          description: Secondary street address (apartment, suite, etc.)
+          example: Apt 4B
+        city:
+          type: string
+          description: City name
+          example: San Francisco
+        state:
+          type: string
+          description: State or province
+          example: CA
+        postal_code:
+          type: string
+          description: ZIP or postal code
+          example: '94105'
+        country:
+          type: string
+          description: ISO-3166-1 alpha-3 Country Code
+          example: USA
+  parameters:
+    startingAfterParam:
+      name: starting_after
+      in: query
+      description: A cursor for use in pagination. An id that defines your place in the list.
+      schema:
+        type: string
+    limitParam:
+      name: limit
+      in: query
+      description: Limits the number of returned results
+      schema:
+        type: integer
+        minimum: 1
+        default: 10
+        format: int32
+  securitySchemes:
+    basicAuth:
+      type: http
+      scheme: basic
+      description: 'Basic HTTP authentication. Allowed headers-- Authorization: Basic <base64(api_key_id:api_key_secret)>'
+    bearerAuth:
+      bearerFormat: auth-scheme
+      description: 'Bearer HTTP authentication. Allowed headers-- Authorization: Bearer <api_key>'
+      scheme: bearer
+      type: http

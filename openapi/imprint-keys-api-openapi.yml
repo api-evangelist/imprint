@@ -1,0 +1,72 @@
+openapi: 3.1.0
+info:
+  title: Public Imprint Customer Links Keys API
+  version: '2.0'
+servers:
+- url: https://dev.sbx.imprint.co
+  description: Imprint public api sandbox
+security:
+- basicAuth: []
+- bearerAuth: []
+tags:
+- name: Keys
+paths:
+  /v2/keys:
+    post:
+      tags:
+      - Keys
+      summary: Create an API Key
+      description: Creates a new API key
+      operationId: createKey
+      responses:
+        '200':
+          description: API Key created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Key'
+        '401':
+          description: Unauthorized
+    delete:
+      tags:
+      - Keys
+      summary: Delete an API Key
+      description: Deletes an existing API Key
+      operationId: deleteKey
+      responses:
+        '200':
+          description: API Key deleted successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Key'
+        '401':
+          description: Unauthorized
+components:
+  schemas:
+    Key:
+      type: object
+      description: Represents an API Key
+      properties:
+        key:
+          type: string
+          description: API Key value
+          example: test_
+        created_at:
+          type: string
+          description: the RFC-3339 date when the key was created
+          example: 2025-02-13 19:08:07+00:00
+        deleted_at:
+          type: string
+          description: the RFC-3339 date when the key was deleted
+          example: 2025-02-13 19:08:07+00:00
+  securitySchemes:
+    basicAuth:
+      type: http
+      scheme: basic
+      description: 'Basic HTTP authentication. Allowed headers-- Authorization: Basic <base64(api_key_id:api_key_secret)>'
+    bearerAuth:
+      bearerFormat: auth-scheme
+      description: 'Bearer HTTP authentication. Allowed headers-- Authorization: Bearer <api_key>'
+      scheme: bearer
+      type: http

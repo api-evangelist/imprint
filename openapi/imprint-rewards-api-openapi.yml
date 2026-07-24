@@ -1,0 +1,217 @@
+openapi: 3.1.0
+info:
+  title: Public Imprint Customer Links Rewards API
+  version: '2.0'
+servers:
+- url: https://dev.sbx.imprint.co
+  description: Imprint public api sandbox
+security:
+- basicAuth: []
+- bearerAuth: []
+tags:
+- name: Rewards
+paths:
+  /v2/rewards:
+    get:
+      tags:
+      - Rewards
+      summary: Search for rewards
+      operationId: searchRewards
+      parameters:
+      - name: transaction_event_id
+        in: query
+        description: Reward associated to the transaction event
+        schema:
+          type: string
+          example: 40fa8333-f809-4861-9839-45f41d50077d
+      - name: limit
+        $ref: '#/components/parameters/limitParam'
+      - name: starting_after
+        $ref: '#/components/parameters/startingAfterParam'
+      responses:
+        '200':
+          description: List of rewards
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Reward'
+                  has_more:
+                    type: boolean
+                  total:
+                    type: integer
+  /v2/rewards/{reward_id}:
+    get:
+      tags:
+      - Rewards
+      summary: Retrieve a reward
+      description: Retrieves the details of an existing reward by ID
+      operationId: getReward
+      parameters:
+      - name: reward_id
+        in: path
+        required: true
+        description: The unique identifier for the reward
+        schema:
+          type: string
+          example: B552A4A1-9B31-4414-8AEE-E735A8652EDA
+      responses:
+        '200':
+          description: Reward retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Reward'
+        '404':
+          description: Reward not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RewardNotFoundError'
+    patch:
+      tags:
+      - Rewards
+      summary: Updates a reward
+      description: Updates the status or amount of pending rewards
+      operationId: patchReward
+      parameters:
+      - name: reward_id
+        in: path
+        required: true
+        schema:
+          type: string
+          example: 2EE24580-B97B-4949-A65C-929CCB9B9B8D
+        description: Unique identifier for the reward
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                amount:
+                  type: integer
+                  description: amount to update the reward
+                  example: 120000
+                status:
+                  $ref: '#/components/schemas/RewardStatus'
+      responses:
+        '200':
+          description: Reward updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Reward'
+components:
+  schemas:
+    RewardNotFoundError:
+      type: object
+      required:
+      - type
+      - message
+      properties:
+        type:
+          type: string
+          description: The category of error being returned
+          example: REWARD_NOT_FOUND_ERROR
+        message:
+          type: string
+          description: A message describing the cause of the error.
+          example: 'Reward not found for provided ID: pymd_123'
+        param:
+          type: string
+          description: The param causing the error
+          example: reward_id
+    RewardCurrency:
+      type: string
+      description: The 3-character currency code of the amount in ISO 4217 format (e.g., "USD") or a reward unit (e.g., "POINTS")
+      example: POINTS
+    Reward:
+      type: object
+      required:
+      - id
+      - customer_id
+      - amount
+      - status
+      - type
+      - created_at
+      properties:
+        id:
+          type: string
+          example: 2EE24580-B97B-4949-A65C-929CCB9B9B8D
+        customer_id:
+          type: string
+          example: 9B5E1EE0-2E1C-46E7-81B9-3C3917204BE4
+        transaction_event_id:
+          type: string
+          description: transaction that generated this reward, if applicable.
+          example: E777214A-2D11-4CAD-9E8F-E1BD71D9FE67
+        amount:
+          type: integer
+          description: reward amount in min units.
+        type:
+          $ref: '#/components/schemas/RewardType'
+        currency:
+          $ref: '#/components/schemas/RewardCurrency'
+        status:
+          $ref: '#/components/schemas/RewardStatus'
+        created_at:
+          type: string
+          description: the RFC-3339 timestamp when the reward was created
+          example: 2025-02-13 19:08:07+00:00
+        updated_at:
+          type: string
+          description: the RFC-3339 timestamp when the reward was last updated
+          example: 2025-02-13 19:08:07+00:00
+        metadata:
+          type: object
+          additionalProperties: true
+          example:
+            platform_version: 2.1.0
+    RewardStatus:
+      type: string
+      enum:
+      - PENDING
+      - AVAILABLE
+      - PENDING_DEDUCTION
+      - DEDUCTED
+      example: PENDING
+    RewardType:
+      type: string
+      enum:
+      - OFFER
+      - TRANSACTION
+      - ONE_TIME
+      - STATEMENT
+      - REFERRAL
+      example: TRANSACTION
+  parameters:
+    startingAfterParam:
+      name: starting_after
+      in: query
+      description: A cursor for use in pagination. An id that defines your place in the list.
+      schema:
+        type: string
+    limitParam:
+      name: limit
+      in: query
+      description: Limits the number of returned results
+      schema:
+        type: integer
+        minimum: 1
+        default: 10
+        format: int32
+  securitySchemes:
+    basicAuth:
+      type: http
+      scheme: basic
+      description: 'Basic HTTP authentication. Allowed headers-- Authorization: Basic <base64(api_key_id:api_key_secret)>'
+    bearerAuth:
+      bearerFormat: auth-scheme
+      description: 'Bearer HTTP authentication. Allowed headers-- Authorization: Bearer <api_key>'
+      scheme: bearer
+      type: http

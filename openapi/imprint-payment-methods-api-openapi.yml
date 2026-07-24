@@ -1,0 +1,417 @@
+openapi: 3.1.0
+info:
+  title: Public Imprint Customer Links Payment Methods API
+  version: '2.0'
+servers:
+- url: https://dev.sbx.imprint.co
+  description: Imprint public api sandbox
+security:
+- basicAuth: []
+- bearerAuth: []
+tags:
+- name: Payment Methods
+paths:
+  /v2/payment_methods:
+    get:
+      tags:
+      - Payment Methods
+      summary: List payment methods
+      operationId: searchPaymentMethods
+      parameters:
+      - name: customer_id
+        in: query
+        required: true
+        description: The unique identifier for the customer
+        schema:
+          type: string
+          example: DE92AF9E-E705-4B8E-9184-6D976DBD8050
+      - name: type
+        in: query
+        description: The type of payment method to filter by
+        schema:
+          type: string
+          enum:
+          - LOAN
+          - CARD
+          - BANK_ACCOUNT
+          example: LOAN
+      - name: limit
+        $ref: '#/components/parameters/limitParam'
+      - name: starting_after
+        $ref: '#/components/parameters/startingAfterParam'
+      responses:
+        '200':
+          description: List of customer payment methods
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/PaymentMethod'
+                  has_more:
+                    type: boolean
+                  total:
+                    type: integer
+    post:
+      tags:
+      - Payment Methods
+      summary: List payment methods
+      operationId: searchPaymentMethodsPost
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - customer_id
+              properties:
+                customer_id:
+                  type: string
+                  description: The Imprint customer id
+                  example: 54CFF41D-0AA0-4D16-853B-608C5AAF503D
+                type:
+                  type: string
+                  description: The type of payment method to filter by
+                  enum:
+                  - LOAN
+                  - CARD
+                  - BANK_ACCOUNT
+                  example: CARD
+                pan:
+                  type: string
+                  description: The card pan to search by
+                  example: '4111111592341815'
+      responses:
+        '200':
+          description: List of customer payment methods
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/PaymentMethod'
+                  has_more:
+                    type: boolean
+                  total:
+                    type: integer
+        '400':
+          description: Invalid request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InvalidRequestError'
+  /v2/payment_methods/{payment_method_id}:
+    get:
+      tags:
+      - Payment Methods
+      summary: Retrieve a payment method
+      description: Retrieves the details of the payment method associated with the supplied `payment_method_id`
+      operationId: getPaymentMethod
+      parameters:
+      - name: payment_method_id
+        in: path
+        required: true
+        description: The unique identifier of the payment method
+        schema:
+          type: string
+          example: 9ED4FE47-8E9C-48E9-BBEF-094DF1789012
+      responses:
+        '200':
+          description: Payment method retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaymentMethod'
+        '404':
+          description: Payment method not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaymentMethodNotFoundError'
+components:
+  schemas:
+    CardDesignID:
+      type: string
+      description: Imprint ID for the graphic design printed on the card
+      example: 3b9c1f3e-52a0-44c1-b131-a7ab0099a214
+    CardType:
+      type: string
+      description: The type of card
+      enum:
+      - PHYSICAL
+      - VIRTUAL
+      - UNIFIED
+    InvalidRequestError:
+      type: object
+      properties:
+        path:
+          type: string
+          description: The path of the endpoint returning the error
+          example: /v2/customers
+        details:
+          type: array
+          items:
+            type: string
+          description: The details of the error being returned
+          example:
+          - 'email: must be a well-formed email address'
+        error:
+          type: string
+          description: The category of error being returned
+          example: Bad Request
+        status:
+          type: integer
+          description: The HTTP status code of the error
+          example: 400
+        timestamp:
+          type: string
+          description: The timestamp that the error occurred
+          example: '2025-01-20T18:18:22.923+00:00'
+    PaymentMethod:
+      type: object
+      required:
+      - id
+      - type
+      - customer_id
+      - created_at
+      - status
+      - metadata
+      properties:
+        id:
+          type: string
+          example: DCBFC736-2286-42DD-897D-160DCA80AED2
+          description: The unique ID Imprint assigns to the payment method.
+        type:
+          type: string
+          description: The type of payment method
+          enum:
+          - CARD
+          - BANK_ACCOUNT
+          - LOAN
+        customer_id:
+          type: string
+          description: The `id` of the Imprint customer that the payment method belongs to.
+          example: B40A789E-BD46-4BB9-B63E-F9919582694C
+        card:
+          type: object
+          description: When payment method is a `CARD` type, this object will have card specific data.
+          required:
+          - last4
+          - brand
+          properties:
+            last4:
+              type: string
+              example: '1234'
+              minLength: 4
+              maxLength: 4
+              description: The last 4 digits of the card PAN
+            network:
+              type: string
+              description: Name of the card issuer
+              enum:
+              - VISA
+              - MASTERCARD
+              - AMEX
+              - ''
+            card_type:
+              $ref: '#/components/schemas/CardType'
+            card_design_id:
+              $ref: '#/components/schemas/CardDesignID'
+            exp_month:
+              type: string
+              description: The month the card expires (MM format).
+              example: '06'
+            exp_year:
+              type: string
+              description: The year the card expires (YYYY format).
+              example: '2027'
+            pci_details:
+              type: object
+              description: The pci details of the returned card. Only verified PCI compliant partners will be able to retrieve pci details in production environments.
+              properties:
+                pan:
+                  type: string
+                  description: The unique 16-digit number printed on the front of a payment card, used to identify the cardholder's account.
+                  example: '5105105105105100'
+                exp_month:
+                  type: string
+                  description: The month the card expires
+                  example: '06'
+                exp_year:
+                  type: string
+                  description: The year the card expires
+                  example: '26'
+                cvv:
+                  type: string
+                  description: A three- or four-digit security code used to verify card-not-present transactions and prevent fraud.
+                  example: '123'
+            tokens:
+              type: array
+              description: Payment method tokens that are defined by a third-party provider are included in this array by Imprint.
+              items:
+                $ref: '#/components/schemas/PaymentMethodToken'
+        bank_account:
+          type: object
+          description: When payment method is a `BANK_ACCOUNT` type, this object will have bank account specific data.
+          required:
+          - last4
+          - routing_number
+          - bank_name
+          properties:
+            last4:
+              type: string
+              example: '1234'
+              description: Last 4 numbers of the account.
+              minLength: 4
+              maxLength: 4
+            routing_number:
+              type: string
+              description: The bank routing number assigned to this account.
+            bank_name:
+              type: string
+              example: Wells Fargo
+              description: Name of the banking institution
+            account_type:
+              type: string
+              description: Type of the account.
+              enum:
+              - CHECKING
+              - SAVINGS
+        loan:
+          type: object
+          description: When payment method is a `LOAN` type, this object will have loan specific data.
+          required:
+          - amount
+          - term_months
+          properties:
+            amount:
+              type: integer
+              description: Amount in min units.
+              example: 10000
+            currency:
+              $ref: '#/components/schemas/TransactionCurrency'
+            remaining_balance:
+              type: integer
+              description: remaining unspent balance on the loan
+            term_months:
+              type: integer
+              description: Length of the loan term in months
+              example: 12
+            apr:
+              type: string
+              description: Annual percentage rate of the loan in floating point
+              example: '5.89'
+            loan_status:
+              type: string
+              description: Current status of the loan
+              enum:
+              - PENDING
+              - APPROVED
+              - REJECTED
+              - ACTIVE
+              - CLOSED
+        created_at:
+          type: string
+          description: the RFC-3339 timestamp when the payment method was created
+          example: 2025-02-13 19:08:07+00:00
+        updated_at:
+          type: string
+          description: the RFC-3339 timestamp when the payment method was last updated
+          example: 2025-02-13 19:08:07+00:00
+        status:
+          type: string
+          description: Current status of the payment method
+          enum:
+          - ACTIVE
+          - INACTIVE
+          - CANCELED
+        metadata:
+          type: object
+          additionalProperties: true
+          description: Additional metadata for the payment method
+          example:
+            platform_version: 2.1.0
+    PaymentMethodToken:
+      type: object
+      required:
+      - type
+      - token
+      - created_at
+      - updated_at
+      properties:
+        type:
+          type: string
+          enum:
+          - ADYEN
+          - APPLE_WALLET
+          - CYBERSOURCE
+          - WORLDPAY
+        token:
+          type: string
+          description: The token, as defined by the processor
+        pan_reference_id:
+          type: string
+          description: An ID that represents the PAN and is defined by the processor
+        created_at:
+          type: string
+          description: the RFC-3339 timestamp when the payment method was created
+          example: 2025-02-13 19:08:07+00:00
+        updated_at:
+          type: string
+          example: 2025-02-13 19:08:07+00:00
+          description: the RFC-3339 timestamp when the payment method was updated
+    TransactionCurrency:
+      type: string
+      description: The 3-character currency code of the amount in ISO 4217 format (e.g., "USD")
+      example: USD
+    PaymentMethodNotFoundError:
+      type: object
+      required:
+      - type
+      - message
+      properties:
+        type:
+          type: string
+          description: The category of error being returned
+          example: PAYMENT_METHOD_NOT_FOUND_ERROR
+        message:
+          type: string
+          description: A message describing the cause of the error.
+          example: 'Payment method not found for provided ID: pymd_123'
+        param:
+          type: string
+          description: The param causing the error
+          example: payment_method_id
+  parameters:
+    startingAfterParam:
+      name: starting_after
+      in: query
+      description: A cursor for use in pagination. An id that defines your place in the list.
+      schema:
+        type: string
+    limitParam:
+      name: limit
+      in: query
+      description: Limits the number of returned results
+      schema:
+        type: integer
+        minimum: 1
+        default: 10
+        format: int32
+  securitySchemes:
+    basicAuth:
+      type: http
+      scheme: basic
+      description: 'Basic HTTP authentication. Allowed headers-- Authorization: Basic <base64(api_key_id:api_key_secret)>'
+    bearerAuth:
+      bearerFormat: auth-scheme
+      description: 'Bearer HTTP authentication. Allowed headers-- Authorization: Bearer <api_key>'
+      scheme: bearer
+      type: http

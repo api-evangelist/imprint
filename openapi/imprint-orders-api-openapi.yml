@@ -1,0 +1,268 @@
+openapi: 3.1.0
+info:
+  title: Public Imprint Customer Links Orders API
+  version: '2.0'
+servers:
+- url: https://dev.sbx.imprint.co
+  description: Imprint public api sandbox
+security:
+- basicAuth: []
+- bearerAuth: []
+tags:
+- name: Orders
+paths:
+  /v2/orders:
+    get:
+      tags:
+      - Orders
+      summary: Retrieve orders
+      description: Get a list of orders
+      operationId: listOrders
+      parameters:
+      - name: id
+        in: query
+        description: An order ID. If provided, the response will only have a maximum of one result.
+        schema:
+          type: string
+        example: 77f60af4-185e-4867-b113-34e3cf7c6acd
+      - name: partner_order_id
+        in: query
+        description: Partner's order identifier
+        schema:
+          type: string
+        example: o-c8a1fe46bbff4a18ba1d
+      responses:
+        '200':
+          description: List of orders
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OrdersResponse'
+    post:
+      tags:
+      - Orders
+      summary: Create orders
+      description: Create new orders
+      operationId: createOrder
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/OrderBase'
+      responses:
+        '200':
+          description: Orders created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Order'
+  /v2/orders/{order_id}:
+    put:
+      tags:
+      - Orders
+      summary: Modify order
+      description: Modify an existing order
+      operationId: putOrder
+      parameters:
+      - name: order_id
+        in: path
+        required: true
+        schema:
+          type: string
+        description: Unique identifier for the order
+        example: 77f60af4-185e-4867-b113-34e3cf7c6acd
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/OrderBase'
+      responses:
+        '200':
+          description: Order modified successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Order'
+    delete:
+      tags:
+      - Orders
+      summary: Delete order
+      description: Delete an existing order
+      operationId: deleteOrder
+      parameters:
+      - name: order_id
+        in: path
+        required: true
+        schema:
+          type: string
+        description: Unique identifier for the order
+        example: 77f60af4-185e-4867-b113-34e3cf7c6acd
+      responses:
+        '204':
+          description: Order deleted successfully
+components:
+  schemas:
+    CurrencyAmount:
+      type: integer
+      description: Amount in the smallest currency unit (e.g., cents for USD)
+    OrderBase:
+      type: object
+      required:
+      - payment_method_id
+      - total_order_amount
+      - partner_order_id
+      properties:
+        id:
+          type: string
+          description: Unique identifier for the order
+          example: 77f60af4-185e-4867-b113-34e3cf7c6acd
+        customer_id:
+          type: string
+          description: Customer identifier
+          example: 1bb0ab64-ed57-4f2f-bd8d-ab04d1a365c5
+        payment_method_id:
+          type: string
+          description: Payment method identifier
+          example: 0144ea84-3c39-4382-a37a-03c699b77646
+        partner_order_id:
+          type: string
+          description: Partner's order identifier
+          example: o-c8a1fe46bbff4a18ba1d
+        merchant_id:
+          type: string
+          nullable: true
+          description: Merchant identifier
+          example: m-123456789
+        merchant_name:
+          type: string
+          nullable: true
+          description: Merchant name
+          example: Rest Assured
+        merchant_address:
+          type: array
+          items:
+            $ref: '#/components/schemas/Address'
+          description: List of merchant addresses
+        order_lines:
+          type: array
+          items:
+            $ref: '#/components/schemas/OrderLine'
+          description: 'An array of items that make up the order, used for the purpose of establishing the items, amounts, and rewards that are *expected* to be included in events sent to Imprint following order creation.
+
+            Changes made to orders after the order is created can be implicitly communicated to Imprint through the event creation process following the creation of the order; modifying the order itself is not necessary. The set of events sent to Imprint after order creation serve as the final source of truth for transaction amounts, rewards, order lines, etc.
+
+            When provided, the API will require that the calculated sum of all the rates and rewards rates within (taking quantities into account) are equal to the `total_order_amount` and `total_rewards_amount`, respectively.'
+          example:
+          - name: Couch Supreme
+            product_url: www.restassured.com/couch-supreme
+            quantity: 1
+            rate: 274999
+            rewards_rate: 2500
+        total_order_amount:
+          allOf:
+          - $ref: '#/components/schemas/CurrencyAmount'
+          - example: 274999
+            description: Total order amount ($2,699.99 + $50.00)
+        total_rewards_amount:
+          allOf:
+          - $ref: '#/components/schemas/CurrencyAmount'
+          - example: 2500
+            description: Total rewards amount ($25 + $0)
+        currency:
+          type: string
+          description: The 3-character currency code of the amount in ISO 4217 format (e.g., "USD")
+          example: USD
+        created_at:
+          type: string
+          format: date-time
+          nullable: true
+          description: The RFC-3339 timestamp when the order was created
+          example: '2025-02-13T19:08:07Z'
+        updated_at:
+          type: string
+          format: date-time
+          nullable: true
+          description: The RFC-3339 timestamp when the order was last updated
+          example: '2025-02-13T19:08:07Z'
+    Order:
+      allOf:
+      - $ref: '#/components/schemas/OrderBase'
+    OrderLine:
+      type: object
+      required:
+      - name
+      - quantity
+      - rate
+      - rewards_rate
+      properties:
+        name:
+          type: string
+          description: Name of the order line item
+          example: Couch Supreme
+        product_url:
+          type: string
+          nullable: true
+          description: URL to the product
+          example: www.restassured.com/couch-supreme
+        quantity:
+          type: integer
+          description: Quantity of the item
+          example: 1
+        rate:
+          allOf:
+          - $ref: '#/components/schemas/CurrencyAmount'
+          - example: 274999
+        rewards_rate:
+          allOf:
+          - $ref: '#/components/schemas/CurrencyAmount'
+          - example: 2500
+    OrdersResponse:
+      type: object
+      required:
+      - orders
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/Order'
+          description: List of orders
+    Address:
+      type: object
+      description: Mailing address information
+      properties:
+        street_line1:
+          type: string
+          description: Primary street address
+          example: 123 Main St
+        street_line2:
+          type: string
+          description: Secondary street address (apartment, suite, etc.)
+          example: Apt 4B
+        city:
+          type: string
+          description: City name
+          example: San Francisco
+        state:
+          type: string
+          description: State or province
+          example: CA
+        postal_code:
+          type: string
+          description: ZIP or postal code
+          example: '94105'
+        country:
+          type: string
+          description: ISO-3166-1 alpha-3 Country Code
+          example: USA
+  securitySchemes:
+    basicAuth:
+      type: http
+      scheme: basic
+      description: 'Basic HTTP authentication. Allowed headers-- Authorization: Basic <base64(api_key_id:api_key_secret)>'
+    bearerAuth:
+      bearerFormat: auth-scheme
+      description: 'Bearer HTTP authentication. Allowed headers-- Authorization: Bearer <api_key>'
+      scheme: bearer
+      type: http
