@@ -1,0 +1,3320 @@
+openapi: 3.1.0
+info:
+  title: Public Imprint API
+  version: '2.0'
+security:
+  - basicAuth: []
+  - bearerAuth: []
+servers:
+  - url: https://dev.sbx.imprint.co
+    description: Imprint public api sandbox
+paths:
+  /v2/customers:
+    get:
+      tags:
+        - Customers
+      summary: Search for customers
+      operationId: searchCustomers
+      parameters:
+        - name: partner_customer_id
+          in: query
+          description: The unique identifier for the customer in the partner's system
+          schema:
+            type: string
+        - name: limit
+          $ref: '#/components/parameters/limitParam'
+        - name: starting_after
+          $ref: '#/components/parameters/startingAfterParam'
+      responses:
+        '200':
+          description: List of customers
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CustomerListResponse'
+    post:
+      tags:
+        - Customers
+      summary: Search for customers
+      operationId: searchCustomersPost
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                partner_customer_id:
+                  description: >-
+                    The unique identifier for the customer in the partner's
+                    system
+                  type: string
+                ssn:
+                  description: The ssn of the customer without hyphens
+                  example: '123456789'
+                  type: string
+                date_of_birth:
+                  $ref: '#/components/schemas/DateOfBirth'
+                limit:
+                  description: Limits the number of returned results
+                  type: integer
+                  minimum: 1
+                  default: 10
+                  format: int32
+                starting_after:
+                  description: >-
+                    A cursor for use in pagination. An id that defines your
+                    place in the list.
+                  type: string
+      responses:
+        '200':
+          description: List of customers
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CustomerListResponse'
+  /v2/customers/{customer_id}:
+    get:
+      tags:
+        - Customers
+      summary: Retrieve a customer
+      description: Retrieves the details of an existing customer by ID
+      operationId: getCustomer
+      parameters:
+        - name: customer_id
+          in: path
+          required: true
+          description: The unique identifier for the customer
+          schema:
+            type: string
+            example: BBB815E9-F654-438D-9AD3-3F7BB8136FC0
+      responses:
+        '200':
+          description: Customer retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Customer'
+        '404':
+          description: Customer not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CustomerNotFoundError'
+  /v2/customers/{customer_id}/link:
+    post:
+      tags:
+        - Customer Links
+      summary: Link an Imprint customer and partner customer accounts
+      description: >-
+        Creates a link between an existing Imprint customer and a partner's
+        customer account. The API key provided with the request will be used to
+        link the partner with the imprint customer.
+      operationId: linkCustomerAccount
+      parameters:
+        - name: customer_id
+          in: path
+          required: true
+          description: The unique identifier for the Imprint customer
+          schema:
+            type: string
+            example: BBB815E9-F654-438D-9AD3-3F7BB8136FC0
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - partner_customer_id
+              properties:
+                partner_customer_id:
+                  $ref: '#/components/schemas/PartnerCustomerId'
+                metadata:
+                  type: object
+                  description: Additional linking metadata
+                  additionalProperties: true
+                  example:
+                    store_id: store_789
+                    platform_version: 2.1.0
+      responses:
+        '200':
+          description: Customer accounts linked successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CustomerLink'
+        '400':
+          description: Invalid request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InvalidRequestError'
+        '404':
+          description: Customer not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CustomerNotFoundError'
+        '409':
+          description: Customer already linked
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - error
+                properties:
+                  error:
+                    type: object
+                    required:
+                      - type
+                      - message
+                    properties:
+                      type:
+                        type: string
+                        description: Error type (e.g., CUSTOMER_ALREADY_LINKED)
+                      message:
+                        type: string
+                        example: Customer already linked to a partner account
+                      existing_link:
+                        $ref: '#/components/schemas/CustomerLink'
+  /v2/customer_sessions:
+    post:
+      tags:
+        - Customer Sessions
+      summary: Create a new customer session
+      description: >-
+        Creates a new session for a customer with a client_secret that can be
+        passed to the SDK, providing client access to modify their own profile,
+        card, or card/loan application. If required, a new customer will be
+        created to attach this session to. Customer history can be attached to
+        this session and will be included in the customer's profile if created,
+        or attached to the application the customer creates during the session
+      operationId: createSession
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                customer_id:
+                  type: string
+                  description: >-
+                    Unique identifier for the Imprint customer, if creating a
+                    customer session for a known imprint customer that the id is
+                    available for
+                  example: AD87A18A-A4BE-49FF-BC46-BF6F0779DBAA
+                partner_customer_id:
+                  type: string
+                  description: >-
+                    The unique identifier for the customer in the partner's
+                    system
+                  example: CUST_03476998
+                transaction_amount:
+                  type: integer
+                  description: >-
+                    The current transaction amount, if the session is currently
+                    executing a transaction. integer value in the min currency
+                    unit (cents for USD)
+                  example: 34000
+                transaction_currency:
+                  type: string
+                  description: The 3 char currency code of the amount in iso-4217
+                  example: USD
+                customer_history:
+                  $ref: '#/components/schemas/CustomerAccountHistory'
+                source:
+                  type: string
+                  description: The source where the session is initiated
+                metadata:
+                  type: object
+                  description: Additional linking metadata
+                  additionalProperties: true
+                  example:
+                    store_number: '123'
+                customer_metadata:
+                  type: object
+                  description: >-
+                    A set of key-value pairs attached to the customer. These
+                    values will be included in webhook event payloads for the
+                    partner to receive information about the customer.
+                  additionalProperties:
+                    type: string
+                  example:
+                    loyalty_id: '840012345678'
+                    membership_tier: gold
+      responses:
+        '201':
+          description: Customer session created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CustomerSession'
+        '400':
+          description: Invalid request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InvalidRequestError'
+  /v2/customer_sessions/{session_id}:
+    get:
+      tags:
+        - Customer Sessions
+      summary: Retrieve a session
+      operationId: getSession
+      parameters:
+        - name: session_id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Customer session retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CustomerSession'
+        '404':
+          description: Session not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SessionNotFoundError'
+  /v2/payment_methods:
+    get:
+      tags:
+        - Payment Methods
+      summary: List payment methods
+      operationId: searchPaymentMethods
+      parameters:
+        - name: customer_id
+          in: query
+          required: true
+          description: The unique identifier for the customer
+          schema:
+            type: string
+            example: DE92AF9E-E705-4B8E-9184-6D976DBD8050
+        - name: type
+          in: query
+          description: The type of payment method to filter by
+          schema:
+            type: string
+            enum:
+              - LOAN
+              - CARD
+              - BANK_ACCOUNT
+            example: LOAN
+        - name: limit
+          $ref: '#/components/parameters/limitParam'
+        - name: starting_after
+          $ref: '#/components/parameters/startingAfterParam'
+      responses:
+        '200':
+          description: List of customer payment methods
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/PaymentMethod'
+                  has_more:
+                    type: boolean
+                  total:
+                    type: integer
+    post:
+      tags:
+        - Payment Methods
+      summary: List payment methods
+      operationId: searchPaymentMethodsPost
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - customer_id
+              properties:
+                customer_id:
+                  type: string
+                  description: The Imprint customer id
+                  example: 54CFF41D-0AA0-4D16-853B-608C5AAF503D
+                type:
+                  type: string
+                  description: The type of payment method to filter by
+                  enum:
+                    - LOAN
+                    - CARD
+                    - BANK_ACCOUNT
+                  example: CARD
+                pan:
+                  type: string
+                  description: The card pan to search by
+                  example: '4111111592341815'
+      responses:
+        '200':
+          description: List of customer payment methods
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/PaymentMethod'
+                  has_more:
+                    type: boolean
+                  total:
+                    type: integer
+        '400':
+          description: Invalid request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InvalidRequestError'
+  /v2/payment_methods/{payment_method_id}:
+    get:
+      tags:
+        - Payment Methods
+      summary: Retrieve a payment method
+      description: >-
+        Retrieves the details of the payment method associated with the supplied
+        `payment_method_id`
+      operationId: getPaymentMethod
+      parameters:
+        - name: payment_method_id
+          in: path
+          required: true
+          description: The unique identifier of the payment method
+          schema:
+            type: string
+            example: 9ED4FE47-8E9C-48E9-BBEF-094DF1789012
+      responses:
+        '200':
+          description: Payment method retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaymentMethod'
+        '404':
+          description: Payment method not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaymentMethodNotFoundError'
+  /v2/transaction_intents:
+    post:
+      tags:
+        - Transaction Intents
+      summary: Create a transaction intent
+      description: >-
+        Creates a transaction intent object that represents a pending financial
+        transaction. Transaction intents are used to initiate, validate, and
+        track the lifecycle of a transaction before it is finalized.
+      operationId: createTransactionIntent
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - customer_id
+                - amount
+                - currency
+              properties:
+                customer_id:
+                  type: string
+                  description: >-
+                    The Imprint Customer ID of the customer making the
+                    transaction intent
+                  example: F9B5A5E8-C8B0-4B7A-8E6B-0C8EE90A62CF
+                payment_method_id:
+                  type: string
+                amount:
+                  type: integer
+                  description: Amount in min units.
+                  example: 10000
+                currency:
+                  $ref: '#/components/schemas/TransactionCurrency'
+                network_transaction_id:
+                  type: string
+                  description: >-
+                    The network's unique identifier for the transaction.
+                    Examples include Visa Transaction ID, Mastercard Trace ID,
+                    and American Express Network Reference ID
+                merchant_name:
+                  type: string
+                  description: The name of the merchant this transaction intent will be
+                  example: walmart
+                merchant_address:
+                  $ref: '#/components/schemas/Address'
+                merchant_id:
+                  type: string
+                merchant_code:
+                  type: string
+                expected_date:
+                  type: string
+                  description: >-
+                    the RFC-3339 date when the transaction is expected to
+                    process. This does not have to be exact but it will be used
+                    as a data point to help link a transaction with a
+                    transaction intent. This example includes date and time to
+                    be explict, any RFC3339 date or date+time will be accepted
+                  example: 2025-02-13T19:08:07.000Z
+                metadata:
+                  type: object
+                  additionalProperties: true
+                  example:
+                    platform_version: 2.1.0
+      responses:
+        '200':
+          description: Transaction intent created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TransactionIntent'
+        '400':
+          description: Invalid request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InvalidRequestError'
+    get:
+      tags:
+        - Transaction Intents
+      summary: List transaction intents
+      description: Retrieves a list of transaction intents.
+      operationId: searchTransactionIntents
+      parameters:
+        - name: type
+          in: query
+          description: The type of transaction intent to filter by.
+          schema:
+            type: string
+            enum:
+              - CONFIRMED
+              - CANCELED
+            example: CONFIRMED
+        - name: limit
+          $ref: '#/components/parameters/limitParam'
+        - name: starting_after
+          $ref: '#/components/parameters/startingAfterParam'
+      responses:
+        '200':
+          description: List of transaction intents
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/TransactionIntent'
+                  has_more:
+                    type: boolean
+                  total:
+                    type: integer
+  /v2/transaction_intents/{intent_id}:
+    get:
+      tags:
+        - Transaction Intents
+      summary: Retrieve a transaction intent
+      description: Retrieves the details of an existing transaction intent by `id`.
+      operationId: getTransactionIntent
+      parameters:
+        - name: intent_id
+          in: path
+          required: true
+          description: The unique identifier for the transaction intent.
+          schema:
+            type: string
+            example: 3E4F0CCD-ACBF-42F3-A459-6DF92AF632D1
+      responses:
+        '200':
+          description: Transaction intent retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TransactionIntent'
+        '404':
+          description: Transaction intent not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TransactionIntentFoundError'
+    post:
+      tags:
+        - Transaction Intents
+      summary: Update a transaction intent
+      description: >-
+        Updates the details of the transaction intent associated with the
+        supplied intent_id
+      operationId: updateTransactionIntent
+      parameters:
+        - name: intent_id
+          in: path
+          required: true
+          description: The unique identifier for the transaction intent
+          schema:
+            type: string
+            example: 3E4F0CCD-ACBF-42F3-A459-6DF92AF632D1
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - customer_id
+                - amount
+                - status
+                - created_at
+              properties:
+                customer_id:
+                  type: string
+                  example: D8CD2346-9A02-4ABB-A388-AB3DACC57DCF
+                amount:
+                  type: integer
+                  example: 100
+                status:
+                  $ref: '#/components/schemas/TransactionIntentStatus'
+                currency:
+                  $ref: '#/components/schemas/TransactionCurrency'
+                network_transaction_id:
+                  type: string
+                  description: >-
+                    The network's unique identifier for the transaction.
+                    Examples include Visa Transaction ID, Mastercard Trace ID,
+                    and American Express Network Reference ID
+                partner_transaction_id:
+                  type: string
+                  description: The partner's unique transaction id
+                metadata:
+                  type: object
+                  description: Additional transaction intent data
+                  additionalProperties: true
+                  example:
+                    platform_version: 2.1.0
+      responses:
+        '200':
+          description: Transaction intent updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TransactionIntent'
+        '400':
+          description: Invalid request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InvalidRequestError'
+  /v2/transactions/{transaction_id}:
+    get:
+      tags:
+        - Transactions
+      summary: Retrieve a transaction
+      description: Retrieves the details of an existing transaction by `id`
+      operationId: getTransaction
+      parameters:
+        - name: transaction_id
+          in: path
+          required: true
+          description: The unique identifier for the transaction
+          schema:
+            type: string
+            example: 4E6FE207-53E5-4EC0-BF51-5923BE5CEE2F
+      responses:
+        '200':
+          description: Transaction retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Transaction'
+        '404':
+          description: Transaction not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TransactionNotFoundError'
+  /v2/rewards:
+    get:
+      tags:
+        - Rewards
+      summary: Search for rewards
+      operationId: searchRewards
+      parameters:
+        - name: transaction_event_id
+          in: query
+          description: Reward associated to the transaction event
+          schema:
+            type: string
+            example: 40fa8333-f809-4861-9839-45f41d50077d
+        - name: limit
+          $ref: '#/components/parameters/limitParam'
+        - name: starting_after
+          $ref: '#/components/parameters/startingAfterParam'
+      responses:
+        '200':
+          description: List of rewards
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Reward'
+                  has_more:
+                    type: boolean
+                  total:
+                    type: integer
+  /v2/rewards/{reward_id}:
+    get:
+      tags:
+        - Rewards
+      summary: Retrieve a reward
+      description: Retrieves the details of an existing reward by ID
+      operationId: getReward
+      parameters:
+        - name: reward_id
+          in: path
+          required: true
+          description: The unique identifier for the reward
+          schema:
+            type: string
+            example: B552A4A1-9B31-4414-8AEE-E735A8652EDA
+      responses:
+        '200':
+          description: Reward retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Reward'
+        '404':
+          description: Reward not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RewardNotFoundError'
+    patch:
+      tags:
+        - Rewards
+      summary: Updates a reward
+      description: Updates the status or amount of pending rewards
+      operationId: patchReward
+      parameters:
+        - name: reward_id
+          in: path
+          required: true
+          schema:
+            type: string
+            example: 2EE24580-B97B-4949-A65C-929CCB9B9B8D
+          description: Unique identifier for the reward
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                amount:
+                  type: integer
+                  description: amount to update the reward
+                  example: 120000
+                status:
+                  $ref: '#/components/schemas/RewardStatus'
+      responses:
+        '200':
+          description: Reward updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Reward'
+  /v2/customers/{customer_id}/rewards_balance:
+    get:
+      tags:
+        - Customers
+      summary: Get customer's current rewards balance
+      operationId: getRewardsBalance
+      parameters:
+        - name: customer_id
+          $ref: '#/components/parameters/customerIdParam'
+      responses:
+        '200':
+          description: Customer rewards balance
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - customer_id
+                  - reward_balance
+                  - reward_symbol
+                properties:
+                  customer_id:
+                    type: string
+                    description: The unique identifier for the customer
+                    example: 2EE24580-B97B-4949-A65C-929CCB9B9B8D
+                  reward_balance:
+                    type: integer
+                    description: The integer value of the customer's rewards balance
+                    example: 120000
+                  reward_symbol:
+                    type: string
+                    description: >-
+                      The symbol for the rewards. Can be in currency like `$` or
+                      things like `points`
+                  reward_description:
+                    type: string
+                    description: >-
+                      The description of the rewards, can be displayed to the
+                      customer
+        '404':
+          description: Customer not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CustomerNotFoundError'
+  /v2/customers/{customer_id}/payment_methods:
+    get:
+      tags:
+        - Customers
+      summary: List customer's payment methods
+      operationId: getPaymentMethods
+      parameters:
+        - name: customer_id
+          $ref: '#/components/parameters/customerIdParam'
+      responses:
+        '200':
+          description: Customer rewards balance
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/PaymentMethod'
+        '404':
+          description: Customer not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CustomerNotFoundError'
+  /v2/customers/{customer_id}/transaction_intents:
+    get:
+      tags:
+        - Customers
+      summary: List customer's transaction intents
+      operationId: getTransactionIntents
+      parameters:
+        - name: customer_id
+          in: path
+          $ref: '#/components/parameters/customerIdParam'
+      responses:
+        '200':
+          description: Customer transaction intents
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/TransactionIntent'
+        '404':
+          description: Transaction not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TransactionNotFoundError'
+  /v2/customers/{customer_id}/transactions:
+    get:
+      tags:
+        - Customers
+      summary: List customer's transactions
+      operationId: getTransactions
+      parameters:
+        - name: customer_id
+          $ref: '#/components/parameters/customerIdParam'
+        - name: limit
+          $ref: '#/components/parameters/limitParam'
+        - name: starting_after
+          $ref: '#/components/parameters/startingAfterParam'
+      responses:
+        '200':
+          description: List of customer transactions
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Transaction'
+                  has_more:
+                    type: boolean
+                  total:
+                    type: integer
+        '404':
+          description: Customer not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CustomerNotFoundError'
+  /v2/customers/{customer_id}/rewards:
+    get:
+      tags:
+        - Customers
+      summary: List customer's rewards
+      description: >-
+        List customer's rewards in descending order by the reward's updated at
+        timestamp
+      operationId: getRewards
+      parameters:
+        - name: customer_id
+          $ref: '#/components/parameters/customerIdParam'
+        - name: limit
+          $ref: '#/components/parameters/limitParam'
+        - name: starting_after
+          $ref: '#/components/parameters/startingAfterParam'
+      responses:
+        '200':
+          description: List of customer rewards
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Reward'
+                  has_more:
+                    type: boolean
+                  total:
+                    type: integer
+        '404':
+          description: Customer not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CustomerNotFoundError'
+  /v2/offers:
+    get:
+      tags:
+        - Offers
+      summary: Retrieve an offer
+      x-excluded: true
+      operationId: getOffer
+      description: Returns the marketing placement for the given customer
+      parameters:
+        - name: partner_customer_id
+          in: query
+          schema:
+            type: string
+            description: The unique identifier for the customer in the partner's system
+      responses:
+        '200':
+          description: Successfully returned marketing placement
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Offer'
+        '404':
+          description: Customer not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PartnerCustomerNotFoundError'
+  /v2/order_events:
+    get:
+      tags:
+        - Order Events
+      summary: Retrieve order events
+      description: Get a list of order events
+      operationId: listOrderEvents
+      parameters:
+        - name: order_event_id
+          in: query
+          description: >-
+            An order event ID. If provided, the response will only have a
+            maximum of one result.
+          schema:
+            type: string
+          example: 7622c07d-eb2b-4345-a9a9-345d61d32bc2
+        - name: order_id
+          in: query
+          description: Enables searching for events by order ID
+          schema:
+            type: string
+          example: 77f60af4-185e-4867-b113-34e3cf7c6acd
+        - name: partner_event_id
+          in: query
+          description: >-
+            The identifier of the order event in the partner system. If
+            provided, the response will only have a maximum of one result.
+          schema:
+            type: string
+        - name: network_transaction_id
+          description: >-
+            The network's unique identifier for the transaction. Examples
+            include Visa Transaction ID, Mastercard Trace ID, and American
+            Express Network Reference ID
+          in: query
+          schema:
+            type: string
+          example: txn-123456
+        - name: limit
+          $ref: '#/components/parameters/limitParam'
+        - name: starting_after
+          $ref: '#/components/parameters/startingAfterParam'
+      responses:
+        '200':
+          description: List of order events
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OrderEventsResponse'
+    post:
+      tags:
+        - Order Events
+      summary: Create order events
+      description: Create new order events
+      operationId: postOrderEvent
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/OrderEventBase'
+      responses:
+        '200':
+          description: Order event created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OrderEvent'
+  /v2/order_events/{order_event_id}:
+    delete:
+      tags:
+        - Order Events
+      summary: Delete order event
+      description: Delete an existing order event
+      operationId: deleteOrderEvent
+      parameters:
+        - name: order_event_id
+          in: path
+          required: true
+          schema:
+            type: string
+          description: Unique identifier for the order event
+          example: 7622c07d-eb2b-4345-a9a9-345d61d32bc2
+      responses:
+        '204':
+          description: Order event deleted successfully
+  /v2/orders:
+    get:
+      tags:
+        - Orders
+      summary: Retrieve orders
+      description: Get a list of orders
+      operationId: listOrders
+      parameters:
+        - name: id
+          in: query
+          description: >-
+            An order ID. If provided, the response will only have a maximum of
+            one result.
+          schema:
+            type: string
+          example: 77f60af4-185e-4867-b113-34e3cf7c6acd
+        - name: partner_order_id
+          in: query
+          description: Partner's order identifier
+          schema:
+            type: string
+          example: o-c8a1fe46bbff4a18ba1d
+      responses:
+        '200':
+          description: List of orders
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OrdersResponse'
+    post:
+      tags:
+        - Orders
+      summary: Create orders
+      description: Create new orders
+      operationId: createOrder
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/OrderBase'
+      responses:
+        '200':
+          description: Orders created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Order'
+  /v2/orders/{order_id}:
+    put:
+      tags:
+        - Orders
+      summary: Modify order
+      description: Modify an existing order
+      operationId: putOrder
+      parameters:
+        - name: order_id
+          in: path
+          required: true
+          schema:
+            type: string
+          description: Unique identifier for the order
+          example: 77f60af4-185e-4867-b113-34e3cf7c6acd
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/OrderBase'
+      responses:
+        '200':
+          description: Order modified successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Order'
+    delete:
+      tags:
+        - Orders
+      summary: Delete order
+      description: Delete an existing order
+      operationId: deleteOrder
+      parameters:
+        - name: order_id
+          in: path
+          required: true
+          schema:
+            type: string
+          description: Unique identifier for the order
+          example: 77f60af4-185e-4867-b113-34e3cf7c6acd
+      responses:
+        '204':
+          description: Order deleted successfully
+  /v2/simulate_transaction_event:
+    post:
+      tags:
+        - Simulate Transaction Event
+      summary: Simulate transaction event in sandbox environment
+      operationId: simulateTransactionEvent
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - payment_method_id
+                - status
+              properties:
+                event_id:
+                  type: string
+                  description: Unique identifier of the event.
+                  example: e2806932-5f1b-4518-8b15-156d773e9496
+                transaction_id:
+                  type: string
+                  description: >-
+                    Unique identifier of the transaction. Required to VOID,
+                    UPDATE, CAPTURE, or REFUND a transaction
+                  example: e2806932-5f1b-4518-8b15-156d773e9496
+                payment_method_id:
+                  type: string
+                  description: Unique identifier of the payment method used.
+                  example: 7f754378-dd84-4a9a-b1ce-0646bb769c29
+                status:
+                  $ref: '#/components/schemas/TransactionStatus'
+                amount:
+                  type: integer
+                  description: >-
+                    Amount of the transaction in the smallest currency unit
+                    (e.g., cents for USD).
+                  example: 5000
+                currency:
+                  $ref: '#/components/schemas/TransactionCurrency'
+                authorization_code:
+                  type: string
+                  nullable: true
+                  description: Code used to authorize the transaction.
+                  example: '645432'
+                network_transaction_id:
+                  type: string
+                  nullable: true
+                  description: >-
+                    Unique transaction identifier assigned by the payment
+                    network.
+                  example: txn-789456
+                purchase_method:
+                  $ref: '#/components/schemas/PurchaseMethod'
+                merchant:
+                  $ref: '#/components/schemas/Merchant'
+      responses:
+        '200':
+          description: Transaction event created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TransactionEvent'
+        '409':
+          description: Transaction event can not be created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConflictError'
+  /v2/simulate_statement_reward:
+    post:
+      tags:
+        - Simulate Statement Reward
+      summary: Simulate Statement Reward
+      description: Initiate a statement reward webhook to be sent in sandbox environment
+      deprecated: true
+      operationId: simulateStatementReward
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - customer_id
+              properties:
+                customer_id:
+                  type: string
+                  example: e2806932-5f1b-4518-8b15-156d773e9496
+      responses:
+        '200':
+          description: Statement reward webhook initiated
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  debugging_id:
+                    type: string
+                    description: >-
+                      If you received an unexpected webhook or did not receive a
+                      webhook, send debugging id to your imprint team
+                    example: E777214A-2D11-4CAD-9E8F-E1BD71D9FE67
+        '400':
+          description: Product is not configured for statement rewards
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+        '403':
+          description: Endpoint is only available in sandbox environments
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+        '404':
+          description: Customer not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+  /v2/simulate_reward:
+    post:
+      tags:
+        - Simulate Reward
+      summary: Simulate Reward
+      description: >-
+        Initiate a reward webhook in sandbox. Specify the reward type to
+        simulate processing of pending rewards.
+      operationId: simulateReward
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - customer_id
+                - reward_type
+              properties:
+                customer_id:
+                  type: string
+                  example: e2806932-5f1b-4518-8b15-156d773e9496
+                reward_type:
+                  type: string
+                  enum:
+                    - STATEMENT
+                    - DELAYED
+                  description: >-
+                    The type of reward to simulate. Must match the product's
+                    configured reward type.
+                  example: DELAYED
+      responses:
+        '200':
+          description: Reward webhook initiated
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  debugging_id:
+                    type: string
+                    description: >-
+                      If you received an unexpected webhook or did not receive a
+                      webhook, send debugging id to your imprint team
+                    example: E777214A-2D11-4CAD-9E8F-E1BD71D9FE67
+        '400':
+          description: >-
+            Invalid reward_type or product is not configured for the specified
+            reward type
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+        '403':
+          description: Endpoint is only available in sandbox environments
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+        '404':
+          description: Customer not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+        '409':
+          description: A simulation is already in progress for this account
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+  /v2/keys:
+    post:
+      tags:
+        - Keys
+      summary: Create an API Key
+      description: Creates a new API key
+      operationId: createKey
+      responses:
+        '200':
+          description: API Key created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Key'
+        '401':
+          description: Unauthorized
+    delete:
+      tags:
+        - Keys
+      summary: Delete an API Key
+      description: Deletes an existing API Key
+      operationId: deleteKey
+      responses:
+        '200':
+          description: API Key deleted successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Key'
+        '401':
+          description: Unauthorized
+webhooks:
+  Application:
+    post:
+      tags:
+        - Webhooks
+      x-blank-ext: added to work around codegen bug
+      summary: Application Event Notification
+      description: >-
+        Receive an event notification when an application for a payment method
+        is created or transitions statuses.
+      operationId: hookApplicationStatus
+      security: []
+      parameters:
+        - in: header
+          name: X-IMPRINT-HMAC-SIGNATURE
+          required: true
+          schema:
+            type: string
+            description: >-
+              HMAC signature generated using shared webhook secret and webhook
+              payload
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ApplicationWebhookPayload'
+      responses:
+        '200':
+          description: Webhook received successfully.
+          content:
+            text/plain:
+              schema:
+                type: string
+  Transaction:
+    post:
+      tags:
+        - Webhooks
+      x-blank-ext: added to work around codegen bug
+      summary: Transaction Event Notification
+      description: >
+        Receive a notification when a transaction is created or when events for
+        the transaction happen
+
+        Please see the [event notifications
+        guide](https://docs.imprint.co/guide-event-notifications) for more
+        information regarding the lifecycle of a transaction.
+      operationId: hookTransactionStatus
+      security: []
+      parameters:
+        - in: header
+          name: X-IMPRINT-HMAC-SIGNATURE
+          required: true
+          schema:
+            type: string
+            description: HMAC signature generated using webhook secret and webhook payload
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TransactionWebhookPayload'
+      responses:
+        '200':
+          description: Webhook received successfully.
+          content:
+            text/plain:
+              schema:
+                type: string
+  PaymentMethod:
+    post:
+      tags:
+        - Webhooks
+      x-blank-ext: added to work around codegen bug
+      summary: Payment Method Event Notification
+      description: >-
+        Receive a notification when a payment method (e.g. credit card or loan)
+        is created or transitions statuses.
+      operationId: hookPaymentMethodStatus
+      security: []
+      parameters:
+        - in: header
+          name: X-IMPRINT-HMAC-SIGNATURE
+          required: true
+          schema:
+            type: string
+            description: HMAC signature generated using webhook secret and webhook payload
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PaymentMethodWebhookPayload'
+      responses:
+        '200':
+          description: Webhook received successfully.
+          content:
+            text/plain:
+              schema:
+                type: string
+  CustomerLink:
+    post:
+      tags:
+        - Webhooks
+      x-blank-ext: added to work around codegen bug
+      summary: Customer Link Event Notification
+      description: >-
+        Receive a notification when a customer’s Imprint account is successfully
+        linked to a partner account via the Account Linker.
+      operationId: hookCustomerLink
+      security: []
+      parameters:
+        - in: header
+          name: X-IMPRINT-HMAC-SIGNATURE
+          required: true
+          schema:
+            type: string
+            description: >-
+              HMAC signature generated using shared webhook secret and webhook
+              payload
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CustomerLinkWebhookPayload'
+      responses:
+        '200':
+          description: Webhook received successfully.
+          content:
+            text/plain:
+              schema:
+                type: string
+  Reward:
+    post:
+      tags:
+        - Webhooks
+      x-blank-ext: added to work around codegen bug
+      summary: Reward Event Notification
+      description: >-
+        Receive an event notification when a reward is created, updated, or
+        available
+      operationId: hookReward
+      security: []
+      parameters:
+        - in: header
+          name: X-IMPRINT-HMAC-SIGNATURE
+          required: true
+          schema:
+            type: string
+            description: >-
+              HMAC signature generated using shared webhook secret and webhook
+              payload
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RewardWebhookPayload'
+      responses:
+        '200':
+          description: Webhook received successfully.
+          content:
+            text/plain:
+              schema:
+                type: string
+  Streak:
+    post:
+      tags:
+        - Webhooks
+      x-blank-ext: added to work around codegen bug
+      summary: Streak Event Notification
+      description: >-
+        Receive an event notification when a customer's streak starts,
+        progresses, completes, or fails.
+      operationId: hookStreak
+      security: []
+      parameters:
+        - in: header
+          name: X-IMPRINT-HMAC-SIGNATURE
+          required: true
+          schema:
+            type: string
+            description: >-
+              HMAC signature generated using shared webhook secret and webhook
+              payload
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/StreakWebhookPayload'
+      responses:
+        '200':
+          description: Webhook received successfully.
+          content:
+            text/plain:
+              schema:
+                type: string
+  AccountStatus:
+    post:
+      tags:
+        - Webhooks
+      x-blank-ext: added to work around codegen bug
+      summary: Account Status Event Notification
+      description: >-
+        Receive an event notification when a customer's account reaches a
+        terminal state (e.g. closure).
+      operationId: hookAccountStatus
+      security: []
+      parameters:
+        - in: header
+          name: X-IMPRINT-HMAC-SIGNATURE
+          required: true
+          schema:
+            type: string
+            description: >-
+              HMAC signature generated using shared webhook secret and webhook
+              payload
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AccountStatusWebhookPayload'
+      responses:
+        '200':
+          description: Webhook received successfully.
+          content:
+            text/plain:
+              schema:
+                type: string
+components:
+  parameters:
+    customerIdParam:
+      name: customer_id
+      in: path
+      required: true
+      description: The unique identifier for the Imprint customer
+      schema:
+        type: string
+        example: 2EE24580-B97B-4949-A65C-929CCB9B9B8D
+    emailParam:
+      name: email
+      in: query
+      schema:
+        type: string
+        format: email
+        example: john@doe.com
+    limitParam:
+      name: limit
+      in: query
+      description: Limits the number of returned results
+      schema:
+        type: integer
+        minimum: 1
+        default: 10
+        format: int32
+    startingAfterParam:
+      name: starting_after
+      in: query
+      description: >-
+        A cursor for use in pagination. An id that defines your place in the
+        list.
+      schema:
+        type: string
+    minAmountParam:
+      name: min_amount
+      in: query
+      description: Filters results based on minimum amount
+      schema:
+        type: integer
+        minimum: 0
+        default: 0
+        format: int32
+    maxAmountParam:
+      name: max_amount
+      in: query
+      description: Filters results based on maximum amount
+      schema:
+        type: integer
+        format: int32
+  schemas:
+    CustomerListResponse:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/Customer'
+        has_more:
+          type: boolean
+        total:
+          type: integer
+    CustomerProgramStatus:
+      type: string
+      description: Status of a customer within a card program.
+      enum:
+        - OPEN
+        - CLOSED
+    PartnerCustomerId:
+      type: string
+      description: The unique identifier for the customer in the partner's system
+      example: PARTNER_USER_456
+    Merchant:
+      type: object
+      properties:
+        network_id:
+          type: string
+          description: Unique identifier of the merchant assigned by the payment network.
+          example: '234923454545'
+        name:
+          type: string
+          description: Name of the merchant where the transaction occurred.
+          example: Target
+        category:
+          type: string
+          nullable: true
+          description: Name of the merchant category.
+          example: Grocery Stores
+        category_code:
+          type: string
+          nullable: true
+          description: Code associated with the merchant category.
+          example: '5411'
+        address:
+          $ref: '#/components/schemas/Address'
+          type: object
+    PurchaseMethod:
+      type: string
+      enum:
+        - CHIP
+        - CONTACTLESS
+        - KEYEDIN
+        - ONLINE
+        - SWIPE
+        - QRCODE
+        - OCR
+        - UNKNOWN
+      nullable: true
+      description: How the purchase was completed.
+      example: CHIP
+    TransactionStatus:
+      type: string
+      enum:
+        - APPROVED
+        - UPDATED
+        - VOIDED
+        - CAPTURED
+        - REFUNDED
+      example: APPROVED
+    Address:
+      type: object
+      description: Mailing address information
+      properties:
+        street_line1:
+          type: string
+          description: Primary street address
+          example: 123 Main St
+        street_line2:
+          type: string
+          description: Secondary street address (apartment, suite, etc.)
+          example: Apt 4B
+        city:
+          type: string
+          description: City name
+          example: San Francisco
+        state:
+          type: string
+          description: State or province
+          example: CA
+        postal_code:
+          type: string
+          description: ZIP or postal code
+          example: '94105'
+        country:
+          type: string
+          description: ISO-3166-1 alpha-3 Country Code
+          example: USA
+    CurrencyAmount:
+      type: integer
+      description: Amount in the smallest currency unit (e.g., cents for USD)
+    DateOfBirth:
+      type: object
+      description: Customer's date of birth
+      properties:
+        year:
+          type: integer
+          description: Year of birth
+          minimum: 1900
+          example: 1990
+        month:
+          type: integer
+          description: Month of birth
+          minimum: 1
+          maximum: 12
+          example: 1
+        day:
+          type: integer
+          description: Day of birth
+          minimum: 1
+          maximum: 31
+          example: 1
+    Customer:
+      type: object
+      description: Represents a customer in the Imprint system
+      required:
+        - id
+      properties:
+        id:
+          type: string
+          description: Unique identifier for the customer
+          example: 9B5E1EE0-2E1C-46E7-81B9-3C3917204BE4
+        email:
+          type: string
+          format: email
+          description: Customer's email address
+          example: customer@example.com
+        phone:
+          type: string
+          description: Customer's phone number in E.164 format
+          example: '+14155552671'
+        statuses:
+          type: object
+          description: >-
+            Map of the customer's enrolled card program name to the customer's
+            status.
+          additionalProperties:
+            $ref: '#/components/schemas/CustomerProgramStatus'
+          example:
+            Card Program Name: OPEN
+        first_name:
+          type: string
+          description: The customer's first name.
+          example: John
+        last_name:
+          type: string
+          description: The customer's last name.
+          example: Doe
+        preferred_language:
+          type: string
+          description: Customer's preferred language code as defined by ISO 639-1
+          example: en
+        ssn4:
+          type: string
+          description: Customer's Social Security Number in 4 digits
+          example: '1234'
+        date_of_birth:
+          $ref: '#/components/schemas/DateOfBirth'
+        address:
+          $ref: '#/components/schemas/Address'
+        partner_customer_id:
+          $ref: '#/components/schemas/PartnerCustomerId'
+        metadata:
+          type: object
+          description: >-
+            Set of key-value pairs for storing additional information about the
+            customer.
+          additionalProperties: true
+          example:
+            preferred_language: en
+        created_at:
+          type: string
+          description: the RFC-3339 date when the customer was created
+          example: 2025-02-13T19:08:07.000Z
+        updated_at:
+          type: string
+          description: the RFC-3339 date when the customer was created
+          example: 2025-02-13T19:08:07.000Z
+    CustomerAccountHistory:
+      type: object
+      description: A Customer's account history with the partner
+      properties:
+        email:
+          type: string
+          format: email
+          description: Customer's email address
+          example: customer@example.com
+        phone:
+          type: string
+          description: Customer's phone number in E.164 format
+          example: '+14155552671'
+        first_name:
+          type: string
+          description: The customer's first name
+          example: John
+        last_name:
+          type: string
+          description: The customer's last name
+          example: Doe
+        preferred_language:
+          type: string
+          description: Customer's preferred language code as defined by ISO 639-1
+          example: en
+        address:
+          $ref: '#/components/schemas/Address'
+        account_tenure:
+          type: integer
+          description: The customer's account tenure with the partner, in months
+          example: 13
+        ltv_amount:
+          type: integer
+          description: >-
+            The Life Time Value for the customer's account, in the min currency
+            unit (cents for USD)
+          example: 34000
+        ltv_currency:
+          type: string
+          description: The 3 char currency code of the amount in iso-4217
+          example: USD
+        loyalty_tier:
+          type: string
+          description: The customer's current loyalty tier
+          example: GOLD
+        account_created_at:
+          type: string
+          description: >-
+            The RFC-3339 timestamp when the customer's account was created with
+            the partner
+          example: 2025-02-13T19:08:07.000Z
+        transaction_count:
+          type: integer
+          description: >-
+            The number of lifetime transactions the customer has made with the
+            partner
+          example: 100
+    CustomerSession:
+      type: object
+      description: Represents a session created on behalf of an Imprint customer
+      required:
+        - id
+        - client_secret
+        - expires_at
+      properties:
+        id:
+          type: string
+          example: 2EE24580-B97B-4949-A65C-929CCB9B9B8D
+          description: The unique ID Imprint assigns to the session.
+        client_secret:
+          type: string
+          example: QzMyNzg4QzgtNEUwOS00QkU4LThDMjEtMkU5OUQ3QzkwRDhGCg==
+          description: >-
+            Not to be logged or stored. Provide this one time use token to the
+            Imprint SDK or other client side code to allow the customer access
+            to edit their own account or apply
+        expires_at:
+          type: string
+          description: the RFC-3339 timestamp when the `client_secret` will expire.
+          example: 2025-02-13T19:08:07.000Z
+        metadata:
+          type: object
+          description: >-
+            Set of key-value pairs for storing additional information about the
+            customer session.
+          additionalProperties: true
+          example:
+            store_number: '123'
+        customer_metadata:
+          type: object
+          description: >-
+            A set of key-value pairs attached to the customer. These values will
+            be included in webhook event payloads for the partner to receive
+            information about the customer.
+          additionalProperties:
+            type: string
+          example:
+            loyalty_id: '840012345678'
+            membership_tier: gold
+        source:
+          type: string
+          description: The source where the session was initiated
+          example: web_signup
+    CustomerLink:
+      type: object
+      required:
+        - customer_id
+        - partner_customer_id
+        - status
+        - created_at
+      properties:
+        customer_id:
+          type: string
+          example: 9B5E1EE0-2E1C-46E7-81B9-3C3917204BE4
+          description: The ID of the Imprint customer
+        partner_customer_id:
+          $ref: '#/components/schemas/PartnerCustomerId'
+        status:
+          type: string
+          enum:
+            - ACTIVE
+            - INACTIVE
+          example: ACTIVE
+          description: Status of the linked relationship
+        created_at:
+          type: string
+          description: the RFC-3339 timestamp when the link was created at.
+          example: 2025-02-13T19:08:07.000Z
+        updated_at:
+          type: string
+          description: the RFC-3339 timestamp when the link was last updated.
+          example: 2025-02-13T19:08:07.000Z
+        metadata:
+          type: object
+          description: Additional linking metadata
+          additionalProperties: true
+          example:
+            store_id: store_789
+            platform_version: 2.1.0
+    PaymentMethod:
+      type: object
+      required:
+        - id
+        - type
+        - customer_id
+        - created_at
+        - status
+        - metadata
+      properties:
+        id:
+          type: string
+          example: DCBFC736-2286-42DD-897D-160DCA80AED2
+          description: The unique ID Imprint assigns to the payment method.
+        type:
+          type: string
+          description: The type of payment method
+          enum:
+            - CARD
+            - BANK_ACCOUNT
+            - LOAN
+        customer_id:
+          type: string
+          description: The `id` of the Imprint customer that the payment method belongs to.
+          example: B40A789E-BD46-4BB9-B63E-F9919582694C
+        card:
+          type: object
+          description: >-
+            When payment method is a `CARD` type, this object will have card
+            specific data.
+          required:
+            - last4
+            - brand
+          properties:
+            last4:
+              type: string
+              example: '1234'
+              minLength: 4
+              maxLength: 4
+              description: The last 4 digits of the card PAN
+            network:
+              type: string
+              description: Name of the card issuer
+              enum:
+                - VISA
+                - MASTERCARD
+                - AMEX
+                - ''
+            card_type:
+              $ref: '#/components/schemas/CardType'
+            card_design_id:
+              $ref: '#/components/schemas/CardDesignID'
+            exp_month:
+              type: string
+              description: The month the card expires (MM format).
+              example: '06'
+            exp_year:
+              type: string
+              description: The year the card expires (YYYY format).
+              example: '2027'
+            pci_details:
+              type: object
+              description: >-
+                The pci details of the returned card. Only verified PCI
+                compliant partners will be able to retrieve pci details in
+                production environments.
+              properties:
+                pan:
+                  type: string
+                  description: >-
+                    The unique 16-digit number printed on the front of a payment
+                    card, used to identify the cardholder's account.
+                  example: '5105105105105100'
+                exp_month:
+                  type: string
+                  description: The month the card expires
+                  example: '06'
+                exp_year:
+                  type: string
+                  description: The year the card expires
+                  example: '26'
+                cvv:
+                  type: string
+                  description: >-
+                    A three- or four-digit security code used to verify
+                    card-not-present transactions and prevent fraud.
+                  example: '123'
+            tokens:
+              type: array
+              description: >-
+                Payment method tokens that are defined by a third-party provider
+                are included in this array by Imprint.
+              items:
+                $ref: '#/components/schemas/PaymentMethodToken'
+        bank_account:
+          type: object
+          description: >-
+            When payment method is a `BANK_ACCOUNT` type, this object will have
+            bank account specific data.
+          required:
+            - last4
+            - routing_number
+            - bank_name
+          properties:
+            last4:
+              type: string
+              example: '1234'
+              description: Last 4 numbers of the account.
+              minLength: 4
+              maxLength: 4
+            routing_number:
+              type: string
+              description: The bank routing number assigned to this account.
+            bank_name:
+              type: string
+              example: Wells Fargo
+              description: Name of the banking institution
+            account_type:
+              type: string
+              description: Type of the account.
+              enum:
+                - CHECKING
+                - SAVINGS
+        loan:
+          type: object
+          description: >-
+            When payment method is a `LOAN` type, this object will have loan
+            specific data.
+          required:
+            - amount
+            - term_months
+          properties:
+            amount:
+              type: integer
+              description: Amount in min units.
+              example: 10000
+            currency:
+              $ref: '#/components/schemas/TransactionCurrency'
+            remaining_balance:
+              type: integer
+              description: remaining unspent balance on the loan
+            term_months:
+              type: integer
+              description: Length of the loan term in months
+              example: 12
+            apr:
+              type: string
+              description: Annual percentage rate of the loan in floating point
+              example: '5.89'
+            loan_status:
+              type: string
+              description: Current status of the loan
+              enum:
+                - PENDING
+                - APPROVED
+                - REJECTED
+                - ACTIVE
+                - CLOSED
+        created_at:
+          type: string
+          description: the RFC-3339 timestamp when the payment method was created
+          example: 2025-02-13T19:08:07.000Z
+        updated_at:
+          type: string
+          description: the RFC-3339 timestamp when the payment method was last updated
+          example: 2025-02-13T19:08:07.000Z
+        status:
+          type: string
+          description: Current status of the payment method
+          enum:
+            - ACTIVE
+            - INACTIVE
+            - CANCELED
+        metadata:
+          type: object
+          additionalProperties: true
+          description: Additional metadata for the payment method
+          example:
+            platform_version: 2.1.0
+    PaymentMethodToken:
+      type: object
+      required:
+        - type
+        - token
+        - created_at
+        - updated_at
+      properties:
+        type:
+          type: string
+          enum:
+            - ADYEN
+            - APPLE_WALLET
+            - CYBERSOURCE
+            - WORLDPAY
+        token:
+          type: string
+          description: The token, as defined by the processor
+        pan_reference_id:
+          type: string
+          description: An ID that represents the PAN and is defined by the processor
+        created_at:
+          type: string
+          description: the RFC-3339 timestamp when the payment method was created
+          example: 2025-02-13T19:08:07.000Z
+        updated_at:
+          type: string
+          example: 2025-02-13T19:08:07.000Z
+          description: the RFC-3339 timestamp when the payment method was updated
+    TransactionIntent:
+      type: object
+      required:
+        - id
+        - customer_id
+        - amount
+        - currency
+        - status
+        - created_at
+      properties:
+        id:
+          type: string
+          example: 5B30532B-5B5B-4826-8DE2-429C57B705FD
+        customer_id:
+          type: string
+          example: 9B5E1EE0-2E1C-46E7-81B9-3C3917204BE4
+        payment_method_id:
+          type: string
+          description: >-
+            The `payment_method_id` that this `transaction_intent` was executed
+            with.
+          example: DCBFC736-2286-42DD-897D-160DCA80AED2
+        amount:
+          type: integer
+          description: Currency amount
+          example: 10000
+        currency:
+          $ref: '#/components/schemas/TransactionCurrency'
+        status:
+          $ref: '#/components/schemas/TransactionIntentStatus'
+        network_transaction_id:
+          type: string
+          description: >-
+            The network's unique identifier for the transaction. Examples
+            include Visa Transaction ID, Mastercard Trace ID, and American
+            Express Network Reference ID
+        partner_transaction_id:
+          type: string
+          description: The partner's unique transaction id
+        created_at:
+          type: string
+          description: the RFC-3339 timestamp when the transaction intent was created
+          example: 2025-02-13T19:08:07.000Z
+        updated_at:
+          type: string
+          description: the RFC-3339 timestamp when the transaction intent was last updated
+          example: 2025-02-13T19:08:07.000Z
+        metadata:
+          type: object
+          description: Additional transaction intent data
+          additionalProperties: true
+          example:
+            platform_version: 2.1.0
+    Transaction:
+      type: object
+      required:
+        - id
+        - customer_id
+        - payment_method_id
+        - amount
+        - currency
+        - status
+        - network_transaction_id
+        - created_at
+      properties:
+        id:
+          type: string
+          example: E777214A-2D11-4CAD-9E8F-E1BD71D9FE67
+        intent_id:
+          type: string
+          description: Reference to the original transaction intent
+          example: 5B30532B-5B5B-4826-8DE2-429C57B705FD
+        customer_id:
+          type: string
+          description: The imprint customer ID for the transaction
+          example: 9B5E1EE0-2E1C-46E7-81B9-3C3917204BE4
+        authorization_code:
+          type: string
+          description: Code authorizing the transaction.
+          example: ABCD
+        payment_method_id:
+          type: string
+          description: Identifies the payment method used for the transaction
+          example: DCBFC736-2286-42DD-897D-160DCA80AED2
+        purchase_method:
+          $ref: '#/components/schemas/PurchaseMethod'
+        amount:
+          type: integer
+          description: Transaction amount in min units.
+        currency:
+          $ref: '#/components/schemas/TransactionCurrency'
+        status:
+          $ref: '#/components/schemas/TransactionStatus'
+        network_transaction_id:
+          type: string
+          description: >-
+            The network's unique identifier for the transaction. Examples
+            include Visa Transaction ID, Mastercard Trace ID, and American
+            Express Network Reference ID
+        partner_transaction_id:
+          type: string
+          description: The partner's unique transaction id
+        created_at:
+          type: string
+          description: the RFC-3339 timestamp when the transaction was created
+          example: 2025-02-13T19:08:07.000Z
+        updated_at:
+          type: string
+          description: the RFC-3339 timestamp when the transaction was last updated
+          example: 2025-02-13T19:08:07.000Z
+        merchant:
+          $ref: '#/components/schemas/Merchant'
+        metadata:
+          type: object
+          additionalProperties: true
+          example:
+            platform_version: 2.1.0
+    TransactionEvent:
+      type: object
+      properties:
+        transaction_id:
+          type: string
+          description: Unique identifier of the transaction
+          example: E777214A-2D11-4CAD-9E8F-E1BD71D9FE67
+        event_id:
+          type: string
+          description: >-
+            Unique identifier of the event generated, matches the event_id in
+            the transaction event notification
+          example: E777214A-2D11-4CAD-9E8F-E1BD71D9FE67
+        status:
+          $ref: '#/components/schemas/TransactionStatus'
+    Reward:
+      type: object
+      required:
+        - id
+        - customer_id
+        - amount
+        - status
+        - type
+        - created_at
+      properties:
+        id:
+          type: string
+          example: 2EE24580-B97B-4949-A65C-929CCB9B9B8D
+        customer_id:
+          type: string
+          example: 9B5E1EE0-2E1C-46E7-81B9-3C3917204BE4
+        transaction_event_id:
+          type: string
+          description: transaction that generated this reward, if applicable.
+          example: E777214A-2D11-4CAD-9E8F-E1BD71D9FE67
+        amount:
+          type: integer
+          description: reward amount in min units.
+        type:
+          $ref: '#/components/schemas/RewardType'
+        currency:
+          $ref: '#/components/schemas/RewardCurrency'
+        status:
+          $ref: '#/components/schemas/RewardStatus'
+        created_at:
+          type: string
+          description: the RFC-3339 timestamp when the reward was created
+          example: 2025-02-13T19:08:07.000Z
+        updated_at:
+          type: string
+          description: the RFC-3339 timestamp when the reward was last updated
+          example: 2025-02-13T19:08:07.000Z
+        metadata:
+          type: object
+          additionalProperties: true
+          example:
+            platform_version: 2.1.0
+    ConflictError:
+      type: object
+      description: object's current state prevents the requested update
+      properties:
+        type:
+          type: string
+        message:
+          type: string
+    InvalidRequestError:
+      type: object
+      properties:
+        path:
+          type: string
+          description: The path of the endpoint returning the error
+          example: /v2/customers
+        details:
+          type: array
+          items:
+            type: string
+          description: The details of the error being returned
+          example:
+            - 'email: must be a well-formed email address'
+        error:
+          type: string
+          description: The category of error being returned
+          example: Bad Request
+        status:
+          type: integer
+          description: The HTTP status code of the error
+          example: 400
+        timestamp:
+          type: string
+          description: The timestamp that the error occurred
+          example: '2025-01-20T18:18:22.923+00:00'
+    CustomerNotFoundError:
+      type: object
+      required:
+        - type
+        - message
+      properties:
+        type:
+          type: string
+          description: The category of error being returned
+          example: CUSTOMER_NOT_FOUND_ERROR
+        message:
+          type: string
+          description: A message describing the cause of the error
+          example: 'Customer not found for provided ID: CSMR-v1-123'
+        param:
+          type: string
+          description: The param causing the error
+          example: customer_id
+    PartnerCustomerNotFoundError:
+      type: object
+      required:
+        - type
+        - message
+      properties:
+        type:
+          type: string
+          description: The category of error being returned
+          example: PARTNER_CUSTOMER_NOT_FOUND_ERROR
+        message:
+          type: string
+          description: A message describing the cause of the error
+          example: 'Partner Customer not found for provided ID: abcd-efgh-123'
+        param:
+          type: string
+          description: The param causing the error
+          example: partner_customer_id
+    SessionNotFoundError:
+      type: object
+      required:
+        - type
+        - message
+      properties:
+        type:
+          type: string
+          description: The category of error being returned
+          example: SESSION_NOT_FOUND_ERROR
+        message:
+          type: string
+          description: A message describing the cause of the error
+          example: 'Session not found for provided ID: cs_123'
+        param:
+          type: string
+          description: The param causing the error
+          example: session_id
+    PaymentMethodNotFoundError:
+      type: object
+      required:
+        - type
+        - message
+      properties:
+        type:
+          type: string
+          description: The category of error being returned
+          example: PAYMENT_METHOD_NOT_FOUND_ERROR
+        message:
+          type: string
+          description: A message describing the cause of the error.
+          example: 'Payment method not found for provided ID: pymd_123'
+        param:
+          type: string
+          description: The param causing the error
+          example: payment_method_id
+    RewardNotFoundError:
+      type: object
+      required:
+        - type
+        - message
+      properties:
+        type:
+          type: string
+          description: The category of error being returned
+          example: REWARD_NOT_FOUND_ERROR
+        message:
+          type: string
+          description: A message describing the cause of the error.
+          example: 'Reward not found for provided ID: pymd_123'
+        param:
+          type: string
+          description: The param causing the error
+          example: reward_id
+    TransactionIntentFoundError:
+      type: object
+      required:
+        - type
+        - message
+      properties:
+        type:
+          type: string
+          description: The category of error being returned.
+          example: TRANSACTION_INTENT_FOUND_ERROR
+        message:
+          type: string
+          description: A message describing the cause of the error.
+          example: 'Transaction intent not found for provided ID: txint_123'
+        param:
+          type: string
+          description: The param causing the error.
+          example: intent_id
+    TransactionNotFoundError:
+      type: object
+      required:
+        - type
+        - message
+      properties:
+        type:
+          type: string
+          description: The category of error being returned.
+          example: TRANSACTION_FOUND_ERROR
+        message:
+          type: string
+          description: A message describing the cause of the error.
+          example: 'Transaction intent not found for provided ID: txn_123'
+        param:
+          type: string
+          description: The param causing the error.
+          example: transaction_id
+    PaymentMethodWebhookPayload:
+      type: object
+      properties:
+        object:
+          type: string
+          description: >-
+            The type of object associated with this webhook event. This field
+            indicates what kind of resource has been created or updated.
+          enum:
+            - PAYMENT_METHOD
+          example: PAYMENT_METHOD
+        data:
+          type: object
+          properties:
+            merchant_key:
+              type: string
+              description: >-
+                Unique identifier for the merchant associated with this webhook
+                event.
+              example: MERCHANT_ABC
+            payment_method_id:
+              type: string
+              description: Unique identifier for the payment method.
+              example: DCBFC736-2286-42DD-897D-160DCA80AED2
+            customer_id:
+              type: string
+              description: Unique identifier for the associated customer
+              example: 2EE24580-B97B-4949-A65C-929CCB9B9B8D
+            partner_customer_id:
+              $ref: '#/components/schemas/PartnerCustomerId'
+            previous_status:
+              type: string
+              description: The previous status of the card.
+              enum:
+                - ACTIVE
+                - INACTIVE
+                - CANCELED
+            new_status:
+              type: string
+              description: The new status of the card
+              enum:
+                - ACTIVE
+                - INACTIVE
+                - CANCELED
+            card_type:
+              $ref: '#/components/schemas/CardType'
+            card_design_id:
+              $ref: '#/components/schemas/CardDesignID'
+            tokens:
+              type: array
+              description: >-
+                Payment method tokens that are defined by a third-party provider
+                are included in this array by Imprint.
+              items:
+                $ref: '#/components/schemas/PaymentMethodToken'
+            created_at:
+              type: string
+              description: the RFC-3339 timestamp when the payment method was created
+              example: 2025-02-13T19:08:07.000Z
+            updated_at:
+              type: string
+              example: 2025-02-13T19:08:07.000Z
+              description: the RFC-3339 timestamp when the payment method was updated
+            customer_metadata:
+              type: object
+              description: A set of key-value pairs of metadata attached to the customer.
+              additionalProperties:
+                type: string
+              example:
+                loyalty_id: '840012345678'
+                membership_tier: gold
+    TransactionWebhookPayload:
+      type: object
+      properties:
+        object:
+          type: string
+          description: >-
+            The type of object associated with this webhook event. This field
+            indicates what kind of resource has been created or updated.
+          enum:
+            - TRANSACTION
+          example: TRANSACTION
+        data:
+          type: object
+          properties:
+            merchant_key:
+              type: string
+              description: >-
+                Unique identifier for the merchant associated with this webhook
+                event.
+              example: MERCHANT_ABC
+            transaction_id:
+              type: string
+              description: >-
+                Unique identifier for the transaction. transaction_id remains
+                the same throughout the lifecycle of a transaction (e.g., from
+                APPROVED to CAPTURED or REFUNDED). It represents the overarching
+                transaction instance.
+              example: e2806932-5f1b-4518-8b15-156d773e9496
+            event_id:
+              type: string
+              description: >-
+                Unique identifier for a specific event that occurs within a
+                transaction’s lifecycle. Transaction events correlated with a
+                status (e.g., APPROVED, UPDATED, CAPTURED, REFUNDED), and every
+                event is uniquely identified by an event_id.
+              example: e2806932-5f1b-4518-8b15-156d773e9496
+            intent_id:
+              type: string
+              nullable: true
+              description: Unique identifier of the transaction intent.
+              example: intent-12345
+            payment_method_id:
+              type: string
+              description: Unique identifier of the payment method used.
+              example: 7f754378-dd84-4a9a-b1ce-0646bb769c29
+            customer_id:
+              type: string
+              description: Unique identifier of the customer.
+              example: e0549550-90e9-4acb-b7e9-2e4738b7def2
+            partner_customer_id:
+              $ref: '#/components/schemas/PartnerCustomerId'
+            status:
+              $ref: '#/components/schemas/TransactionStatus'
+            created_at:
+              type: string
+              format: date-time
+              description: >-
+                RFC 3339 timestamp indicating when the transaction was
+                authorized.
+              example: '2025-02-27T18:11:32.358Z'
+            updated_at:
+              type: string
+              format: date-time
+              nullable: true
+              description: >-
+                RFC 3339 timestamp indicating when the transaction was last
+                updated.
+              example: '2025-02-27T18:15:00.000Z'
+            amount:
+              type: integer
+              description: >-
+                Amount of the transaction in the smallest currency unit (e.g.,
+                cents for USD).
+              example: 5000
+            currency:
+              $ref: '#/components/schemas/TransactionCurrency'
+            authorization_code:
+              type: string
+              nullable: true
+              description: Code used to authorize the transaction.
+              example: '645432'
+            network_transaction_id:
+              type: string
+              nullable: true
+              description: Unique transaction identifier assigned by the payment network.
+              example: txn-789456
+            purchase_method:
+              $ref: '#/components/schemas/PurchaseMethod'
+            merchant:
+              $ref: '#/components/schemas/Merchant'
+            customer_metadata:
+              type: object
+              description: A set of key-value pairs of metadata attached to the customer.
+              additionalProperties:
+                type: string
+              example:
+                loyalty_id: '840012345678'
+                membership_tier: gold
+    ApplicationWebhookPayload:
+      type: object
+      properties:
+        object:
+          type: string
+          description: >-
+            The type of object associated with this webhook event. This field
+            indicates what kind of resource has been created or updated.
+          enum:
+            - APPLICATION
+          example: APPLICATION
+        data:
+          type: object
+          properties:
+            merchant_key:
+              type: string
+              description: >-
+                Unique identifier for the merchant associated with this webhook
+                event.
+              example: MERCHANT_ABC
+            customer_id:
+              type: string
+              description: Imprint's unique identifier for the associated customer
+              example: 2EE24580-B97B-4949-A65C-929CCB9B9B8D
+            partner_customer_id:
+              $ref: '#/components/schemas/PartnerCustomerId'
+            status:
+              type: string
+              description: The new status of the application.
+              example: OFFER_ACCEPTED
+              enum:
+                - OFFER_ACCEPTED
+                - REJECTED
+            created_at:
+              type: string
+              example: 2025-02-13T19:08:07.000Z
+              description: the RFC-3339 timestamp when the application was created
+            updated_at:
+              type: string
+              example: 2025-02-13T19:08:07.000Z
+              description: the RFC-3339 timestamp when the application was last updated
+            customer_metadata:
+              type: object
+              description: A set of key-value pairs of metadata attached to the customer.
+              additionalProperties:
+                type: string
+              example:
+                loyalty_id: '840012345678'
+                membership_tier: gold
+    CustomerLinkWebhookPayload:
+      type: object
+      properties:
+        object:
+          type: string
+          description: The type of object associated with this webhook event.
+          enum:
+            - CUSTOMER_LINK
+        data:
+          type: object
+          properties:
+            merchant_key:
+              type: string
+              description: >-
+                Unique identifier for the merchant associated with this webhook
+                event.
+              example: MERCHANT_ABC
+            customer_id:
+              type: string
+              description: Imprint's unique identifier for the customer
+              example: 2EE24580-B97B-4949-A65C-929CCB9B9B8D
+            partner_customer_id:
+              $ref: '#/components/schemas/PartnerCustomerId'
+            status:
+              type: string
+              description: The status of the customer link
+              enum:
+                - ACTIVE
+              example: ACTIVE
+            created_at:
+              type: string
+              description: The RFC-3339 timestamp when the customer link was created
+              example: '2025-02-13T19:08:07Z'
+            updated_at:
+              type: string
+              description: The RFC-3339 timestamp when the customer link was last updated
+              example: '2025-02-13T19:08:07Z'
+            customer_metadata:
+              type: object
+              description: A set of key-value pairs of metadata attached to the customer.
+              additionalProperties:
+                type: string
+              example:
+                loyalty_id: '840012345678'
+                membership_tier: gold
+    RewardWebhookPayload:
+      type: object
+      properties:
+        object:
+          type: string
+          description: >-
+            The type of object associated with this webhook event. This field
+            indicates what kind of resource has been created or updated.
+          enum:
+            - REWARD
+          example: REWARD
+        data:
+          type: object
+          properties:
+            merchant_key:
+              type: string
+              description: >-
+                Unique identifier for the merchant associated with this webhook
+                event.
+              example: MERCHANT_ABC
+            reward_id:
+              type: string
+              description: >-
+                Unique identifier for the reward. Use this reward_id in the
+                Retrieve a reward API to details about the reward
+              example: DCBFC736-2286-42DD-897D-160DCA80AED2
+            customer_id:
+              type: string
+              description: Unique identifier for the associated customer
+              example: 2EE24580-B97B-4949-A65C-929CCB9B9B8D
+            transaction_id:
+              type: string
+              description: >-
+                Identifies the transaction related to this reward for
+                TRANSACTION typed reward
+              example: 34E24580-B97B-4949-A65C-929CCB9B9B8D
+            type:
+              $ref: '#/components/schemas/RewardType'
+            amount:
+              type: integer
+              description: >-
+                Amount of the reward in the smallest currency unit (e.g., cents
+                for USD).
+              example: 5000
+            status:
+              $ref: '#/components/schemas/RewardStatus'
+            currency:
+              $ref: '#/components/schemas/RewardCurrency'
+            created_at:
+              type: string
+              description: the RFC-3339 timestamp when the reward was created
+              example: 2025-02-13T19:08:07.000Z
+            metadata:
+              type: object
+              additionalProperties: true
+            customer_metadata:
+              type: object
+              description: A set of key-value pairs of metadata attached to the customer.
+              additionalProperties:
+                type: string
+              example:
+                loyalty_id: '840012345678'
+                membership_tier: gold
+    StreakWebhookPayload:
+      type: object
+      properties:
+        object:
+          type: string
+          description: The type of object this webhook event relates to.
+          enum:
+            - STREAK
+          example: STREAK
+        data:
+          type: object
+          properties:
+            merchant_key:
+              type: string
+              description: >-
+                Unique identifier for the merchant associated with this webhook
+                event.
+              example: MERCHANT_ABC
+            customer_id:
+              type: string
+              description: Imprint's unique identifier for the associated customer.
+              example: 2EE24580-B97B-4949-A65C-929CCB9B9B8D
+            partner_customer_id:
+              $ref: '#/components/schemas/PartnerCustomerId'
+            streak_id:
+              type: string
+              description: Unique identifier for the customer's streak instance.
+              example: 11111111-2222-3333-4444-555555555555
+            streak_config_id:
+              type: string
+              description: >-
+                Unique identifier for the streak configuration this instance was
+                created from.
+              example: 66666666-7777-8888-9999-000000000000
+            event:
+              $ref: '#/components/schemas/StreakEvent'
+            status:
+              $ref: '#/components/schemas/StreakStatus'
+            period_type:
+              type: string
+              description: The cadence used to evaluate streak progress.
+              example: STATEMENT
+            current_period:
+              type: integer
+              description: The 1-based index of the period the streak is currently on.
+              example: 12
+            completed_periods:
+              type: integer
+              description: The number of periods the customer has successfully completed.
+              example: 12
+            total_periods:
+              type: integer
+              description: The total number of periods required to complete the streak.
+              example: 12
+            current_period_start_at:
+              type: string
+              description: >-
+                RFC-3339 timestamp (millisecond precision) when the current
+                period opened. Omitted on the STREAK_FAILED event.
+              example: '2026-05-01T12:00:00.000Z'
+            current_period_end_at:
+              type: string
+              description: >-
+                RFC-3339 timestamp (millisecond precision) when the current
+                period closes. Omitted on the STREAK_FAILED event.
+              example: '2026-05-31T12:00:00.000Z'
+            benefits:
+              type: array
+              description: >-
+                Partner-facing benefit identifiers to fulfill for the streak.
+                Always present; populated only on the STREAK_COMPLETED event and
+                empty on all other events.
+              items:
+                type: string
+              example:
+                - BENEFIT_1
+            created_at:
+              type: string
+              description: >-
+                RFC-3339 timestamp (millisecond precision) when the triggering
+                event occurred. Present on every event.
+              example: '2026-05-01T12:00:01.000Z'
+            metadata:
+              type: object
+              additionalProperties: true
+            customer_metadata:
+              type: object
+              description: A set of key-value pairs of metadata attached to the customer.
+              additionalProperties:
+                type: string
+              example:
+                loyalty_id: '840012345678'
+                membership_tier: gold
+    StreakEvent:
+      type: string
+      description: The streak lifecycle event being signalled.
+      enum:
+        - ENROLLED
+        - PERIOD_COMPLETED
+        - STREAK_COMPLETED
+        - STREAK_FAILED
+      example: STREAK_COMPLETED
+    StreakStatus:
+      type: string
+      description: >-
+        The status of the streak, derived from the event. ENROLLED and
+        PERIOD_COMPLETED carry IN_PROGRESS; STREAK_COMPLETED carries COMPLETED;
+        STREAK_FAILED carries FAILED.
+      enum:
+        - IN_PROGRESS
+        - COMPLETED
+        - FAILED
+      example: COMPLETED
+    AccountStatusWebhookPayload:
+      type: object
+      properties:
+        object:
+          type: string
+          description: The type of object this webhook event relates to.
+          enum:
+            - ACCOUNT_STATUS
+          example: ACCOUNT_STATUS
+        data:
+          type: object
+          properties:
+            merchant_key:
+              type: string
+              description: >-
+                Unique identifier for the merchant associated with this webhook
+                event.
+              example: MERCHANT_ABC
+            customer_id:
+              type: string
+              description: Imprint's unique identifier for the associated customer.
+              example: 2EE24580-B97B-4949-A65C-929CCB9B9B8D
+            partner_customer_id:
+              $ref: '#/components/schemas/PartnerCustomerId'
+            status:
+              $ref: '#/components/schemas/AccountStatusValue'
+            updated_at:
+              type: string
+              description: >-
+                RFC-3339 timestamp when the account status transition took
+                effect. May be backdated when the transition has an effective
+                date earlier than delivery (e.g. a debt sale).
+              example: '2026-05-01T12:00:00Z'
+            customer_metadata:
+              type: object
+              description: A set of key-value pairs of metadata attached to the customer.
+              additionalProperties:
+                type: string
+              example:
+                loyalty_id: '840012345678'
+                membership_tier: gold
+    AccountStatusValue:
+      type: string
+      description: The customer's account status.
+      enum:
+        - CLOSED
+      example: CLOSED
+    RewardStatus:
+      type: string
+      enum:
+        - PENDING
+        - AVAILABLE
+        - PENDING_DEDUCTION
+        - DEDUCTED
+      example: PENDING
+    RewardType:
+      type: string
+      enum:
+        - OFFER
+        - TRANSACTION
+        - ONE_TIME
+        - STATEMENT
+        - REFERRAL
+      example: TRANSACTION
+    Offer:
+      type: object
+      description: Offer marketing placement returned for a partner customer
+      required:
+        - id
+        - is_prescreened
+        - title
+        - description
+      properties:
+        id:
+          type: string
+          description: The unique ID Imprint assigns to the offer placement
+          example: 2ade1a36-b6f7-489b-a941-865c33f82f5a
+        is_prescreened:
+          type: boolean
+          description: Indicates whether the offer is a prescreened offer
+          example: true
+        title:
+          type: string
+          description: Short, human-readable title for the offer
+          example: 'Welcome Offer: Earn $25'
+        description:
+          type: string
+          description: Full marketing copy for the offer
+          example: >-
+            Sign-up, accept your offer, and spend $500 in the first 90 days of
+            becoming a cardholder to unlock your $25 welcome bonus. To qualify
+            for the $25 bonus, you must make qualifying purchases totaling $500
+            or more using your Company® Card within 90 days of account approval.
+    TransactionCurrency:
+      type: string
+      description: >-
+        The 3-character currency code of the amount in ISO 4217 format (e.g.,
+        "USD")
+      example: USD
+    RewardCurrency:
+      type: string
+      description: >-
+        The 3-character currency code of the amount in ISO 4217 format (e.g.,
+        "USD") or a reward unit (e.g., "POINTS")
+      example: POINTS
+    Key:
+      type: object
+      description: Represents an API Key
+      properties:
+        key:
+          type: string
+          description: API Key value
+          example: test_
+        created_at:
+          type: string
+          description: the RFC-3339 date when the key was created
+          example: 2025-02-13T19:08:07.000Z
+        deleted_at:
+          type: string
+          description: the RFC-3339 date when the key was deleted
+          example: 2025-02-13T19:08:07.000Z
+    TransactionIntentStatus:
+      type: string
+      enum:
+        - CONFIRMED
+        - CANCELED
+      example: CONFIRMED
+    CardDesignID:
+      type: string
+      description: Imprint ID for the graphic design printed on the card
+      example: 3b9c1f3e-52a0-44c1-b131-a7ab0099a214
+    CardType:
+      type: string
+      description: The type of card
+      enum:
+        - PHYSICAL
+        - VIRTUAL
+        - UNIFIED
+    OrderEvent:
+      allOf:
+        - $ref: '#/components/schemas/OrderEventBase'
+    OrderEventBase:
+      type: object
+      required:
+        - order_id
+        - type
+        - amount
+        - network_transaction_id
+      properties:
+        order_event_id:
+          type: string
+          description: The ID of the order event
+          example: 77f60af4-185e-4867-b113-34e3cf7c6acd
+        order_id:
+          type: string
+          description: The ID of the order to which the event is related
+          example: 77f60af4-185e-4867-b113-34e3cf7c6acd
+        partner_event_id:
+          type: string
+          description: Partner's event identifier
+          example: 7622c07d-eb2b-4345-a9a9-345d61d32bc2
+        type:
+          type: string
+          enum:
+            - CAPTURED
+            - REFUNDED
+          description: Type of order event
+          example: CAPTURED
+        amount:
+          allOf:
+            - $ref: '#/components/schemas/CurrencyAmount'
+            - example: 274999
+              description: Total event amount ($2,699.99 + $50.00)
+        rewards_amount:
+          allOf:
+            - $ref: '#/components/schemas/CurrencyAmount'
+            - example: 2500
+              description: Total rewards amount for the event ($25 + $0)
+        currency:
+          type: string
+          description: >-
+            The 3-character currency code of the amount in ISO 4217 format
+            (e.g., "USD")
+          example: USD
+        network_transaction_id:
+          type: string
+          description: Card network transaction identifier
+          example: 615e3ba0-6b99-495b-ade4-1f584c40f376
+        order_lines:
+          type: array
+          items:
+            $ref: '#/components/schemas/OrderLine'
+          description: >-
+            When provided, the API will require that the calculated sum of all
+            the rates and rewards rates within (taking quantities into account)
+            are equal to the `amount` and `rewards_amount`, respectively.
+
+            It is important to note that the sums of all *event* amounts and
+            *event* rewards amounts belonging to an order do not need to be
+            equal to `total_order_amount` and `total_rewards_amount` in the
+            order, as the data contained in events will serve as the final
+            source of truth for the lifecycle of the order, as it actually
+            transpired.
+          example:
+            - name: Couch Supreme
+              product_url: www.restassured.com/couch-supreme
+              quantity: 1
+              rate: 274999
+              rewards_rate: 2500
+    OrderEventsResponse:
+      type: object
+      required:
+        - data
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/OrderEvent'
+          description: List of order events
+        has_more:
+          type: boolean
+        total:
+          type: integer
+    Order:
+      allOf:
+        - $ref: '#/components/schemas/OrderBase'
+    OrderBase:
+      type: object
+      required:
+        - payment_method_id
+        - total_order_amount
+        - partner_order_id
+      properties:
+        id:
+          type: string
+          description: Unique identifier for the order
+          example: 77f60af4-185e-4867-b113-34e3cf7c6acd
+        customer_id:
+          type: string
+          description: Customer identifier
+          example: 1bb0ab64-ed57-4f2f-bd8d-ab04d1a365c5
+        payment_method_id:
+          type: string
+          description: Payment method identifier
+          example: 0144ea84-3c39-4382-a37a-03c699b77646
+        partner_order_id:
+          type: string
+          description: Partner's order identifier
+          example: o-c8a1fe46bbff4a18ba1d
+        merchant_id:
+          type: string
+          nullable: true
+          description: Merchant identifier
+          example: m-123456789
+        merchant_name:
+          type: string
+          nullable: true
+          description: Merchant name
+          example: Rest Assured
+        merchant_address:
+          type: array
+          items:
+            $ref: '#/components/schemas/Address'
+          description: List of merchant addresses
+        order_lines:
+          type: array
+          items:
+            $ref: '#/components/schemas/OrderLine'
+          description: >-
+            An array of items that make up the order, used for the purpose of
+            establishing the items, amounts, and rewards that are *expected* to
+            be included in events sent to Imprint following order creation.
+
+            Changes made to orders after the order is created can be implicitly
+            communicated to Imprint through the event creation process following
+            the creation of the order; modifying the order itself is not
+            necessary. The set of events sent to Imprint after order creation
+            serve as the final source of truth for transaction amounts, rewards,
+            order lines, etc.
+
+            When provided, the API will require that the calculated sum of all
+            the rates and rewards rates within (taking quantities into account)
+            are equal to the `total_order_amount` and `total_rewards_amount`,
+            respectively.
+          example:
+            - name: Couch Supreme
+              product_url: www.restassured.com/couch-supreme
+              quantity: 1
+              rate: 274999
+              rewards_rate: 2500
+        total_order_amount:
+          allOf:
+            - $ref: '#/components/schemas/CurrencyAmount'
+            - example: 274999
+              description: Total order amount ($2,699.99 + $50.00)
+        total_rewards_amount:
+          allOf:
+            - $ref: '#/components/schemas/CurrencyAmount'
+            - example: 2500
+              description: Total rewards amount ($25 + $0)
+        currency:
+          type: string
+          description: >-
+            The 3-character currency code of the amount in ISO 4217 format
+            (e.g., "USD")
+          example: USD
+        created_at:
+          type: string
+          format: date-time
+          nullable: true
+          description: The RFC-3339 timestamp when the order was created
+          example: '2025-02-13T19:08:07Z'
+        updated_at:
+          type: string
+          format: date-time
+          nullable: true
+          description: The RFC-3339 timestamp when the order was last updated
+          example: '2025-02-13T19:08:07Z'
+    OrderLine:
+      type: object
+      required:
+        - name
+        - quantity
+        - rate
+        - rewards_rate
+      properties:
+        name:
+          type: string
+          description: Name of the order line item
+          example: Couch Supreme
+        product_url:
+          type: string
+          nullable: true
+          description: URL to the product
+          example: www.restassured.com/couch-supreme
+        quantity:
+          type: integer
+          description: Quantity of the item
+          example: 1
+        rate:
+          allOf:
+            - $ref: '#/components/schemas/CurrencyAmount'
+            - example: 274999
+        rewards_rate:
+          allOf:
+            - $ref: '#/components/schemas/CurrencyAmount'
+            - example: 2500
+    OrdersResponse:
+      type: object
+      required:
+        - orders
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/Order'
+          description: List of orders
+    ApiError:
+      type: object
+      required:
+        - error
+      properties:
+        error:
+          type: object
+          required:
+            - type
+            - message
+          properties:
+            type:
+              type: string
+              description: The category of error being returned
+              example: BAD_REQUEST_ERROR
+            message:
+              type: string
+              description: A message describing the cause of the error
+              example: 'unsupported reward_type: INVALID, must be STATEMENT or DELAYED'
+  securitySchemes:
+    basicAuth:
+      type: http
+      scheme: basic
+      description: >-
+        Basic HTTP authentication. Allowed headers-- Authorization: Basic
+        <base64(api_key_id:api_key_secret)>
+    bearerAuth:
+      bearerFormat: auth-scheme
+      description: >-
+        Bearer HTTP authentication. Allowed headers-- Authorization: Bearer
+        <api_key>
+      scheme: bearer
+      type: http

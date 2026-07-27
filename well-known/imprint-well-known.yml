@@ -1,0 +1,33 @@
+generated: '2026-07-19'
+method: searched
+source: live probes of /.well-known/ on Imprint hosts
+hosts:
+  - https://imprint.co
+  - https://dev.imprint.co
+  - https://docs.imprint.co
+documents:
+  - host: https://dev.imprint.co
+    path: /.well-known/security.txt
+    status: 404
+  - host: https://imprint.co
+    path: /.well-known/security.txt
+    status: 404
+  - host: https://docs.imprint.co
+    path: /.well-known/security.txt
+    status: 404
+  - host: https://dev.imprint.co
+    path: /.well-known/openid-configuration
+    status: 404
+  - host: https://dev.imprint.co
+    path: /.well-known/oauth-authorization-server
+    status: 404
+  - host: https://dev.imprint.co
+    path: /.well-known/api-catalog
+    status: 404
+  - host: https://imprint.co
+    path: /.well-known/ai-plugin.json
+    status: 404
+note: >-
+  No /.well-known/ discovery documents are published. Absence is expected and
+  recorded as valid data. Imprint uses HTTP Basic/Bearer API-key auth (no OIDC/OAuth
+  discovery surface).

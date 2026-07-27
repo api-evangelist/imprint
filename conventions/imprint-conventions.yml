@@ -1,0 +1,69 @@
+generated: '2026-07-19'
+method: searched
+source: >-
+  https://docs.imprint.co/authentication, https://docs.imprint.co/data-types,
+  https://docs.imprint.co/error-handling, https://docs.imprint.co/base-urls,
+  openapi/imprint-openapi-original.yml
+authentication:
+  style: api-key
+  transports:
+    - http-basic   # API key as the basic-auth username, empty password
+    - http-bearer  # Authorization: Bearer <api_key>
+  multi_product_header:
+    name: x-imprint-merchant-key
+    required: false
+    description: Targets a specific co-branded product for multi-product partnerships.
+  see: authentication/imprint-authentication.yml
+versioning:
+  scheme: uri-path
+  current: v2
+  example: https://dev.imprint.co/v2/customers
+  see: lifecycle/imprint-lifecycle.yml
+pagination:
+  style: cursor
+  request_params:
+    - name: limit
+      description: Page size.
+    - name: starting_after
+      description: Cursor; the id of the last item on the previous page.
+  response_fields:
+    - data      # array of results
+    - has_more  # boolean, more pages available
+    - total     # total count (where provided)
+data_types:
+  amounts:
+    unit: minor
+    description: Amounts are integers in the currency's minor unit (e.g. 1000 = $10.00 USD).
+  currencies:
+    standard: ISO 4217
+    default: USD
+  dates:
+    standard: RFC 3339
+    example: '2025-02-13T19:08:07.000Z'
+    fields: [created_at, updated_at]
+error_envelope:
+  shape: '{ "error": { "type": <code>, "message": <human>, "param": <field?> } }'
+  code_field: type
+  message_field: message
+  param_field: param
+  note: >-
+    Custom error envelope (NOT RFC 9457 problem+json). Some validation errors use
+    an alternate InvalidRequestError shape with error/details/path/timestamp.
+  see: errors/imprint-problem-types.yml
+webhooks:
+  signing:
+    header: X-IMPRINT-HMAC-SIGNATURE
+    format: 't=<unix_ms>,s=<hex_hmac_sha256>'
+    algorithm: HMAC-SHA256
+    signed_payload: '<timestamp>.<raw_request_body>'
+    token: Event signing token issued during event-notification enrollment (hashed with SHA-256).
+    see: https://docs.imprint.co/verify-event-notification
+  see: asyncapi/imprint-webhooks.yml
+idempotency:
+  supported: false
+  note: >-
+    No Idempotency-Key header or idempotent-retry contract is documented in the
+    API reference or OpenAPI as of this capture. Do not assume safe retries on
+    non-idempotent POSTs.
+rate_limiting:
+  documented: false

@@ -1,0 +1,58 @@
+generated: '2026-07-19'
+method: searched
+source: https://docs.imprint.co/tips-for-sandbox, https://docs.imprint.co/base-urls, https://docs.imprint.co/simulate-transaction-events-in-sandbox
+environments:
+  sandbox:
+    base_url: https://dev.sbx.imprint.co
+    description: Familiarize yourself with API behavior and build your integration.
+  production:
+    base_url: https://dev.imprint.co
+    description: Live environment for real applications and transactions.
+notes: >-
+  API keys are environment-specific (issued and managed in the Imprint Dashboard).
+  Imprint does not send SMS or email in sandbox. Never invent test values beyond
+  those published below.
+test_values:
+  one_time_password:
+    value: '888888'
+    description: >-
+      Whenever prompted for a one-time password (OTP) in sandbox, enter 888888.
+      No other value is accepted.
+  application_outcome_simulation:
+    field: customer last name
+    case_sensitive: true
+    description: >-
+      Set the customer's Last Name (case-sensitive) to drive the application
+      outcome in sandbox.
+    mapping:
+      - last_name: approve
+        outcome: APPROVED
+      - last_name: review
+        outcome: ACTION_REQUIRED
+      - last_name: frozen
+        outcome: ACTION_REQUIRED
+      - last_name: (anything else)
+        outcome: REJECTED
+  phone_number_indexing:
+    description: >-
+      Imprint indexes payment-method applications by the customer's phone number.
+      Re-using a phone number that has an active application resumes that
+      application; use a fresh phone number to start a brand-new application.
+    detection_message: "Looks like you already have an account with Imprint!"
+simulation_endpoints:
+  - operationId: simulateTransactionEvent
+    path: POST /v2/simulate_transaction_event
+    description: Create transaction events in the sandbox environment.
+  - operationId: simulateReward
+    path: POST /v2/simulate_reward
+    description: Initiate a reward webhook in sandbox; specify the reward type to process pending rewards.
+  - operationId: simulateStatementReward
+    path: POST /v2/simulate_statement_reward
+    description: Initiate a statement reward webhook in sandbox.
+sandbox_only:
+  note: >-
+    The simulate_* endpoints are only available in the sandbox environment and
+    return 403 in production.
+egress_ips:
+  sandbox: [3.234.133.80, 44.195.50.226, 34.195.81.111, 34.233.222.223, 13.216.131.91, 54.165.100.6]
+  production: [52.207.135.140, 52.23.113.79]

@@ -1,0 +1,22 @@
+overlay: 1.0.0
+info:
+  title: API Evangelist enhancements for Imprint Public API
+  version: 1.0.0
+extends: openapi/imprint-openapi-original.yml
+actions:
+  - target: $.info
+    update:
+      x-apievangelist-provider: imprint
+      x-apievangelist-review-date: '2026-07-19'
+      x-apievangelist-auth: HTTP Basic / Bearer API key
+      x-apievangelist-pagination: cursor (limit + starting_after; data/has_more/total)
+      x-apievangelist-error-format: 'custom envelope { error: { type, message, param } } (not RFC 9457)'
+      x-apievangelist-webhook-signing: 'HMAC-SHA256 via X-IMPRINT-HMAC-SIGNATURE'
+      x-apievangelist-idempotency: not-documented
+      x-apievangelist-compliance: [SOC 2, ISO 27001, PCI DSS]
+  - target: $.servers
+    update:
+      - url: https://dev.imprint.co
+        description: Imprint public API production (added by API Evangelist; docs/base-urls)
+      - url: https://dev.sbx.imprint.co
+        description: Imprint public API sandbox

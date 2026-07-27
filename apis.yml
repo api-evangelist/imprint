@@ -1,8 +1,29 @@
 aid: imprint
 name: Imprint
-description: Imprint is a company surfaced as a portfolio company of khosla-ventures, kleiner-perkins,
-  ribbit-capital and added to the API Evangelist network as a stub for enrichment. This profile is a lead
-  awaiting the enrichment pipeline.
+description: >-
+  Imprint is a financial technology company that builds bespoke co-branded credit
+  cards, deposit accounts, and installment loans for consumer brands such as Shell,
+  Rakuten, and Booking.com. Its Imprint Core platform powers the full lifecycle of a
+  co-branded program - application, card issuance, transactions, rewards, and account
+  management. The public Imprint API (v2) lets partners create customer sessions that
+  hand a client_secret to embeddable Web/iOS/Android SDKs, manage customers and payment
+  methods, track transaction intents and transactions, run reward programs, manage
+  orders, and receive HMAC-signed webhook event notifications. Authentication is via
+  environment-specific API keys (HTTP Basic or Bearer), with separate sandbox and
+  production environments.
+accessModel:
+  pricing: unknown
+  onboarding: self-serve
+  trial: false
+  try_now: false
+  public: false
+  label: Self-serve signup
+  confidence: medium
+  source:
+  - authentication
+  generated: '2026-07-22'
+  method: derived
+image: https://framerusercontent.com/assets/CVGaxWn2JW3mV5KWWXmkzXVM.png
 url: https://raw.githubusercontent.com/api-evangelist/imprint/refs/heads/main/apis.yml
 x-type: company
 x-source: vc-portfolio
@@ -10,14 +31,249 @@ x-backed-by:
 - khosla-ventures
 - kleiner-perkins
 - ribbit-capital
-x-tier: stub
-x-tier-reason: portfolio-lead
+x-tier: profiled
+x-tier-reason: portfolio-lead-enriched
 specificationVersion: '0.20'
 created: '2026-07-17'
-modified: '2026-07-17'
+modified: '2026-07-19'
 tags:
 - Company
-apis: []
+- Financial Services
+- Fintech
+- Credit Cards
+- Co-Branded Cards
+- Payments
+- Loans
+- Rewards
+- Loyalty
+- Embedded Finance
+apis:
+- aid: imprint:imprint-customer-links-api
+  name: Imprint Customer Links API
+  description: The Customer Links API from Imprint — 1 operation(s) for customer links.
+  humanURL: https://docs.imprint.co/
+  baseURL: https://dev.imprint.co
+  tags:
+  - Customer Links
+  properties:
+  - type: OpenAPI
+    url: openapi/imprint-customer-links-api-openapi.yml
+  - type: Documentation
+    url: https://docs.imprint.co/
+  - type: APIReference
+    url: https://docs.imprint.co/api-reference
+  - type: Authentication
+    url: authentication/imprint-authentication.yml
+- aid: imprint:imprint-customer-sessions-api
+  name: Imprint Customer Sessions API
+  description: The Customer Sessions API from Imprint — 2 operation(s) for customer sessions.
+  humanURL: https://docs.imprint.co/
+  baseURL: https://dev.imprint.co
+  tags:
+  - Customer Sessions
+  properties:
+  - type: OpenAPI
+    url: openapi/imprint-customer-sessions-api-openapi.yml
+  - type: Documentation
+    url: https://docs.imprint.co/
+  - type: APIReference
+    url: https://docs.imprint.co/api-reference
+  - type: Authentication
+    url: authentication/imprint-authentication.yml
+- aid: imprint:imprint-customers-api
+  name: Imprint Customers API
+  description: The Customers API from Imprint — 7 operation(s) for customers.
+  humanURL: https://docs.imprint.co/
+  baseURL: https://dev.imprint.co
+  tags:
+  - Customers
+  properties:
+  - type: OpenAPI
+    url: openapi/imprint-customers-api-openapi.yml
+  - type: Documentation
+    url: https://docs.imprint.co/
+  - type: APIReference
+    url: https://docs.imprint.co/api-reference
+  - type: Authentication
+    url: authentication/imprint-authentication.yml
+- aid: imprint:imprint-keys-api
+  name: Imprint Keys API
+  description: The Keys API from Imprint — 1 operation(s) for keys.
+  humanURL: https://docs.imprint.co/
+  baseURL: https://dev.imprint.co
+  tags:
+  - Keys
+  properties:
+  - type: OpenAPI
+    url: openapi/imprint-keys-api-openapi.yml
+  - type: Documentation
+    url: https://docs.imprint.co/
+  - type: APIReference
+    url: https://docs.imprint.co/api-reference
+  - type: Authentication
+    url: authentication/imprint-authentication.yml
+- aid: imprint:imprint-offers-api
+  name: Imprint Offers API
+  description: The Offers API from Imprint — 1 operation(s) for offers.
+  humanURL: https://docs.imprint.co/
+  baseURL: https://dev.imprint.co
+  tags:
+  - Offers
+  properties:
+  - type: OpenAPI
+    url: openapi/imprint-offers-api-openapi.yml
+  - type: Documentation
+    url: https://docs.imprint.co/
+  - type: APIReference
+    url: https://docs.imprint.co/api-reference
+  - type: Authentication
+    url: authentication/imprint-authentication.yml
+- aid: imprint:imprint-order-events-api
+  name: Imprint Order Events API
+  description: The Order Events API from Imprint — 2 operation(s) for order events.
+  humanURL: https://docs.imprint.co/
+  baseURL: https://dev.imprint.co
+  tags:
+  - Order Events
+  properties:
+  - type: OpenAPI
+    url: openapi/imprint-order-events-api-openapi.yml
+  - type: Documentation
+    url: https://docs.imprint.co/
+  - type: APIReference
+    url: https://docs.imprint.co/api-reference
+  - type: Authentication
+    url: authentication/imprint-authentication.yml
+- aid: imprint:imprint-orders-api
+  name: Imprint Orders API
+  description: The Orders API from Imprint — 2 operation(s) for orders.
+  humanURL: https://docs.imprint.co/
+  baseURL: https://dev.imprint.co
+  tags:
+  - Orders
+  properties:
+  - type: OpenAPI
+    url: openapi/imprint-orders-api-openapi.yml
+  - type: Documentation
+    url: https://docs.imprint.co/
+  - type: APIReference
+    url: https://docs.imprint.co/api-reference
+  - type: Authentication
+    url: authentication/imprint-authentication.yml
+- aid: imprint:imprint-payment-methods-api
+  name: Imprint Payment Methods API
+  description: The Payment Methods API from Imprint — 2 operation(s) for payment methods.
+  humanURL: https://docs.imprint.co/
+  baseURL: https://dev.imprint.co
+  tags:
+  - Payment Methods
+  properties:
+  - type: OpenAPI
+    url: openapi/imprint-payment-methods-api-openapi.yml
+  - type: Documentation
+    url: https://docs.imprint.co/
+  - type: APIReference
+    url: https://docs.imprint.co/api-reference
+  - type: Authentication
+    url: authentication/imprint-authentication.yml
+- aid: imprint:imprint-rewards-api
+  name: Imprint Rewards API
+  description: The Rewards API from Imprint — 2 operation(s) for rewards.
+  humanURL: https://docs.imprint.co/
+  baseURL: https://dev.imprint.co
+  tags:
+  - Rewards
+  properties:
+  - type: OpenAPI
+    url: openapi/imprint-rewards-api-openapi.yml
+  - type: Documentation
+    url: https://docs.imprint.co/
+  - type: APIReference
+    url: https://docs.imprint.co/api-reference
+  - type: Authentication
+    url: authentication/imprint-authentication.yml
+- aid: imprint:imprint-simulate-reward-api
+  name: Imprint Simulate Reward API
+  description: The Simulate Reward API from Imprint — 1 operation(s) for simulate reward.
+  humanURL: https://docs.imprint.co/
+  baseURL: https://dev.imprint.co
+  tags:
+  - Simulate Reward
+  properties:
+  - type: OpenAPI
+    url: openapi/imprint-simulate-reward-api-openapi.yml
+  - type: Documentation
+    url: https://docs.imprint.co/
+  - type: APIReference
+    url: https://docs.imprint.co/api-reference
+  - type: Authentication
+    url: authentication/imprint-authentication.yml
+- aid: imprint:imprint-simulate-statement-reward-api
+  name: Imprint Simulate Statement Reward API
+  description: >-
+    The Simulate Statement Reward API from Imprint — 1 operation(s) for simulate statement reward.
+  humanURL: https://docs.imprint.co/
+  baseURL: https://dev.imprint.co
+  tags:
+  - Simulate Statement Reward
+  properties:
+  - type: OpenAPI
+    url: openapi/imprint-simulate-statement-reward-api-openapi.yml
+  - type: Documentation
+    url: https://docs.imprint.co/
+  - type: APIReference
+    url: https://docs.imprint.co/api-reference
+  - type: Authentication
+    url: authentication/imprint-authentication.yml
+- aid: imprint:imprint-simulate-transaction-event-api
+  name: Imprint Simulate Transaction Event API
+  description: >-
+    The Simulate Transaction Event API from Imprint — 1 operation(s) for simulate transaction event.
+  humanURL: https://docs.imprint.co/
+  baseURL: https://dev.imprint.co
+  tags:
+  - Simulate Transaction Event
+  properties:
+  - type: OpenAPI
+    url: openapi/imprint-simulate-transaction-event-api-openapi.yml
+  - type: Documentation
+    url: https://docs.imprint.co/
+  - type: APIReference
+    url: https://docs.imprint.co/api-reference
+  - type: Authentication
+    url: authentication/imprint-authentication.yml
+- aid: imprint:imprint-transaction-intents-api
+  name: Imprint Transaction Intents API
+  description: The Transaction Intents API from Imprint — 2 operation(s) for transaction intents.
+  humanURL: https://docs.imprint.co/
+  baseURL: https://dev.imprint.co
+  tags:
+  - Transaction Intents
+  properties:
+  - type: OpenAPI
+    url: openapi/imprint-transaction-intents-api-openapi.yml
+  - type: Documentation
+    url: https://docs.imprint.co/
+  - type: APIReference
+    url: https://docs.imprint.co/api-reference
+  - type: Authentication
+    url: authentication/imprint-authentication.yml
+- aid: imprint:imprint-transactions-api
+  name: Imprint Transactions API
+  description: The Transactions API from Imprint — 1 operation(s) for transactions.
+  humanURL: https://docs.imprint.co/
+  baseURL: https://dev.imprint.co
+  tags:
+  - Transactions
+  properties:
+  - type: OpenAPI
+    url: openapi/imprint-transactions-api-openapi.yml
+  - type: Documentation
+    url: https://docs.imprint.co/
+  - type: APIReference
+    url: https://docs.imprint.co/api-reference
+  - type: Authentication
+    url: authentication/imprint-authentication.yml
 maintainers:
 - FN: Kin Lane
   email: kin@apievangelist.com
@@ -26,3 +282,66 @@ maintainers:
 common:
 - type: Website
   url: https://imprint.co/
+- type: DeveloperPortal
+  url: https://docs.imprint.co/
+- type: Documentation
+  url: https://docs.imprint.co/
+- type: APIReference
+  url: https://docs.imprint.co/api-reference
+- type: GettingStarted
+  url: https://docs.imprint.co/welcome
+- type: Support
+  url: https://imprint.co/support
+- type: Blog
+  url: https://tech.imprint.co/
+- type: GitHubOrganization
+  url: https://github.com/Imprint-Tech
+- type: TermsOfService
+  url: https://imprint.co/terms-of-use
+- type: PrivacyPolicy
+  url: https://imprint.co/privacy-notice
+- type: StatusPage
+  url: https://status.imprint.co/partners
+- type: TrustCenter
+  url: security/imprint-trust-center.yml
+- type: Compliance
+  url: https://trust.imprint.co/
+- type: Authentication
+  url: authentication/imprint-authentication.yml
+- type: Packages
+  url: packages/imprint-packages.yml
+- type: SDKs
+  url: packages/imprint-packages.yml
+- type: Components
+  url: components/imprint-components.yml
+- type: MCPServer
+  url: mcp/imprint-mcp.yml
+- type: LLMsTxt
+  url: llms/imprint-llms.txt
+- type: Overlay
+  url: overlays/imprint-openapi-overlay.yaml
+- type: Conformance
+  url: conformance/imprint-conformance.yml
+- type: ErrorCatalog
+  url: errors/imprint-problem-types.yml
+- type: Lifecycle
+  url: lifecycle/imprint-lifecycle.yml
+- type: Conventions
+  url: conventions/imprint-conventions.yml
+- type: DataModel
+  url: data-model/imprint-data-model.yml
+- type: Sandbox
+  url: sandbox/imprint-sandbox.yml
+- type: Webhooks
+  url: asyncapi/imprint-webhooks.yml
+- type: WellKnown
+  url: well-known/imprint-well-known.yml
+- type: DomainSecurity
+  url: security/imprint-domain-security.yml
+- type: AgentSkill
+  url: skills/_index.yml
+x-enrichment:
+  date: '2026-07-19'
+  status: backfilled
+  pass: local-v1
+  note: backfilled from .gitignore signal + verified work evidence

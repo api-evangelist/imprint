@@ -1,0 +1,36 @@
+generated: '2026-07-19'
+method: searched
+source: https://docs.imprint.co/web, https://docs.imprint.co/ios, https://docs.imprint.co/android
+note: >-
+  Imprint's client-side SDKs embed the co-branded "application experience" (the
+  card/loan application, and redirect flows like Account Linking) into a partner
+  surface. Each is initialized with an ImprintConfiguration carrying the
+  client_secret from a customer session and an environment. Distinct from a
+  server-side API client library.
+families:
+  - family: Web SDK
+    kind: embedded-iframe
+    loader: https://apply.imprint.co/imprintsdk.js
+    container: '<div id="imprint-ui" />'
+    docs: https://docs.imprint.co/web
+    notes: >-
+      Renders the application experience inside an injected <iframe>. Redirect
+      targets must be frameable (no X-Frame-Options DENY / restrictive CSP
+      frame-ancestors), which chiefly affects the Account Linking flow.
+  - family: iOS SDK
+    kind: native-view
+    module: Imprint
+    distribution: Swift Package Manager (github.com/Imprint-Tech/imprint-sdk-ios)
+    config: ImprintConfiguration(clientSecret:, environment:)
+    docs: https://docs.imprint.co/ios
+  - family: Android SDK
+    kind: native-view
+    module: co.imprint.sdk.Imprint
+    distribution: Gradle (co.imprint.sdk:imprint-sdk)
+    config: ImprintConfiguration(clientSecret =, environment =)
+    docs: https://docs.imprint.co/android
+completion_states:
+  - OFFER_ACCEPTED
+  - REJECTED
+  - IN_PROGRESS
+  - ERROR

@@ -1,0 +1,97 @@
+generated: '2026-07-19'
+method: derived
+source: openapi/imprint-openapi-original.yml
+docs: https://docs.imprint.co/api-reference
+note: >-
+  Entity-relationship graph derived from OpenAPI schema id-reference fields. The
+  Customer is the aggregate root; a partner_customer_id cross-references the
+  partner's own system.
+entities:
+  - name: Customer
+    id_field: id
+    external_ref: partner_customer_id
+  - name: CustomerSession
+    id_field: id
+    note: Time-limited session that yields a client_secret for the SDK application flow.
+  - name: CustomerLink
+    note: Join between an Imprint Customer and a partner customer account.
+  - name: PaymentMethod
+    id_field: id
+    note: Issued credit card or loan.
+  - name: TransactionIntent
+    id_field: id
+    note: Pending financial transaction before finalization.
+  - name: Transaction
+    id_field: id
+  - name: TransactionEvent
+    note: Lifecycle event on a Transaction.
+  - name: Reward
+    id_field: id
+  - name: Order
+    id_field: id
+    external_ref: partner_order_id
+  - name: OrderEvent
+    id_field: order_event_id
+    external_ref: partner_event_id
+  - name: Offer
+    id_field: id
+  - name: Merchant
+    note: Co-branded product / merchant, selected via x-imprint-merchant-key.
+  - name: ApiKey
+relationships:
+  - from: CustomerLink
+    to: Customer
+    kind: belongs_to
+    via: customer_id
+  - from: PaymentMethod
+    to: Customer
+    kind: belongs_to
+    via: customer_id
+  - from: TransactionIntent
+    to: Customer
+    kind: belongs_to
+    via: customer_id
+  - from: TransactionIntent
+    to: PaymentMethod
+    kind: belongs_to
+    via: payment_method_id
+  - from: Transaction
+    to: Customer
+    kind: belongs_to
+    via: customer_id
+  - from: Transaction
+    to: PaymentMethod
+    kind: belongs_to
+    via: payment_method_id
+  - from: Transaction
+    to: TransactionIntent
+    kind: belongs_to
+    via: intent_id
+  - from: TransactionEvent
+    to: Transaction
+    kind: belongs_to
+    via: transaction_id
+  - from: Reward
+    to: Customer
+    kind: belongs_to
+    via: customer_id
+  - from: Reward
+    to: TransactionEvent
+    kind: belongs_to
+    via: transaction_event_id
+  - from: Order
+    to: Customer
+    kind: belongs_to
+    via: customer_id
+  - from: Order
+    to: PaymentMethod
+    kind: belongs_to
+    via: payment_method_id
+  - from: Order
+    to: Merchant
+    kind: belongs_to
+    via: merchant_id
+  - from: OrderEvent
+    to: Order
+    kind: belongs_to
+    via: order_id

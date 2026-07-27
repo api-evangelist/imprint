@@ -1,0 +1,85 @@
+generated: '2026-07-19'
+method: derived
+source: openapi/imprint-openapi-original.yml
+docs: https://docs.imprint.co/error-handling
+format: custom
+envelope:
+  shape: '{ "error": { "type": <code>, "message": <human>, "param": <field?> } }'
+  fields:
+    type: Machine-readable error category (e.g. CUSTOMER_NOT_FOUND_ERROR, BAD_REQUEST_ERROR).
+    message: Human-readable description of the cause.
+    param: The request parameter related to the error, when applicable.
+  alternate_validation_shape:
+    schema: InvalidRequestError
+    fields: [error, details, path, timestamp]
+    example_detail: 'email: must be a well-formed email address'
+notes: >-
+  Imprint uses standard HTTP status codes (2xx success, 4xx client error). Errors
+  are NOT RFC 9457 problem+json; they use the custom envelope above.
+status_codes:
+  - status: 400
+    meaning: Invalid request / bad parameters
+    type_example: BAD_REQUEST_ERROR / INVALID_REQUEST_ERROR
+    schema: InvalidRequestError
+  - status: 401
+    meaning: Unauthorized (missing or invalid API key)
+  - status: 403
+    meaning: Forbidden (e.g. simulate_* endpoints called outside sandbox)
+    schema: ApiError
+  - status: 404
+    meaning: Resource not found
+  - status: 409
+    meaning: Conflict (state prevents the requested change / already exists)
+    schema: ConflictError
+problems:
+  - status: 404
+    type: CUSTOMER_NOT_FOUND_ERROR
+    title: Customer not found
+    param: customer_id
+    source_operations: [getCustomer, getRewardsBalance, getPaymentMethods, getTransactions, getRewards, linkCustomerAccount]
+  - status: 404
+    type: PARTNER_CUSTOMER_NOT_FOUND_ERROR
+    title: Partner customer not found
+    param: partner_customer_id
+    source_operations: [getOffer]
+  - status: 404
+    type: SESSION_NOT_FOUND_ERROR
+    title: Session not found
+    param: session_id
+    source_operations: [getSession]
+  - status: 404
+    type: PAYMENT_METHOD_NOT_FOUND_ERROR
+    title: Payment method not found
+    param: payment_method_id
+    source_operations: [getPaymentMethod]
+  - status: 404
+    type: REWARD_NOT_FOUND_ERROR
+    title: Reward not found
+    param: reward_id
+    source_operations: [getReward]
+  - status: 404
+    type: TRANSACTION_INTENT_FOUND_ERROR
+    title: Transaction intent not found
+    param: intent_id
+    source_operations: [getTransactionIntent, getTransactionIntents]
+  - status: 404
+    type: TRANSACTION_FOUND_ERROR
+    title: Transaction not found
+    param: transaction_id
+    source_operations: [getTransaction, getTransactions]
+  - status: 400
+    type: INVALID_REQUEST_ERROR
+    title: Invalid request
+    source_operations: [linkCustomerAccount, createSession, searchPaymentMethodsPost, createTransactionIntent, updateTransactionIntent]
+  - status: 409
+    type: CONFLICT_ERROR
+    title: Conflict — current state prevents the update (e.g. customer already linked, simulation already in progress)
+    source_operations: [linkCustomerAccount, simulateTransactionEvent, simulateReward]
+  - status: 403
+    type: SANDBOX_ONLY_ERROR
+    title: Endpoint is only available in the sandbox environment
+    source_operations: [simulateReward, simulateStatementReward]
+  - status: 401
+    type: UNAUTHORIZED
+    title: Unauthorized
+    source_operations: [createKey, deleteKey]

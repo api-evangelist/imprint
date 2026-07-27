@@ -1,0 +1,19 @@
+generated: '2026-07-19'
+method: searched
+source: https://docs.imprint.co/base-urls, https://status.imprint.co/partners, openapi/imprint-openapi-original.yml
+versioning:
+  scheme: uri-path
+  current: v2
+  docs: https://docs.imprint.co/base-urls
+deprecation:
+  policy_url: null
+  sunset_header: null
+  note: No published deprecation/sunset policy found as of this capture.
+sla:
+  url: null
+  uptime_target: null
+status_page: https://status.imprint.co/partners
+environments:
+  sandbox: https://dev.sbx.imprint.co
+  production: https://dev.imprint.co
+deprecated_operations: []

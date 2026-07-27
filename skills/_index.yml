@@ -1,0 +1,16 @@
+generated: '2026-07-19'
+method: generated
+source: openapi/imprint-openapi-original.yml, https://docs.imprint.co
+skills:
+  - file: imprint-apply-for-card.md
+    name: Apply for an Imprint card or loan
+    api: openapi/imprint-openapi-original.yml
+    operations: [createSession, getSession, getPaymentMethod, linkCustomerAccount]
+  - file: imprint-reconcile-transactions.md
+    name: Reconcile Imprint transactions
+    api: openapi/imprint-openapi-original.yml
+    operations: [createTransactionIntent, getTransactionIntent, searchTransactionIntents, updateTransactionIntent, getTransaction, getTransactions]
+  - file: imprint-manage-rewards.md
+    name: Manage Imprint rewards
+    api: openapi/imprint-openapi-original.yml
+    operations: [getRewardsBalance, getRewards, searchRewards, getReward, patchReward]

@@ -1,0 +1,46 @@
+generated: '2026-07-19'
+method: derived
+source: openapi/imprint-openapi-original.yml, https://trust.imprint.co/, https://docs.imprint.co/data-types
+standards:
+  - id: oauth2
+    conforms: false
+    evidence: No oauth2 securityScheme; auth is HTTP Basic / Bearer API key.
+  - id: oidc
+    conforms: false
+  - id: http-basic-auth
+    conforms: true
+    evidence: openapi securityScheme basicAuth (API key as basic-auth username)
+  - id: http-bearer-auth
+    conforms: true
+    evidence: openapi securityScheme bearerAuth
+  - id: rfc9457-problem-details
+    conforms: false
+    evidence: "Errors use a custom { error: { type, message, param } } envelope, not application/problem+json."
+  - id: iso4217-currencies
+    conforms: true
+    evidence: Amounts use ISO 4217 currency codes (default USD).
+  - id: rfc3339-dates
+    conforms: true
+    evidence: created_at/updated_at expressed as RFC 3339 timestamps.
+  - id: cursor-pagination
+    conforms: true
+    evidence: limit + starting_after cursor params; data/has_more/total response fields.
+  - id: hmac-signed-webhooks
+    conforms: true
+    evidence: X-IMPRINT-HMAC-SIGNATURE header, HMAC-SHA256 over timestamp.body.
+  - id: idempotency
+    conforms: false
+    evidence: No Idempotency-Key contract documented.
+  - id: pci-dss
+    conforms: true
+    evidence: PCI DSS listed on https://trust.imprint.co/
+  - id: soc2
+    conforms: true
+    evidence: SOC 2 listed on https://trust.imprint.co/
+  - id: iso27001
+    conforms: true
+    evidence: ISO 27001 listed on https://trust.imprint.co/
+compliance_program:
+  published: true
+  url: https://trust.imprint.co/
+  certifications: [SOC 2, ISO 27001, PCI DSS]

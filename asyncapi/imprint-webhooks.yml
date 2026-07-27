@@ -1,0 +1,45 @@
+generated: '2026-07-19'
+method: searched
+source: openapi/imprint-openapi-original.yml (webhooks), https://docs.imprint.co/guide-event-notifications
+spec_type: Webhooks
+transport: https
+delivery: Imprint POSTs JSON event notifications to a partner-registered endpoint.
+signing:
+  header: X-IMPRINT-HMAC-SIGNATURE
+  format: 't=<unix_ms>,s=<hex_hmac_sha256>'
+  algorithm: HMAC-SHA256
+  signed_payload: '<timestamp>.<raw_request_body>'
+  docs: https://docs.imprint.co/verify-event-notification
+events:
+  - name: Application
+    operationId: hookApplicationStatus
+    description: An application for a payment method is created or transitions statuses.
+    docs: https://docs.imprint.co/api-reference/webhooks/application-event-notification
+  - name: Transaction
+    operationId: hookTransactionStatus
+    description: A transaction is created or transaction events occur.
+    docs: https://docs.imprint.co/api-reference/webhooks/transaction-event-notification
+  - name: PaymentMethod
+    operationId: hookPaymentMethodStatus
+    description: A payment method (credit card or loan) is created or transitions statuses.
+    docs: https://docs.imprint.co/api-reference/webhooks/payment-method-event-notification
+  - name: CustomerLink
+    operationId: hookCustomerLink
+    description: A customer's Imprint account is successfully linked to a partner account.
+    docs: https://docs.imprint.co/api-reference/webhooks/customer-link-event-notification
+  - name: Reward
+    operationId: hookReward
+    description: A reward is created, updated, or made available.
+    docs: https://docs.imprint.co/api-reference/webhooks/reward-event-notification
+  - name: Streak
+    operationId: hookStreak
+    description: A customer's streak starts, progresses, completes, or fails.
+    docs: https://docs.imprint.co/api-reference/webhooks/streak-event-notification
+  - name: AccountStatus
+    operationId: hookAccountStatus
+    description: A customer's account reaches a terminal state (e.g. closure).
+    docs: https://docs.imprint.co/api-reference/webhooks/account-status-event-notification
+sandbox_simulation:
+  - operationId: simulateTransactionEvent
+  - operationId: simulateReward
+  - operationId: simulateStatementReward
