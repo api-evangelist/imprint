@@ -1,0 +1,352 @@
+{
+  "item": [
+    {
+      "id": "2e3b0b8f-eb78-4cf9-bf31-b8de45537c7a",
+      "name": "Customer Links",
+      "description": {
+        "content": "",
+        "type": "text/plain"
+      },
+      "item": [
+        {
+          "id": "108d68e1-22c5-44cc-a8ad-20ea222b46e0",
+          "name": "Link an Imprint customer and partner customer accounts",
+          "request": {
+            "name": "Link an Imprint customer and partner customer accounts",
+            "description": {
+              "content": "Creates a link between an existing Imprint customer and a partner's customer account. The API key provided with the request will be used to link the partner with the imprint customer.",
+              "type": "text/plain"
+            },
+            "url": {
+              "path": [
+                "v2",
+                "customers",
+                ":customer_id",
+                "link"
+              ],
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "query": [],
+              "variable": [
+                {
+                  "disabled": false,
+                  "type": "any",
+                  "value": "<string>",
+                  "key": "customer_id",
+                  "description": "(Required) The unique identifier for the Imprint customer"
+                }
+              ]
+            },
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "method": "POST",
+            "auth": null,
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"partner_customer_id\": \"<string>\",\n  \"metadata\": {\n    \"key_0\": 629,\n    \"key_1\": \"string\",\n    \"key_2\": true,\n    \"key_3\": true,\n    \"key_4\": \"string\"\n  }\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [
+            {
+              "id": "bd69b141-d06f-449c-85bb-8c5e8d9c0de3",
+              "name": "Customer accounts linked successfully",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "v2",
+                    "customers",
+                    ":customer_id",
+                    "link"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": [
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<string>",
+                      "key": "customer_id",
+                      "description": "(Required) The unique identifier for the Imprint customer"
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: basic",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Basic <credentials>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "POST",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"partner_customer_id\": \"PARTNER_USER_456\",\n  \"metadata\": {\n    \"store_id\": \"store_789\",\n    \"platform_version\": \"2.1.0\"\n  }\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"customer_id\": \"9B5E1EE0-2E1C-46E7-81B9-3C3917204BE4\",\n  \"partner_customer_id\": \"PARTNER_USER_456\",\n  \"status\": \"ACTIVE\",\n  \"created_at\": \"2025-02-13 19:08:07+00:00\",\n  \"updated_at\": \"2025-02-13 19:08:07+00:00\",\n  \"metadata\": {\n    \"store_id\": \"store_789\",\n    \"platform_version\": \"2.1.0\"\n  }\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "4e057ffc-3027-4e80-9c98-c6984f068948",
+              "name": "Invalid request",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "v2",
+                    "customers",
+                    ":customer_id",
+                    "link"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": [
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<string>",
+                      "key": "customer_id",
+                      "description": "(Required) The unique identifier for the Imprint customer"
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: basic",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Basic <credentials>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "POST",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"partner_customer_id\": \"PARTNER_USER_456\",\n  \"metadata\": {\n    \"store_id\": \"store_789\",\n    \"platform_version\": \"2.1.0\"\n  }\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "Bad Request",
+              "code": 400,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"path\": \"/v2/customers\",\n  \"details\": [\n    \"email: must be a well-formed email address\"\n  ],\n  \"error\": \"Bad Request\",\n  \"status\": 400,\n  \"timestamp\": \"2025-01-20T18:18:22.923+00:00\"\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "f0253237-62d9-4a6d-9203-4442d4e6a65e",
+              "name": "Customer not found",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "v2",
+                    "customers",
+                    ":customer_id",
+                    "link"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": [
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<string>",
+                      "key": "customer_id",
+                      "description": "(Required) The unique identifier for the Imprint customer"
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: basic",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Basic <credentials>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "POST",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"partner_customer_id\": \"PARTNER_USER_456\",\n  \"metadata\": {\n    \"store_id\": \"store_789\",\n    \"platform_version\": \"2.1.0\"\n  }\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "Not Found",
+              "code": 404,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"type\": \"CUSTOMER_NOT_FOUND_ERROR\",\n  \"message\": \"Customer not found for provided ID: CSMR-v1-123\",\n  \"param\": \"customer_id\"\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "ea4a5025-5797-4812-aad4-cb20e9dd45c6",
+              "name": "Customer already linked",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "v2",
+                    "customers",
+                    ":customer_id",
+                    "link"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": [
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<string>",
+                      "key": "customer_id",
+                      "description": "(Required) The unique identifier for the Imprint customer"
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: basic",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Basic <credentials>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "POST",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"partner_customer_id\": \"PARTNER_USER_456\",\n  \"metadata\": {\n    \"store_id\": \"store_789\",\n    \"platform_version\": \"2.1.0\"\n  }\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "Conflict",
+              "code": 409,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"error\": {\n    \"type\": \"string\",\n    \"message\": \"Customer already linked to a partner account\",\n    \"existing_link\": {\n      \"customer_id\": \"9B5E1EE0-2E1C-46E7-81B9-3C3917204BE4\",\n      \"partner_customer_id\": \"PARTNER_USER_456\",\n      \"status\": \"ACTIVE\",\n      \"created_at\": \"2025-02-13 19:08:07+00:00\",\n      \"updated_at\": \"2025-02-13 19:08:07+00:00\",\n      \"metadata\": {\n        \"store_id\": \"store_789\",\n        \"platform_version\": \"2.1.0\"\n      }\n    }\n  }\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            }
+          ],
+          "event": [],
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          }
+        }
+      ],
+      "event": []
+    }
+  ],
+  "event": [],
+  "variable": [
+    {
+      "type": "string",
+      "value": "https://dev.sbx.imprint.co",
+      "key": "baseUrl"
+    }
+  ],
+  "auth": {
+    "type": "basic",
+    "basic": [
+      {
+        "key": "username",
+        "value": "{{basicAuthUsername}}"
+      },
+      {
+        "key": "password",
+        "value": "{{basicAuthPassword}}"
+      }
+    ]
+  },
+  "info": {
+    "_postman_id": "5eaf925b-d4e5-44e0-aad1-80bcff61d13e",
+    "name": "Public Imprint Customer Links API",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "description": {
+      "content": "",
+      "type": "text/plain"
+    }
+  }
+}

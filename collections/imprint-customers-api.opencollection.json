@@ -1,0 +1,209 @@
+{
+  "opencollection": "1.0.0",
+  "info": {
+    "name": "Public Imprint Customer Links Customers API",
+    "version": "2.0"
+  },
+  "request": {
+    "auth": {
+      "type": "basic",
+      "username": "{{username}}",
+      "password": "{{password}}"
+    }
+  },
+  "items": [
+    {
+      "info": {
+        "name": "Customers",
+        "type": "folder"
+      },
+      "items": [
+        {
+          "info": {
+            "name": "Search for customers",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://dev.sbx.imprint.co/v2/customers",
+            "params": [
+              {
+                "name": "partner_customer_id",
+                "value": "",
+                "type": "query",
+                "description": "The unique identifier for the customer in the partner's system"
+              },
+              {
+                "name": "limit",
+                "value": "",
+                "type": "query",
+                "description": "Limits the number of returned results"
+              },
+              {
+                "name": "starting_after",
+                "value": "",
+                "type": "query",
+                "description": "A cursor for use in pagination. An id that defines your place in the list."
+              }
+            ]
+          },
+          "docs": "Search for customers"
+        },
+        {
+          "info": {
+            "name": "Search for customers",
+            "type": "http"
+          },
+          "http": {
+            "method": "POST",
+            "url": "https://dev.sbx.imprint.co/v2/customers",
+            "body": {
+              "type": "json",
+              "data": "{}"
+            }
+          },
+          "docs": "Search for customers"
+        },
+        {
+          "info": {
+            "name": "Retrieve a customer",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://dev.sbx.imprint.co/v2/customers/:customer_id",
+            "params": [
+              {
+                "name": "customer_id",
+                "value": "",
+                "type": "path",
+                "description": "The unique identifier for the customer"
+              }
+            ]
+          },
+          "docs": "Retrieves the details of an existing customer by ID"
+        },
+        {
+          "info": {
+            "name": "Get customer's current rewards balance",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://dev.sbx.imprint.co/v2/customers/:customer_id/rewards_balance",
+            "params": [
+              {
+                "name": "customer_id",
+                "value": "",
+                "type": "path",
+                "description": "The unique identifier for the Imprint customer"
+              }
+            ]
+          },
+          "docs": "Get customer's current rewards balance"
+        },
+        {
+          "info": {
+            "name": "List customer's payment methods",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://dev.sbx.imprint.co/v2/customers/:customer_id/payment_methods",
+            "params": [
+              {
+                "name": "customer_id",
+                "value": "",
+                "type": "path",
+                "description": "The unique identifier for the Imprint customer"
+              }
+            ]
+          },
+          "docs": "List customer's payment methods"
+        },
+        {
+          "info": {
+            "name": "List customer's transaction intents",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://dev.sbx.imprint.co/v2/customers/:customer_id/transaction_intents",
+            "params": [
+              {
+                "name": "customer_id",
+                "value": "",
+                "type": "path",
+                "description": "The unique identifier for the Imprint customer"
+              }
+            ]
+          },
+          "docs": "List customer's transaction intents"
+        },
+        {
+          "info": {
+            "name": "List customer's transactions",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://dev.sbx.imprint.co/v2/customers/:customer_id/transactions",
+            "params": [
+              {
+                "name": "customer_id",
+                "value": "",
+                "type": "path",
+                "description": "The unique identifier for the Imprint customer"
+              },
+              {
+                "name": "limit",
+                "value": "",
+                "type": "query",
+                "description": "Limits the number of returned results"
+              },
+              {
+                "name": "starting_after",
+                "value": "",
+                "type": "query",
+                "description": "A cursor for use in pagination. An id that defines your place in the list."
+              }
+            ]
+          },
+          "docs": "List customer's transactions"
+        },
+        {
+          "info": {
+            "name": "List customer's rewards",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://dev.sbx.imprint.co/v2/customers/:customer_id/rewards",
+            "params": [
+              {
+                "name": "customer_id",
+                "value": "",
+                "type": "path",
+                "description": "The unique identifier for the Imprint customer"
+              },
+              {
+                "name": "limit",
+                "value": "",
+                "type": "query",
+                "description": "Limits the number of returned results"
+              },
+              {
+                "name": "starting_after",
+                "value": "",
+                "type": "query",
+                "description": "A cursor for use in pagination. An id that defines your place in the list."
+              }
+            ]
+          },
+          "docs": "List customer's rewards in descending order by the reward's updated at timestamp"
+        }
+      ]
+    }
+  ],
+  "bundled": true
+}

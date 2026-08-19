@@ -1,0 +1,47 @@
+{
+  "opencollection": "1.0.0",
+  "info": {
+    "name": "Public Imprint Customer Links Keys API",
+    "version": "2.0"
+  },
+  "request": {
+    "auth": {
+      "type": "basic",
+      "username": "{{username}}",
+      "password": "{{password}}"
+    }
+  },
+  "items": [
+    {
+      "info": {
+        "name": "Keys",
+        "type": "folder"
+      },
+      "items": [
+        {
+          "info": {
+            "name": "Create an API Key",
+            "type": "http"
+          },
+          "http": {
+            "method": "POST",
+            "url": "https://dev.sbx.imprint.co/v2/keys"
+          },
+          "docs": "Creates a new API key"
+        },
+        {
+          "info": {
+            "name": "Delete an API Key",
+            "type": "http"
+          },
+          "http": {
+            "method": "DELETE",
+            "url": "https://dev.sbx.imprint.co/v2/keys"
+          },
+          "docs": "Deletes an existing API Key"
+        }
+      ]
+    }
+  ],
+  "bundled": true
+}

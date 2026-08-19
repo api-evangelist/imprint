@@ -1,0 +1,424 @@
+{
+  "item": [
+    {
+      "id": "716fb730-8875-4e44-8d0b-ed1dce410b8d",
+      "name": "Rewards",
+      "description": {
+        "content": "",
+        "type": "text/plain"
+      },
+      "item": [
+        {
+          "id": "0657d17c-1959-4185-add6-d9cac54247aa",
+          "name": "Search for rewards",
+          "request": {
+            "name": "Search for rewards",
+            "description": {},
+            "url": {
+              "path": [
+                "v2",
+                "rewards"
+              ],
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "query": [
+                {
+                  "disabled": false,
+                  "key": "transaction_event_id",
+                  "value": "<string>",
+                  "description": "Reward associated to the transaction event"
+                },
+                {
+                  "disabled": false,
+                  "key": "limit",
+                  "value": "10",
+                  "description": "Limits the number of returned results"
+                },
+                {
+                  "disabled": false,
+                  "key": "starting_after",
+                  "value": "<string>",
+                  "description": "A cursor for use in pagination. An id that defines your place in the list."
+                }
+              ],
+              "variable": []
+            },
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "method": "GET",
+            "auth": null
+          },
+          "response": [
+            {
+              "id": "e76c4d84-a7fe-46d6-b792-d0562903c3d0",
+              "name": "List of rewards",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "v2",
+                    "rewards"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [
+                    {
+                      "key": "transaction_event_id",
+                      "value": "40fa8333-f809-4861-9839-45f41d50077d"
+                    },
+                    {
+                      "key": "limit",
+                      "value": "10"
+                    },
+                    {
+                      "key": "starting_after",
+                      "value": "<string>"
+                    }
+                  ],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: basic",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Basic <credentials>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "GET",
+                "body": {}
+              },
+              "status": "OK",
+              "code": 200,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"data\": [\n    {\n      \"id\": \"2EE24580-B97B-4949-A65C-929CCB9B9B8D\",\n      \"customer_id\": \"9B5E1EE0-2E1C-46E7-81B9-3C3917204BE4\",\n      \"amount\": 4579,\n      \"status\": \"PENDING\",\n      \"type\": \"TRANSACTION\",\n      \"created_at\": \"2025-02-13 19:08:07+00:00\",\n      \"transaction_event_id\": \"E777214A-2D11-4CAD-9E8F-E1BD71D9FE67\",\n      \"currency\": \"POINTS\",\n      \"updated_at\": \"2025-02-13 19:08:07+00:00\",\n      \"metadata\": {\n        \"platform_version\": \"2.1.0\"\n      }\n    },\n    {\n      \"id\": \"2EE24580-B97B-4949-A65C-929CCB9B9B8D\",\n      \"customer_id\": \"9B5E1EE0-2E1C-46E7-81B9-3C3917204BE4\",\n      \"amount\": 2811,\n      \"status\": \"PENDING\",\n      \"type\": \"TRANSACTION\",\n      \"created_at\": \"2025-02-13 19:08:07+00:00\",\n      \"transaction_event_id\": \"E777214A-2D11-4CAD-9E8F-E1BD71D9FE67\",\n      \"currency\": \"POINTS\",\n      \"updated_at\": \"2025-02-13 19:08:07+00:00\",\n      \"metadata\": {\n        \"platform_version\": \"2.1.0\"\n      }\n    }\n  ],\n  \"has_more\": false,\n  \"total\": 5449\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            }
+          ],
+          "event": [],
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          }
+        },
+        {
+          "id": "e280e112-d859-46b3-be08-2c4920cf7efd",
+          "name": "Retrieve a reward",
+          "request": {
+            "name": "Retrieve a reward",
+            "description": {
+              "content": "Retrieves the details of an existing reward by ID",
+              "type": "text/plain"
+            },
+            "url": {
+              "path": [
+                "v2",
+                "rewards",
+                ":reward_id"
+              ],
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "query": [],
+              "variable": [
+                {
+                  "disabled": false,
+                  "type": "any",
+                  "value": "<string>",
+                  "key": "reward_id",
+                  "description": "(Required) The unique identifier for the reward"
+                }
+              ]
+            },
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "method": "GET",
+            "auth": null
+          },
+          "response": [
+            {
+              "id": "e4316dff-95af-4507-9907-6d5a08468d8b",
+              "name": "Reward retrieved successfully",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "v2",
+                    "rewards",
+                    ":reward_id"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": [
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<string>",
+                      "key": "reward_id",
+                      "description": "(Required) The unique identifier for the reward"
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: basic",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Basic <credentials>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "GET",
+                "body": {}
+              },
+              "status": "OK",
+              "code": 200,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"id\": \"2EE24580-B97B-4949-A65C-929CCB9B9B8D\",\n  \"customer_id\": \"9B5E1EE0-2E1C-46E7-81B9-3C3917204BE4\",\n  \"amount\": 6339,\n  \"status\": \"PENDING\",\n  \"type\": \"TRANSACTION\",\n  \"created_at\": \"2025-02-13 19:08:07+00:00\",\n  \"transaction_event_id\": \"E777214A-2D11-4CAD-9E8F-E1BD71D9FE67\",\n  \"currency\": \"POINTS\",\n  \"updated_at\": \"2025-02-13 19:08:07+00:00\",\n  \"metadata\": {\n    \"platform_version\": \"2.1.0\"\n  }\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "850be07d-dafe-44ca-96e4-7e38970665ca",
+              "name": "Reward not found",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "v2",
+                    "rewards",
+                    ":reward_id"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": [
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<string>",
+                      "key": "reward_id",
+                      "description": "(Required) The unique identifier for the reward"
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: basic",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Basic <credentials>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "GET",
+                "body": {}
+              },
+              "status": "Not Found",
+              "code": 404,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"type\": \"REWARD_NOT_FOUND_ERROR\",\n  \"message\": \"Reward not found for provided ID: pymd_123\",\n  \"param\": \"reward_id\"\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            }
+          ],
+          "event": [],
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          }
+        },
+        {
+          "id": "6fa6a1f1-48c1-452d-a7ad-6d3dfde03039",
+          "name": "Updates a reward",
+          "request": {
+            "name": "Updates a reward",
+            "description": {
+              "content": "Updates the status or amount of pending rewards",
+              "type": "text/plain"
+            },
+            "url": {
+              "path": [
+                "v2",
+                "rewards",
+                ":reward_id"
+              ],
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "query": [],
+              "variable": [
+                {
+                  "disabled": false,
+                  "type": "any",
+                  "value": "<string>",
+                  "key": "reward_id",
+                  "description": "(Required) Unique identifier for the reward"
+                }
+              ]
+            },
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "method": "PATCH",
+            "auth": null,
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"amount\": \"<integer>\",\n  \"status\": \"<string>\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [
+            {
+              "id": "51ecd128-feaf-423a-a2f6-95e43b6e22c7",
+              "name": "Reward updated successfully",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "v2",
+                    "rewards",
+                    ":reward_id"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": [
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<string>",
+                      "key": "reward_id",
+                      "description": "(Required) Unique identifier for the reward"
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: basic",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Basic <credentials>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "PATCH",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"amount\": 120000,\n  \"status\": \"PENDING\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"id\": \"2EE24580-B97B-4949-A65C-929CCB9B9B8D\",\n  \"customer_id\": \"9B5E1EE0-2E1C-46E7-81B9-3C3917204BE4\",\n  \"amount\": 6339,\n  \"status\": \"PENDING\",\n  \"type\": \"TRANSACTION\",\n  \"created_at\": \"2025-02-13 19:08:07+00:00\",\n  \"transaction_event_id\": \"E777214A-2D11-4CAD-9E8F-E1BD71D9FE67\",\n  \"currency\": \"POINTS\",\n  \"updated_at\": \"2025-02-13 19:08:07+00:00\",\n  \"metadata\": {\n    \"platform_version\": \"2.1.0\"\n  }\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            }
+          ],
+          "event": [],
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          }
+        }
+      ],
+      "event": []
+    }
+  ],
+  "event": [],
+  "variable": [
+    {
+      "type": "string",
+      "value": "https://dev.sbx.imprint.co",
+      "key": "baseUrl"
+    }
+  ],
+  "auth": {
+    "type": "basic",
+    "basic": [
+      {
+        "key": "username",
+        "value": "{{basicAuthUsername}}"
+      },
+      {
+        "key": "password",
+        "value": "{{basicAuthPassword}}"
+      }
+    ]
+  },
+  "info": {
+    "_postman_id": "13d47772-a468-40af-8bb9-fcc84785c4bf",
+    "name": "Public Imprint Customer Links Rewards API",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "description": {
+      "content": "",
+      "type": "text/plain"
+    }
+  }
+}

@@ -1,0 +1,48 @@
+{
+  "opencollection": "1.0.0",
+  "info": {
+    "name": "Public Imprint Customer Links API",
+    "version": "2.0"
+  },
+  "request": {
+    "auth": {
+      "type": "basic",
+      "username": "{{username}}",
+      "password": "{{password}}"
+    }
+  },
+  "items": [
+    {
+      "info": {
+        "name": "Customer Links",
+        "type": "folder"
+      },
+      "items": [
+        {
+          "info": {
+            "name": "Link an Imprint customer and partner customer accounts",
+            "type": "http"
+          },
+          "http": {
+            "method": "POST",
+            "url": "https://dev.sbx.imprint.co/v2/customers/:customer_id/link",
+            "params": [
+              {
+                "name": "customer_id",
+                "value": "",
+                "type": "path",
+                "description": "The unique identifier for the Imprint customer"
+              }
+            ],
+            "body": {
+              "type": "json",
+              "data": "{}"
+            }
+          },
+          "docs": "Creates a link between an existing Imprint customer and a partner's customer account. The API key provided with the request will be used to link the partner with the imprint customer."
+        }
+      ]
+    }
+  ],
+  "bundled": true
+}

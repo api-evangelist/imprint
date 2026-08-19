@@ -1,0 +1,40 @@
+{
+  "opencollection": "1.0.0",
+  "info": {
+    "name": "Public Imprint Customer Links Simulate Statement Reward API",
+    "version": "2.0"
+  },
+  "request": {
+    "auth": {
+      "type": "basic",
+      "username": "{{username}}",
+      "password": "{{password}}"
+    }
+  },
+  "items": [
+    {
+      "info": {
+        "name": "Simulate Statement Reward",
+        "type": "folder"
+      },
+      "items": [
+        {
+          "info": {
+            "name": "Simulate Statement Reward",
+            "type": "http"
+          },
+          "http": {
+            "method": "POST",
+            "url": "https://dev.sbx.imprint.co/v2/simulate_statement_reward",
+            "body": {
+              "type": "json",
+              "data": "{}"
+            }
+          },
+          "docs": "Initiate a statement reward webhook to be sent in sandbox environment"
+        }
+      ]
+    }
+  ],
+  "bundled": true
+}

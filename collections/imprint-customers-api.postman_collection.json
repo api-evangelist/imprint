@@ -1,0 +1,1223 @@
+{
+  "item": [
+    {
+      "id": "a82d32c8-0685-4228-b5c3-7d0166a239e8",
+      "name": "Customers",
+      "description": {
+        "content": "",
+        "type": "text/plain"
+      },
+      "item": [
+        {
+          "id": "f514a452-42a4-4463-a0ce-bcfabb57635b",
+          "name": "Search for customers",
+          "request": {
+            "name": "Search for customers",
+            "description": {},
+            "url": {
+              "path": [
+                "v2",
+                "customers"
+              ],
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "query": [
+                {
+                  "disabled": false,
+                  "key": "partner_customer_id",
+                  "value": "<string>",
+                  "description": "The unique identifier for the customer in the partner's system"
+                },
+                {
+                  "disabled": false,
+                  "key": "limit",
+                  "value": "10",
+                  "description": "Limits the number of returned results"
+                },
+                {
+                  "disabled": false,
+                  "key": "starting_after",
+                  "value": "<string>",
+                  "description": "A cursor for use in pagination. An id that defines your place in the list."
+                }
+              ],
+              "variable": []
+            },
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "method": "GET",
+            "auth": null
+          },
+          "response": [
+            {
+              "id": "1aa578a9-b7b0-419b-89f4-1fdf47befa25",
+              "name": "List of customers",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "v2",
+                    "customers"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [
+                    {
+                      "key": "partner_customer_id",
+                      "value": "<string>"
+                    },
+                    {
+                      "key": "limit",
+                      "value": "10"
+                    },
+                    {
+                      "key": "starting_after",
+                      "value": "<string>"
+                    }
+                  ],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: basic",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Basic <credentials>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "GET",
+                "body": {}
+              },
+              "status": "OK",
+              "code": 200,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"data\": [\n    {\n      \"id\": \"9B5E1EE0-2E1C-46E7-81B9-3C3917204BE4\",\n      \"email\": \"customer@example.com\",\n      \"phone\": \"+14155552671\",\n      \"statuses\": {\n        \"Card Program Name\": \"OPEN\"\n      },\n      \"first_name\": \"John\",\n      \"last_name\": \"Doe\",\n      \"preferred_language\": \"en\",\n      \"ssn4\": \"1234\",\n      \"date_of_birth\": {\n        \"year\": 1990,\n        \"month\": 1,\n        \"day\": 1\n      },\n      \"address\": {\n        \"street_line1\": \"123 Main St\",\n        \"street_line2\": \"Apt 4B\",\n        \"city\": \"San Francisco\",\n        \"state\": \"CA\",\n        \"postal_code\": \"94105\",\n        \"country\": \"USA\"\n      },\n      \"partner_customer_id\": \"PARTNER_USER_456\",\n      \"metadata\": {\n        \"preferred_language\": \"en\"\n      },\n      \"created_at\": \"2025-02-13 19:08:07+00:00\",\n      \"updated_at\": \"2025-02-13 19:08:07+00:00\"\n    },\n    {\n      \"id\": \"9B5E1EE0-2E1C-46E7-81B9-3C3917204BE4\",\n      \"email\": \"customer@example.com\",\n      \"phone\": \"+14155552671\",\n      \"statuses\": {\n        \"Card Program Name\": \"OPEN\"\n      },\n      \"first_name\": \"John\",\n      \"last_name\": \"Doe\",\n      \"preferred_language\": \"en\",\n      \"ssn4\": \"1234\",\n      \"date_of_birth\": {\n        \"year\": 1990,\n        \"month\": 1,\n        \"day\": 1\n      },\n      \"address\": {\n        \"street_line1\": \"123 Main St\",\n        \"street_line2\": \"Apt 4B\",\n        \"city\": \"San Francisco\",\n        \"state\": \"CA\",\n        \"postal_code\": \"94105\",\n        \"country\": \"USA\"\n      },\n      \"partner_customer_id\": \"PARTNER_USER_456\",\n      \"metadata\": {\n        \"preferred_language\": \"en\"\n      },\n      \"created_at\": \"2025-02-13 19:08:07+00:00\",\n      \"updated_at\": \"2025-02-13 19:08:07+00:00\"\n    }\n  ],\n  \"has_more\": false,\n  \"total\": 5209\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            }
+          ],
+          "event": [],
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          }
+        },
+        {
+          "id": "fa1ad920-791d-4afb-b2cf-d5e688480b3a",
+          "name": "Search for customers",
+          "request": {
+            "name": "Search for customers",
+            "description": {},
+            "url": {
+              "path": [
+                "v2",
+                "customers"
+              ],
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "query": [],
+              "variable": []
+            },
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "method": "POST",
+            "auth": null,
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"partner_customer_id\": \"<string>\",\n  \"ssn\": \"<string>\",\n  \"date_of_birth\": {\n    \"year\": \"<integer>\",\n    \"month\": \"<integer>\",\n    \"day\": \"<integer>\"\n  },\n  \"limit\": 10,\n  \"starting_after\": \"<string>\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [
+            {
+              "id": "0432ba51-35fb-4c39-aa87-dcf6a56a6b06",
+              "name": "List of customers",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "v2",
+                    "customers"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: basic",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Basic <credentials>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "POST",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"partner_customer_id\": \"<string>\",\n  \"ssn\": \"123456789\",\n  \"date_of_birth\": {\n    \"year\": 1990,\n    \"month\": 1,\n    \"day\": 1\n  },\n  \"limit\": 10,\n  \"starting_after\": \"<string>\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"data\": [\n    {\n      \"id\": \"9B5E1EE0-2E1C-46E7-81B9-3C3917204BE4\",\n      \"email\": \"customer@example.com\",\n      \"phone\": \"+14155552671\",\n      \"statuses\": {\n        \"Card Program Name\": \"OPEN\"\n      },\n      \"first_name\": \"John\",\n      \"last_name\": \"Doe\",\n      \"preferred_language\": \"en\",\n      \"ssn4\": \"1234\",\n      \"date_of_birth\": {\n        \"year\": 1990,\n        \"month\": 1,\n        \"day\": 1\n      },\n      \"address\": {\n        \"street_line1\": \"123 Main St\",\n        \"street_line2\": \"Apt 4B\",\n        \"city\": \"San Francisco\",\n        \"state\": \"CA\",\n        \"postal_code\": \"94105\",\n        \"country\": \"USA\"\n      },\n      \"partner_customer_id\": \"PARTNER_USER_456\",\n      \"metadata\": {\n        \"preferred_language\": \"en\"\n      },\n      \"created_at\": \"2025-02-13 19:08:07+00:00\",\n      \"updated_at\": \"2025-02-13 19:08:07+00:00\"\n    },\n    {\n      \"id\": \"9B5E1EE0-2E1C-46E7-81B9-3C3917204BE4\",\n      \"email\": \"customer@example.com\",\n      \"phone\": \"+14155552671\",\n      \"statuses\": {\n        \"Card Program Name\": \"OPEN\"\n      },\n      \"first_name\": \"John\",\n      \"last_name\": \"Doe\",\n      \"preferred_language\": \"en\",\n      \"ssn4\": \"1234\",\n      \"date_of_birth\": {\n        \"year\": 1990,\n        \"month\": 1,\n        \"day\": 1\n      },\n      \"address\": {\n        \"street_line1\": \"123 Main St\",\n        \"street_line2\": \"Apt 4B\",\n        \"city\": \"San Francisco\",\n        \"state\": \"CA\",\n        \"postal_code\": \"94105\",\n        \"country\": \"USA\"\n      },\n      \"partner_customer_id\": \"PARTNER_USER_456\",\n      \"metadata\": {\n        \"preferred_language\": \"en\"\n      },\n      \"created_at\": \"2025-02-13 19:08:07+00:00\",\n      \"updated_at\": \"2025-02-13 19:08:07+00:00\"\n    }\n  ],\n  \"has_more\": false,\n  \"total\": 5209\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            }
+          ],
+          "event": [],
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          }
+        },
+        {
+          "id": "144b41a9-9741-470c-90d0-e359596edcde",
+          "name": "Retrieve a customer",
+          "request": {
+            "name": "Retrieve a customer",
+            "description": {
+              "content": "Retrieves the details of an existing customer by ID",
+              "type": "text/plain"
+            },
+            "url": {
+              "path": [
+                "v2",
+                "customers",
+                ":customer_id"
+              ],
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "query": [],
+              "variable": [
+                {
+                  "disabled": false,
+                  "type": "any",
+                  "value": "<string>",
+                  "key": "customer_id",
+                  "description": "(Required) The unique identifier for the customer"
+                }
+              ]
+            },
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "method": "GET",
+            "auth": null
+          },
+          "response": [
+            {
+              "id": "70d160a1-780d-490d-a79c-433ac18f2151",
+              "name": "Customer retrieved successfully",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "v2",
+                    "customers",
+                    ":customer_id"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": [
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<string>",
+                      "key": "customer_id",
+                      "description": "(Required) The unique identifier for the customer"
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: basic",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Basic <credentials>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "GET",
+                "body": {}
+              },
+              "status": "OK",
+              "code": 200,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"id\": \"9B5E1EE0-2E1C-46E7-81B9-3C3917204BE4\",\n  \"email\": \"customer@example.com\",\n  \"phone\": \"+14155552671\",\n  \"statuses\": {\n    \"Card Program Name\": \"OPEN\"\n  },\n  \"first_name\": \"John\",\n  \"last_name\": \"Doe\",\n  \"preferred_language\": \"en\",\n  \"ssn4\": \"1234\",\n  \"date_of_birth\": {\n    \"year\": 1990,\n    \"month\": 1,\n    \"day\": 1\n  },\n  \"address\": {\n    \"street_line1\": \"123 Main St\",\n    \"street_line2\": \"Apt 4B\",\n    \"city\": \"San Francisco\",\n    \"state\": \"CA\",\n    \"postal_code\": \"94105\",\n    \"country\": \"USA\"\n  },\n  \"partner_customer_id\": \"PARTNER_USER_456\",\n  \"metadata\": {\n    \"preferred_language\": \"en\"\n  },\n  \"created_at\": \"2025-02-13 19:08:07+00:00\",\n  \"updated_at\": \"2025-02-13 19:08:07+00:00\"\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "0397ed01-ef23-471f-a309-f85ced63e5eb",
+              "name": "Customer not found",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "v2",
+                    "customers",
+                    ":customer_id"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": [
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<string>",
+                      "key": "customer_id",
+                      "description": "(Required) The unique identifier for the customer"
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: basic",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Basic <credentials>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "GET",
+                "body": {}
+              },
+              "status": "Not Found",
+              "code": 404,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"type\": \"CUSTOMER_NOT_FOUND_ERROR\",\n  \"message\": \"Customer not found for provided ID: CSMR-v1-123\",\n  \"param\": \"customer_id\"\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            }
+          ],
+          "event": [],
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          }
+        },
+        {
+          "id": "e978f00a-bdf0-4a9b-bc8e-f178e82d2e6e",
+          "name": "Get customer's current rewards balance",
+          "request": {
+            "name": "Get customer's current rewards balance",
+            "description": {},
+            "url": {
+              "path": [
+                "v2",
+                "customers",
+                ":customer_id",
+                "rewards_balance"
+              ],
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "query": [],
+              "variable": [
+                {
+                  "disabled": false,
+                  "type": "any",
+                  "value": "<string>",
+                  "key": "customer_id",
+                  "description": "(Required) The unique identifier for the Imprint customer"
+                }
+              ]
+            },
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "method": "GET",
+            "auth": null
+          },
+          "response": [
+            {
+              "id": "e71cc0fa-76eb-4743-880a-9e29a1f4f002",
+              "name": "Customer rewards balance",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "v2",
+                    "customers",
+                    ":customer_id",
+                    "rewards_balance"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": [
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<string>",
+                      "key": "customer_id",
+                      "description": "(Required) The unique identifier for the Imprint customer"
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: basic",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Basic <credentials>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "GET",
+                "body": {}
+              },
+              "status": "OK",
+              "code": 200,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"customer_id\": \"2EE24580-B97B-4949-A65C-929CCB9B9B8D\",\n  \"reward_balance\": 120000,\n  \"reward_symbol\": \"string\",\n  \"reward_description\": \"string\"\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "079967f3-acaa-46f5-b772-00a394f7ebdb",
+              "name": "Customer not found",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "v2",
+                    "customers",
+                    ":customer_id",
+                    "rewards_balance"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": [
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<string>",
+                      "key": "customer_id",
+                      "description": "(Required) The unique identifier for the Imprint customer"
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: basic",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Basic <credentials>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "GET",
+                "body": {}
+              },
+              "status": "Not Found",
+              "code": 404,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"type\": \"CUSTOMER_NOT_FOUND_ERROR\",\n  \"message\": \"Customer not found for provided ID: CSMR-v1-123\",\n  \"param\": \"customer_id\"\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            }
+          ],
+          "event": [],
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          }
+        },
+        {
+          "id": "4b3a24ca-c708-435b-9507-27c4be46f18c",
+          "name": "List customer's payment methods",
+          "request": {
+            "name": "List customer's payment methods",
+            "description": {},
+            "url": {
+              "path": [
+                "v2",
+                "customers",
+                ":customer_id",
+                "payment_methods"
+              ],
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "query": [],
+              "variable": [
+                {
+                  "disabled": false,
+                  "type": "any",
+                  "value": "<string>",
+                  "key": "customer_id",
+                  "description": "(Required) The unique identifier for the Imprint customer"
+                }
+              ]
+            },
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "method": "GET",
+            "auth": null
+          },
+          "response": [
+            {
+              "id": "093470f6-b6be-445e-994a-c75ea0377e9a",
+              "name": "Customer rewards balance",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "v2",
+                    "customers",
+                    ":customer_id",
+                    "payment_methods"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": [
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<string>",
+                      "key": "customer_id",
+                      "description": "(Required) The unique identifier for the Imprint customer"
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: basic",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Basic <credentials>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "GET",
+                "body": {}
+              },
+              "status": "OK",
+              "code": 200,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"data\": [\n    {\n      \"id\": \"DCBFC736-2286-42DD-897D-160DCA80AED2\",\n      \"type\": \"LOAN\",\n      \"customer_id\": \"B40A789E-BD46-4BB9-B63E-F9919582694C\",\n      \"created_at\": \"2025-02-13 19:08:07+00:00\",\n      \"status\": \"CANCELED\",\n      \"metadata\": {\n        \"platform_version\": \"2.1.0\"\n      },\n      \"card\": {\n        \"last4\": \"1234\",\n        \"network\": \"VISA\",\n        \"card_type\": \"UNIFIED\",\n        \"card_design_id\": \"3b9c1f3e-52a0-44c1-b131-a7ab0099a214\",\n        \"exp_month\": \"06\",\n        \"exp_year\": \"2027\",\n        \"pci_details\": {\n          \"pan\": \"5105105105105100\",\n          \"exp_month\": \"06\",\n          \"exp_year\": \"26\",\n          \"cvv\": \"123\"\n        },\n        \"tokens\": [\n          {\n            \"type\": \"CYBERSOURCE\",\n            \"token\": \"string\",\n            \"created_at\": \"2025-02-13 19:08:07+00:00\",\n            \"updated_at\": \"2025-02-13 19:08:07+00:00\",\n            \"pan_reference_id\": \"string\"\n          },\n          {\n            \"type\": \"CYBERSOURCE\",\n            \"token\": \"string\",\n            \"created_at\": \"2025-02-13 19:08:07+00:00\",\n            \"updated_at\": \"2025-02-13 19:08:07+00:00\",\n            \"pan_reference_id\": \"string\"\n          }\n        ]\n      },\n      \"bank_account\": {\n        \"last4\": \"1234\",\n        \"routing_number\": \"string\",\n        \"bank_name\": \"Wells Fargo\",\n        \"account_type\": \"CHECKING\"\n      },\n      \"loan\": {\n        \"amount\": 10000,\n        \"term_months\": 12,\n        \"currency\": \"USD\",\n        \"remaining_balance\": 1733,\n        \"apr\": \"5.89\",\n        \"loan_status\": \"CLOSED\"\n      },\n      \"updated_at\": \"2025-02-13 19:08:07+00:00\"\n    },\n    {\n      \"id\": \"DCBFC736-2286-42DD-897D-160DCA80AED2\",\n      \"type\": \"LOAN\",\n      \"customer_id\": \"B40A789E-BD46-4BB9-B63E-F9919582694C\",\n      \"created_at\": \"2025-02-13 19:08:07+00:00\",\n      \"status\": \"CANCELED\",\n      \"metadata\": {\n        \"platform_version\": \"2.1.0\"\n      },\n      \"card\": {\n        \"last4\": \"1234\",\n        \"network\": \"\",\n        \"card_type\": \"VIRTUAL\",\n        \"card_design_id\": \"3b9c1f3e-52a0-44c1-b131-a7ab0099a214\",\n        \"exp_month\": \"06\",\n        \"exp_year\": \"2027\",\n        \"pci_details\": {\n          \"pan\": \"5105105105105100\",\n          \"exp_month\": \"06\",\n          \"exp_year\": \"26\",\n          \"cvv\": \"123\"\n        },\n        \"tokens\": [\n          {\n            \"type\": \"CYBERSOURCE\",\n            \"token\": \"string\",\n            \"created_at\": \"2025-02-13 19:08:07+00:00\",\n            \"updated_at\": \"2025-02-13 19:08:07+00:00\",\n            \"pan_reference_id\": \"string\"\n          },\n          {\n            \"type\": \"CYBERSOURCE\",\n            \"token\": \"string\",\n            \"created_at\": \"2025-02-13 19:08:07+00:00\",\n            \"updated_at\": \"2025-02-13 19:08:07+00:00\",\n            \"pan_reference_id\": \"string\"\n          }\n        ]\n      },\n      \"bank_account\": {\n        \"last4\": \"1234\",\n        \"routing_number\": \"string\",\n        \"bank_name\": \"Wells Fargo\",\n        \"account_type\": \"SAVINGS\"\n      },\n      \"loan\": {\n        \"amount\": 10000,\n        \"term_months\": 12,\n        \"currency\": \"USD\",\n        \"remaining_balance\": 1926,\n        \"apr\": \"5.89\",\n        \"loan_status\": \"APPROVED\"\n      },\n      \"updated_at\": \"2025-02-13 19:08:07+00:00\"\n    }\n  ]\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "139c3118-5ee6-4727-8ecc-a80dc3c1fb0e",
+              "name": "Customer not found",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "v2",
+                    "customers",
+                    ":customer_id",
+                    "payment_methods"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": [
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<string>",
+                      "key": "customer_id",
+                      "description": "(Required) The unique identifier for the Imprint customer"
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: basic",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Basic <credentials>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "GET",
+                "body": {}
+              },
+              "status": "Not Found",
+              "code": 404,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"type\": \"CUSTOMER_NOT_FOUND_ERROR\",\n  \"message\": \"Customer not found for provided ID: CSMR-v1-123\",\n  \"param\": \"customer_id\"\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            }
+          ],
+          "event": [],
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          }
+        },
+        {
+          "id": "d668b2ec-898a-4eb5-ada6-6f6c4a2f2356",
+          "name": "List customer's transaction intents",
+          "request": {
+            "name": "List customer's transaction intents",
+            "description": {},
+            "url": {
+              "path": [
+                "v2",
+                "customers",
+                ":customer_id",
+                "transaction_intents"
+              ],
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "query": [],
+              "variable": [
+                {
+                  "disabled": false,
+                  "type": "any",
+                  "value": "<string>",
+                  "key": "customer_id",
+                  "description": "(Required) The unique identifier for the Imprint customer"
+                }
+              ]
+            },
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "method": "GET",
+            "auth": null
+          },
+          "response": [
+            {
+              "id": "233a1897-4640-4192-a184-5afb3f6b965d",
+              "name": "Customer transaction intents",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "v2",
+                    "customers",
+                    ":customer_id",
+                    "transaction_intents"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": [
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<string>",
+                      "key": "customer_id",
+                      "description": "(Required) The unique identifier for the Imprint customer"
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: basic",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Basic <credentials>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "GET",
+                "body": {}
+              },
+              "status": "OK",
+              "code": 200,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"data\": [\n    {\n      \"id\": \"5B30532B-5B5B-4826-8DE2-429C57B705FD\",\n      \"customer_id\": \"9B5E1EE0-2E1C-46E7-81B9-3C3917204BE4\",\n      \"amount\": 10000,\n      \"currency\": \"USD\",\n      \"status\": \"CONFIRMED\",\n      \"created_at\": \"2025-02-13 19:08:07+00:00\",\n      \"payment_method_id\": \"DCBFC736-2286-42DD-897D-160DCA80AED2\",\n      \"network_transaction_id\": \"string\",\n      \"partner_transaction_id\": \"string\",\n      \"updated_at\": \"2025-02-13 19:08:07+00:00\",\n      \"metadata\": {\n        \"platform_version\": \"2.1.0\"\n      }\n    },\n    {\n      \"id\": \"5B30532B-5B5B-4826-8DE2-429C57B705FD\",\n      \"customer_id\": \"9B5E1EE0-2E1C-46E7-81B9-3C3917204BE4\",\n      \"amount\": 10000,\n      \"currency\": \"USD\",\n      \"status\": \"CONFIRMED\",\n      \"created_at\": \"2025-02-13 19:08:07+00:00\",\n      \"payment_method_id\": \"DCBFC736-2286-42DD-897D-160DCA80AED2\",\n      \"network_transaction_id\": \"string\",\n      \"partner_transaction_id\": \"string\",\n      \"updated_at\": \"2025-02-13 19:08:07+00:00\",\n      \"metadata\": {\n        \"platform_version\": \"2.1.0\"\n      }\n    }\n  ]\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "c6fed5a4-1d04-4f86-a4c0-aecb90beb25d",
+              "name": "Transaction not found",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "v2",
+                    "customers",
+                    ":customer_id",
+                    "transaction_intents"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": [
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<string>",
+                      "key": "customer_id",
+                      "description": "(Required) The unique identifier for the Imprint customer"
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: basic",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Basic <credentials>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "GET",
+                "body": {}
+              },
+              "status": "Not Found",
+              "code": 404,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"type\": \"TRANSACTION_FOUND_ERROR\",\n  \"message\": \"Transaction intent not found for provided ID: txn_123\",\n  \"param\": \"transaction_id\"\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            }
+          ],
+          "event": [],
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          }
+        },
+        {
+          "id": "cfffe568-f458-47dc-8dc7-137c8eaad3bc",
+          "name": "List customer's transactions",
+          "request": {
+            "name": "List customer's transactions",
+            "description": {},
+            "url": {
+              "path": [
+                "v2",
+                "customers",
+                ":customer_id",
+                "transactions"
+              ],
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "query": [
+                {
+                  "disabled": false,
+                  "key": "limit",
+                  "value": "10",
+                  "description": "Limits the number of returned results"
+                },
+                {
+                  "disabled": false,
+                  "key": "starting_after",
+                  "value": "<string>",
+                  "description": "A cursor for use in pagination. An id that defines your place in the list."
+                }
+              ],
+              "variable": [
+                {
+                  "disabled": false,
+                  "type": "any",
+                  "value": "<string>",
+                  "key": "customer_id",
+                  "description": "(Required) The unique identifier for the Imprint customer"
+                }
+              ]
+            },
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "method": "GET",
+            "auth": null
+          },
+          "response": [
+            {
+              "id": "65d00593-1148-4c37-b99a-c1c2aef7d009",
+              "name": "List of customer transactions",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "v2",
+                    "customers",
+                    ":customer_id",
+                    "transactions"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [
+                    {
+                      "key": "limit",
+                      "value": "10"
+                    },
+                    {
+                      "key": "starting_after",
+                      "value": "<string>"
+                    }
+                  ],
+                  "variable": [
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<string>",
+                      "key": "customer_id",
+                      "description": "(Required) The unique identifier for the Imprint customer"
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: basic",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Basic <credentials>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "GET",
+                "body": {}
+              },
+              "status": "OK",
+              "code": 200,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"data\": [\n    {\n      \"id\": \"E777214A-2D11-4CAD-9E8F-E1BD71D9FE67\",\n      \"customer_id\": \"9B5E1EE0-2E1C-46E7-81B9-3C3917204BE4\",\n      \"payment_method_id\": \"DCBFC736-2286-42DD-897D-160DCA80AED2\",\n      \"amount\": 723,\n      \"currency\": \"USD\",\n      \"status\": \"APPROVED\",\n      \"network_transaction_id\": \"string\",\n      \"created_at\": \"2025-02-13 19:08:07+00:00\",\n      \"intent_id\": \"5B30532B-5B5B-4826-8DE2-429C57B705FD\",\n      \"authorization_code\": \"ABCD\",\n      \"purchase_method\": \"CHIP\",\n      \"partner_transaction_id\": \"string\",\n      \"updated_at\": \"2025-02-13 19:08:07+00:00\",\n      \"merchant\": {\n        \"network_id\": \"234923454545\",\n        \"name\": \"Target\",\n        \"category\": \"Grocery Stores\",\n        \"category_code\": \"5411\",\n        \"address\": {\n          \"street_line1\": \"123 Main St\",\n          \"street_line2\": \"Apt 4B\",\n          \"city\": \"San Francisco\",\n          \"state\": \"CA\",\n          \"postal_code\": \"94105\",\n          \"country\": \"USA\"\n        }\n      },\n      \"metadata\": {\n        \"platform_version\": \"2.1.0\"\n      }\n    },\n    {\n      \"id\": \"E777214A-2D11-4CAD-9E8F-E1BD71D9FE67\",\n      \"customer_id\": \"9B5E1EE0-2E1C-46E7-81B9-3C3917204BE4\",\n      \"payment_method_id\": \"DCBFC736-2286-42DD-897D-160DCA80AED2\",\n      \"amount\": 6205,\n      \"currency\": \"USD\",\n      \"status\": \"APPROVED\",\n      \"network_transaction_id\": \"string\",\n      \"created_at\": \"2025-02-13 19:08:07+00:00\",\n      \"intent_id\": \"5B30532B-5B5B-4826-8DE2-429C57B705FD\",\n      \"authorization_code\": \"ABCD\",\n      \"purchase_method\": \"CHIP\",\n      \"partner_transaction_id\": \"string\",\n      \"updated_at\": \"2025-02-13 19:08:07+00:00\",\n      \"merchant\": {\n        \"network_id\": \"234923454545\",\n        \"name\": \"Target\",\n        \"category\": \"Grocery Stores\",\n        \"category_code\": \"5411\",\n        \"address\": {\n          \"street_line1\": \"123 Main St\",\n          \"street_line2\": \"Apt 4B\",\n          \"city\": \"San Francisco\",\n          \"state\": \"CA\",\n          \"postal_code\": \"94105\",\n          \"country\": \"USA\"\n        }\n      },\n      \"metadata\": {\n        \"platform_version\": \"2.1.0\"\n      }\n    }\n  ],\n  \"has_more\": false,\n  \"total\": 551\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "c379746a-01b1-412b-88ce-03bc7c7e1d86",
+              "name": "Customer not found",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "v2",
+                    "customers",
+                    ":customer_id",
+                    "transactions"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [
+                    {
+                      "key": "limit",
+                      "value": "10"
+                    },
+                    {
+                      "key": "starting_after",
+                      "value": "<string>"
+                    }
+                  ],
+                  "variable": [
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<string>",
+                      "key": "customer_id",
+                      "description": "(Required) The unique identifier for the Imprint customer"
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: basic",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Basic <credentials>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "GET",
+                "body": {}
+              },
+              "status": "Not Found",
+              "code": 404,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"type\": \"CUSTOMER_NOT_FOUND_ERROR\",\n  \"message\": \"Customer not found for provided ID: CSMR-v1-123\",\n  \"param\": \"customer_id\"\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            }
+          ],
+          "event": [],
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          }
+        },
+        {
+          "id": "9b40834e-c010-46a0-89b4-0ede5d254a59",
+          "name": "List customer's rewards",
+          "request": {
+            "name": "List customer's rewards",
+            "description": {
+              "content": "List customer's rewards in descending order by the reward's updated at timestamp",
+              "type": "text/plain"
+            },
+            "url": {
+              "path": [
+                "v2",
+                "customers",
+                ":customer_id",
+                "rewards"
+              ],
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "query": [
+                {
+                  "disabled": false,
+                  "key": "limit",
+                  "value": "10",
+                  "description": "Limits the number of returned results"
+                },
+                {
+                  "disabled": false,
+                  "key": "starting_after",
+                  "value": "<string>",
+                  "description": "A cursor for use in pagination. An id that defines your place in the list."
+                }
+              ],
+              "variable": [
+                {
+                  "disabled": false,
+                  "type": "any",
+                  "value": "<string>",
+                  "key": "customer_id",
+                  "description": "(Required) The unique identifier for the Imprint customer"
+                }
+              ]
+            },
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "method": "GET",
+            "auth": null
+          },
+          "response": [
+            {
+              "id": "b0295eac-a374-4831-aecd-f00a747a488a",
+              "name": "List of customer rewards",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "v2",
+                    "customers",
+                    ":customer_id",
+                    "rewards"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [
+                    {
+                      "key": "limit",
+                      "value": "10"
+                    },
+                    {
+                      "key": "starting_after",
+                      "value": "<string>"
+                    }
+                  ],
+                  "variable": [
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<string>",
+                      "key": "customer_id",
+                      "description": "(Required) The unique identifier for the Imprint customer"
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: basic",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Basic <credentials>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "GET",
+                "body": {}
+              },
+              "status": "OK",
+              "code": 200,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"data\": [\n    {\n      \"id\": \"2EE24580-B97B-4949-A65C-929CCB9B9B8D\",\n      \"customer_id\": \"9B5E1EE0-2E1C-46E7-81B9-3C3917204BE4\",\n      \"amount\": 8867,\n      \"status\": \"PENDING\",\n      \"type\": \"TRANSACTION\",\n      \"created_at\": \"2025-02-13 19:08:07+00:00\",\n      \"transaction_event_id\": \"E777214A-2D11-4CAD-9E8F-E1BD71D9FE67\",\n      \"currency\": \"POINTS\",\n      \"updated_at\": \"2025-02-13 19:08:07+00:00\",\n      \"metadata\": {\n        \"platform_version\": \"2.1.0\"\n      }\n    },\n    {\n      \"id\": \"2EE24580-B97B-4949-A65C-929CCB9B9B8D\",\n      \"customer_id\": \"9B5E1EE0-2E1C-46E7-81B9-3C3917204BE4\",\n      \"amount\": 191,\n      \"status\": \"PENDING\",\n      \"type\": \"TRANSACTION\",\n      \"created_at\": \"2025-02-13 19:08:07+00:00\",\n      \"transaction_event_id\": \"E777214A-2D11-4CAD-9E8F-E1BD71D9FE67\",\n      \"currency\": \"POINTS\",\n      \"updated_at\": \"2025-02-13 19:08:07+00:00\",\n      \"metadata\": {\n        \"platform_version\": \"2.1.0\"\n      }\n    }\n  ],\n  \"has_more\": false,\n  \"total\": 7729\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "ddc451a1-58ed-4db2-8d82-42ee2fe58490",
+              "name": "Customer not found",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "v2",
+                    "customers",
+                    ":customer_id",
+                    "rewards"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [
+                    {
+                      "key": "limit",
+                      "value": "10"
+                    },
+                    {
+                      "key": "starting_after",
+                      "value": "<string>"
+                    }
+                  ],
+                  "variable": [
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<string>",
+                      "key": "customer_id",
+                      "description": "(Required) The unique identifier for the Imprint customer"
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: basic",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Basic <credentials>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "GET",
+                "body": {}
+              },
+              "status": "Not Found",
+              "code": 404,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"type\": \"CUSTOMER_NOT_FOUND_ERROR\",\n  \"message\": \"Customer not found for provided ID: CSMR-v1-123\",\n  \"param\": \"customer_id\"\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            }
+          ],
+          "event": [],
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          }
+        }
+      ],
+      "event": []
+    }
+  ],
+  "event": [],
+  "variable": [
+    {
+      "type": "string",
+      "value": "https://dev.sbx.imprint.co",
+      "key": "baseUrl"
+    }
+  ],
+  "auth": {
+    "type": "basic",
+    "basic": [
+      {
+        "key": "username",
+        "value": "{{basicAuthUsername}}"
+      },
+      {
+        "key": "password",
+        "value": "{{basicAuthPassword}}"
+      }
+    ]
+  },
+  "info": {
+    "_postman_id": "610fa9e5-0115-44d2-9efa-3dc8a15441f3",
+    "name": "Public Imprint Customer Links Customers API",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "description": {
+      "content": "",
+      "type": "text/plain"
+    }
+  }
+}

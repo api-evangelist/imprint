@@ -1,0 +1,641 @@
+{
+  "item": [
+    {
+      "id": "19ec5775-67a8-45b9-b5dc-3b0391c2ee70",
+      "name": "Transaction Intents",
+      "description": {
+        "content": "",
+        "type": "text/plain"
+      },
+      "item": [
+        {
+          "id": "9b7a64e5-33b0-4c54-844c-eefa30084a10",
+          "name": "Create a transaction intent",
+          "request": {
+            "name": "Create a transaction intent",
+            "description": {
+              "content": "Creates a transaction intent object that represents a pending financial transaction. Transaction intents are used to initiate, validate, and track the lifecycle of a transaction before it is finalized.",
+              "type": "text/plain"
+            },
+            "url": {
+              "path": [
+                "v2",
+                "transaction_intents"
+              ],
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "query": [],
+              "variable": []
+            },
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "method": "POST",
+            "auth": null,
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"customer_id\": \"<string>\",\n  \"amount\": \"<integer>\",\n  \"currency\": \"<string>\",\n  \"payment_method_id\": \"<string>\",\n  \"network_transaction_id\": \"<string>\",\n  \"merchant_name\": \"<string>\",\n  \"merchant_address\": {\n    \"street_line1\": \"<string>\",\n    \"street_line2\": \"<string>\",\n    \"city\": \"<string>\",\n    \"state\": \"<string>\",\n    \"postal_code\": \"<string>\",\n    \"country\": \"<string>\"\n  },\n  \"merchant_id\": \"<string>\",\n  \"merchant_code\": \"<string>\",\n  \"expected_date\": \"<string>\",\n  \"metadata\": {\n    \"key_0\": true\n  }\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [
+            {
+              "id": "8fe46b76-77ac-4d3c-addb-8fb96acb2ba7",
+              "name": "Transaction intent created successfully",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "v2",
+                    "transaction_intents"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: basic",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Basic <credentials>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "POST",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"customer_id\": \"F9B5A5E8-C8B0-4B7A-8E6B-0C8EE90A62CF\",\n  \"amount\": 10000,\n  \"currency\": \"USD\",\n  \"payment_method_id\": \"<string>\",\n  \"network_transaction_id\": \"<string>\",\n  \"merchant_name\": \"walmart\",\n  \"merchant_address\": {\n    \"street_line1\": \"123 Main St\",\n    \"street_line2\": \"Apt 4B\",\n    \"city\": \"San Francisco\",\n    \"state\": \"CA\",\n    \"postal_code\": \"94105\",\n    \"country\": \"USA\"\n  },\n  \"merchant_id\": \"<string>\",\n  \"merchant_code\": \"<string>\",\n  \"expected_date\": \"2025-02-13 19:08:07+00:00\",\n  \"metadata\": {\n    \"platform_version\": \"2.1.0\"\n  }\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"id\": \"5B30532B-5B5B-4826-8DE2-429C57B705FD\",\n  \"customer_id\": \"9B5E1EE0-2E1C-46E7-81B9-3C3917204BE4\",\n  \"amount\": 10000,\n  \"currency\": \"USD\",\n  \"status\": \"CONFIRMED\",\n  \"created_at\": \"2025-02-13 19:08:07+00:00\",\n  \"payment_method_id\": \"DCBFC736-2286-42DD-897D-160DCA80AED2\",\n  \"network_transaction_id\": \"string\",\n  \"partner_transaction_id\": \"string\",\n  \"updated_at\": \"2025-02-13 19:08:07+00:00\",\n  \"metadata\": {\n    \"platform_version\": \"2.1.0\"\n  }\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "c2cf2a26-d692-4285-bab3-2c4bbef22945",
+              "name": "Invalid request",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "v2",
+                    "transaction_intents"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: basic",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Basic <credentials>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "POST",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"customer_id\": \"F9B5A5E8-C8B0-4B7A-8E6B-0C8EE90A62CF\",\n  \"amount\": 10000,\n  \"currency\": \"USD\",\n  \"payment_method_id\": \"<string>\",\n  \"network_transaction_id\": \"<string>\",\n  \"merchant_name\": \"walmart\",\n  \"merchant_address\": {\n    \"street_line1\": \"123 Main St\",\n    \"street_line2\": \"Apt 4B\",\n    \"city\": \"San Francisco\",\n    \"state\": \"CA\",\n    \"postal_code\": \"94105\",\n    \"country\": \"USA\"\n  },\n  \"merchant_id\": \"<string>\",\n  \"merchant_code\": \"<string>\",\n  \"expected_date\": \"2025-02-13 19:08:07+00:00\",\n  \"metadata\": {\n    \"platform_version\": \"2.1.0\"\n  }\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "Bad Request",
+              "code": 400,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"path\": \"/v2/customers\",\n  \"details\": [\n    \"email: must be a well-formed email address\"\n  ],\n  \"error\": \"Bad Request\",\n  \"status\": 400,\n  \"timestamp\": \"2025-01-20T18:18:22.923+00:00\"\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            }
+          ],
+          "event": [],
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          }
+        },
+        {
+          "id": "55d3c10d-60e2-4361-a8f5-1d1b35abe46b",
+          "name": "List transaction intents",
+          "request": {
+            "name": "List transaction intents",
+            "description": {
+              "content": "Retrieves a list of transaction intents.",
+              "type": "text/plain"
+            },
+            "url": {
+              "path": [
+                "v2",
+                "transaction_intents"
+              ],
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "query": [
+                {
+                  "disabled": false,
+                  "key": "type",
+                  "value": "<string>",
+                  "description": "The type of transaction intent to filter by."
+                },
+                {
+                  "disabled": false,
+                  "key": "limit",
+                  "value": "10",
+                  "description": "Limits the number of returned results"
+                },
+                {
+                  "disabled": false,
+                  "key": "starting_after",
+                  "value": "<string>",
+                  "description": "A cursor for use in pagination. An id that defines your place in the list."
+                }
+              ],
+              "variable": []
+            },
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "method": "GET",
+            "auth": null
+          },
+          "response": [
+            {
+              "id": "5026c5b4-10e2-4c0d-86e8-8d4076bbe37d",
+              "name": "List of transaction intents",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "v2",
+                    "transaction_intents"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [
+                    {
+                      "key": "type",
+                      "value": "CONFIRMED"
+                    },
+                    {
+                      "key": "limit",
+                      "value": "10"
+                    },
+                    {
+                      "key": "starting_after",
+                      "value": "<string>"
+                    }
+                  ],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: basic",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Basic <credentials>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "GET",
+                "body": {}
+              },
+              "status": "OK",
+              "code": 200,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"data\": [\n    {\n      \"id\": \"5B30532B-5B5B-4826-8DE2-429C57B705FD\",\n      \"customer_id\": \"9B5E1EE0-2E1C-46E7-81B9-3C3917204BE4\",\n      \"amount\": 10000,\n      \"currency\": \"USD\",\n      \"status\": \"CONFIRMED\",\n      \"created_at\": \"2025-02-13 19:08:07+00:00\",\n      \"payment_method_id\": \"DCBFC736-2286-42DD-897D-160DCA80AED2\",\n      \"network_transaction_id\": \"string\",\n      \"partner_transaction_id\": \"string\",\n      \"updated_at\": \"2025-02-13 19:08:07+00:00\",\n      \"metadata\": {\n        \"platform_version\": \"2.1.0\"\n      }\n    },\n    {\n      \"id\": \"5B30532B-5B5B-4826-8DE2-429C57B705FD\",\n      \"customer_id\": \"9B5E1EE0-2E1C-46E7-81B9-3C3917204BE4\",\n      \"amount\": 10000,\n      \"currency\": \"USD\",\n      \"status\": \"CONFIRMED\",\n      \"created_at\": \"2025-02-13 19:08:07+00:00\",\n      \"payment_method_id\": \"DCBFC736-2286-42DD-897D-160DCA80AED2\",\n      \"network_transaction_id\": \"string\",\n      \"partner_transaction_id\": \"string\",\n      \"updated_at\": \"2025-02-13 19:08:07+00:00\",\n      \"metadata\": {\n        \"platform_version\": \"2.1.0\"\n      }\n    }\n  ],\n  \"has_more\": false,\n  \"total\": 8711\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            }
+          ],
+          "event": [],
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          }
+        },
+        {
+          "id": "7cef0f55-9e0f-4ee1-8adc-00648e281395",
+          "name": "Retrieve a transaction intent",
+          "request": {
+            "name": "Retrieve a transaction intent",
+            "description": {
+              "content": "Retrieves the details of an existing transaction intent by `id`.",
+              "type": "text/plain"
+            },
+            "url": {
+              "path": [
+                "v2",
+                "transaction_intents",
+                ":intent_id"
+              ],
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "query": [],
+              "variable": [
+                {
+                  "disabled": false,
+                  "type": "any",
+                  "value": "<string>",
+                  "key": "intent_id",
+                  "description": "(Required) The unique identifier for the transaction intent."
+                }
+              ]
+            },
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "method": "GET",
+            "auth": null
+          },
+          "response": [
+            {
+              "id": "2e4e32e8-d6b9-4739-bae6-1e179aa528b6",
+              "name": "Transaction intent retrieved successfully",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "v2",
+                    "transaction_intents",
+                    ":intent_id"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": [
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<string>",
+                      "key": "intent_id",
+                      "description": "(Required) The unique identifier for the transaction intent."
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: basic",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Basic <credentials>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "GET",
+                "body": {}
+              },
+              "status": "OK",
+              "code": 200,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"id\": \"5B30532B-5B5B-4826-8DE2-429C57B705FD\",\n  \"customer_id\": \"9B5E1EE0-2E1C-46E7-81B9-3C3917204BE4\",\n  \"amount\": 10000,\n  \"currency\": \"USD\",\n  \"status\": \"CONFIRMED\",\n  \"created_at\": \"2025-02-13 19:08:07+00:00\",\n  \"payment_method_id\": \"DCBFC736-2286-42DD-897D-160DCA80AED2\",\n  \"network_transaction_id\": \"string\",\n  \"partner_transaction_id\": \"string\",\n  \"updated_at\": \"2025-02-13 19:08:07+00:00\",\n  \"metadata\": {\n    \"platform_version\": \"2.1.0\"\n  }\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "cc1ab3c9-8c6b-4833-8104-7d6142687ca2",
+              "name": "Transaction intent not found",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "v2",
+                    "transaction_intents",
+                    ":intent_id"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": [
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<string>",
+                      "key": "intent_id",
+                      "description": "(Required) The unique identifier for the transaction intent."
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: basic",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Basic <credentials>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "GET",
+                "body": {}
+              },
+              "status": "Not Found",
+              "code": 404,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"type\": \"TRANSACTION_INTENT_FOUND_ERROR\",\n  \"message\": \"Transaction intent not found for provided ID: txint_123\",\n  \"param\": \"intent_id\"\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            }
+          ],
+          "event": [],
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          }
+        },
+        {
+          "id": "e0e4f365-5658-47df-a37b-92f5fb38c4d0",
+          "name": "Update a transaction intent",
+          "request": {
+            "name": "Update a transaction intent",
+            "description": {
+              "content": "Updates the details of the transaction intent associated with the supplied intent_id",
+              "type": "text/plain"
+            },
+            "url": {
+              "path": [
+                "v2",
+                "transaction_intents",
+                ":intent_id"
+              ],
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "query": [],
+              "variable": [
+                {
+                  "disabled": false,
+                  "type": "any",
+                  "value": "<string>",
+                  "key": "intent_id",
+                  "description": "(Required) The unique identifier for the transaction intent"
+                }
+              ]
+            },
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "method": "POST",
+            "auth": null,
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"customer_id\": \"<string>\",\n  \"amount\": \"<integer>\",\n  \"status\": \"<string>\",\n  \"currency\": \"<string>\",\n  \"network_transaction_id\": \"<string>\",\n  \"partner_transaction_id\": \"<string>\",\n  \"metadata\": {\n    \"key_0\": \"string\"\n  }\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [
+            {
+              "id": "cf16e0a0-9df1-4e47-bd4b-18acd6dcd537",
+              "name": "Transaction intent updated successfully",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "v2",
+                    "transaction_intents",
+                    ":intent_id"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": [
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<string>",
+                      "key": "intent_id",
+                      "description": "(Required) The unique identifier for the transaction intent"
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: basic",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Basic <credentials>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "POST",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"customer_id\": \"D8CD2346-9A02-4ABB-A388-AB3DACC57DCF\",\n  \"amount\": 100,\n  \"status\": \"CONFIRMED\",\n  \"currency\": \"USD\",\n  \"network_transaction_id\": \"<string>\",\n  \"partner_transaction_id\": \"<string>\",\n  \"metadata\": {\n    \"platform_version\": \"2.1.0\"\n  }\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"id\": \"5B30532B-5B5B-4826-8DE2-429C57B705FD\",\n  \"customer_id\": \"9B5E1EE0-2E1C-46E7-81B9-3C3917204BE4\",\n  \"amount\": 10000,\n  \"currency\": \"USD\",\n  \"status\": \"CONFIRMED\",\n  \"created_at\": \"2025-02-13 19:08:07+00:00\",\n  \"payment_method_id\": \"DCBFC736-2286-42DD-897D-160DCA80AED2\",\n  \"network_transaction_id\": \"string\",\n  \"partner_transaction_id\": \"string\",\n  \"updated_at\": \"2025-02-13 19:08:07+00:00\",\n  \"metadata\": {\n    \"platform_version\": \"2.1.0\"\n  }\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "47a97ee9-5284-41b0-bf1a-a1fcff48de2c",
+              "name": "Invalid request",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "v2",
+                    "transaction_intents",
+                    ":intent_id"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": [
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<string>",
+                      "key": "intent_id",
+                      "description": "(Required) The unique identifier for the transaction intent"
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: basic",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Basic <credentials>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "POST",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"customer_id\": \"D8CD2346-9A02-4ABB-A388-AB3DACC57DCF\",\n  \"amount\": 100,\n  \"status\": \"CONFIRMED\",\n  \"currency\": \"USD\",\n  \"network_transaction_id\": \"<string>\",\n  \"partner_transaction_id\": \"<string>\",\n  \"metadata\": {\n    \"platform_version\": \"2.1.0\"\n  }\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "Bad Request",
+              "code": 400,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"path\": \"/v2/customers\",\n  \"details\": [\n    \"email: must be a well-formed email address\"\n  ],\n  \"error\": \"Bad Request\",\n  \"status\": 400,\n  \"timestamp\": \"2025-01-20T18:18:22.923+00:00\"\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            }
+          ],
+          "event": [],
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          }
+        }
+      ],
+      "event": []
+    }
+  ],
+  "event": [],
+  "variable": [
+    {
+      "type": "string",
+      "value": "https://dev.sbx.imprint.co",
+      "key": "baseUrl"
+    }
+  ],
+  "auth": {
+    "type": "basic",
+    "basic": [
+      {
+        "key": "username",
+        "value": "{{basicAuthUsername}}"
+      },
+      {
+        "key": "password",
+        "value": "{{basicAuthPassword}}"
+      }
+    ]
+  },
+  "info": {
+    "_postman_id": "ddb8783d-b3d8-4e0f-b726-d410b0e52142",
+    "name": "Public Imprint Customer Links Transaction Intents API",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "description": {
+      "content": "",
+      "type": "text/plain"
+    }
+  }
+}

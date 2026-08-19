@@ -1,0 +1,108 @@
+{
+  "opencollection": "1.0.0",
+  "info": {
+    "name": "Public Imprint Customer Links Order Events API",
+    "version": "2.0"
+  },
+  "request": {
+    "auth": {
+      "type": "basic",
+      "username": "{{username}}",
+      "password": "{{password}}"
+    }
+  },
+  "items": [
+    {
+      "info": {
+        "name": "Order Events",
+        "type": "folder"
+      },
+      "items": [
+        {
+          "info": {
+            "name": "Retrieve order events",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://dev.sbx.imprint.co/v2/order_events",
+            "params": [
+              {
+                "name": "order_event_id",
+                "value": "7622c07d-eb2b-4345-a9a9-345d61d32bc2",
+                "type": "query",
+                "description": "An order event ID. If provided, the response will only have a maximum of one result."
+              },
+              {
+                "name": "order_id",
+                "value": "77f60af4-185e-4867-b113-34e3cf7c6acd",
+                "type": "query",
+                "description": "Enables searching for events by order ID"
+              },
+              {
+                "name": "partner_event_id",
+                "value": "",
+                "type": "query",
+                "description": "The identifier of the order event in the partner system. If provided, the response will only have a maximum of one result."
+              },
+              {
+                "name": "network_transaction_id",
+                "value": "txn-123456",
+                "type": "query",
+                "description": "The network's unique identifier for the transaction. Examples include Visa Transaction ID, Mastercard Trace ID, and American Express Network Reference ID"
+              },
+              {
+                "name": "limit",
+                "value": "",
+                "type": "query",
+                "description": "Limits the number of returned results"
+              },
+              {
+                "name": "starting_after",
+                "value": "",
+                "type": "query",
+                "description": "A cursor for use in pagination. An id that defines your place in the list."
+              }
+            ]
+          },
+          "docs": "Get a list of order events"
+        },
+        {
+          "info": {
+            "name": "Create order events",
+            "type": "http"
+          },
+          "http": {
+            "method": "POST",
+            "url": "https://dev.sbx.imprint.co/v2/order_events",
+            "body": {
+              "type": "json",
+              "data": "{}"
+            }
+          },
+          "docs": "Create new order events"
+        },
+        {
+          "info": {
+            "name": "Delete order event",
+            "type": "http"
+          },
+          "http": {
+            "method": "DELETE",
+            "url": "https://dev.sbx.imprint.co/v2/order_events/:order_event_id",
+            "params": [
+              {
+                "name": "order_event_id",
+                "value": "7622c07d-eb2b-4345-a9a9-345d61d32bc2",
+                "type": "path",
+                "description": "Unique identifier for the order event"
+              }
+            ]
+          },
+          "docs": "Delete an existing order event"
+        }
+      ]
+    }
+  ],
+  "bundled": true
+}

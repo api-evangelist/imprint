@@ -1,0 +1,455 @@
+{
+  "item": [
+    {
+      "id": "c7ade374-600d-433b-933d-ad903cdc0c96",
+      "name": "Orders",
+      "description": {
+        "content": "",
+        "type": "text/plain"
+      },
+      "item": [
+        {
+          "id": "7812ed3a-8c8d-4d6e-bc48-a2483c923fe8",
+          "name": "Retrieve orders",
+          "request": {
+            "name": "Retrieve orders",
+            "description": {
+              "content": "Get a list of orders",
+              "type": "text/plain"
+            },
+            "url": {
+              "path": [
+                "v2",
+                "orders"
+              ],
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "query": [
+                {
+                  "disabled": false,
+                  "key": "id",
+                  "value": "<string>",
+                  "description": "An order ID. If provided, the response will only have a maximum of one result."
+                },
+                {
+                  "disabled": false,
+                  "key": "partner_order_id",
+                  "value": "<string>",
+                  "description": "Partner's order identifier"
+                }
+              ],
+              "variable": []
+            },
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "method": "GET",
+            "auth": null
+          },
+          "response": [
+            {
+              "id": "b55e0c92-7950-4594-bf71-ea38c8ae8ab8",
+              "name": "List of orders",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "v2",
+                    "orders"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [
+                    {
+                      "key": "id",
+                      "value": "77f60af4-185e-4867-b113-34e3cf7c6acd"
+                    },
+                    {
+                      "key": "partner_order_id",
+                      "value": "o-c8a1fe46bbff4a18ba1d"
+                    }
+                  ],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: basic",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Basic <credentials>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "GET",
+                "body": {}
+              },
+              "status": "OK",
+              "code": 200,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"data\": [\n    {\n      \"payment_method_id\": \"0144ea84-3c39-4382-a37a-03c699b77646\",\n      \"total_order_amount\": 274999,\n      \"partner_order_id\": \"o-c8a1fe46bbff4a18ba1d\",\n      \"id\": \"77f60af4-185e-4867-b113-34e3cf7c6acd\",\n      \"customer_id\": \"1bb0ab64-ed57-4f2f-bd8d-ab04d1a365c5\",\n      \"merchant_id\": \"m-123456789\",\n      \"merchant_name\": \"Rest Assured\",\n      \"merchant_address\": [\n        {\n          \"street_line1\": \"123 Main St\",\n          \"street_line2\": \"Apt 4B\",\n          \"city\": \"San Francisco\",\n          \"state\": \"CA\",\n          \"postal_code\": \"94105\",\n          \"country\": \"USA\"\n        },\n        {\n          \"street_line1\": \"123 Main St\",\n          \"street_line2\": \"Apt 4B\",\n          \"city\": \"San Francisco\",\n          \"state\": \"CA\",\n          \"postal_code\": \"94105\",\n          \"country\": \"USA\"\n        }\n      ],\n      \"order_lines\": [\n        {\n          \"name\": \"Couch Supreme\",\n          \"product_url\": \"www.restassured.com/couch-supreme\",\n          \"quantity\": 1,\n          \"rate\": 274999,\n          \"rewards_rate\": 2500\n        }\n      ],\n      \"total_rewards_amount\": 2500,\n      \"currency\": \"USD\",\n      \"created_at\": \"2025-02-13T19:08:07Z\",\n      \"updated_at\": \"2025-02-13T19:08:07Z\"\n    },\n    {\n      \"payment_method_id\": \"0144ea84-3c39-4382-a37a-03c699b77646\",\n      \"total_order_amount\": 274999,\n      \"partner_order_id\": \"o-c8a1fe46bbff4a18ba1d\",\n      \"id\": \"77f60af4-185e-4867-b113-34e3cf7c6acd\",\n      \"customer_id\": \"1bb0ab64-ed57-4f2f-bd8d-ab04d1a365c5\",\n      \"merchant_id\": \"m-123456789\",\n      \"merchant_name\": \"Rest Assured\",\n      \"merchant_address\": [\n        {\n          \"street_line1\": \"123 Main St\",\n          \"street_line2\": \"Apt 4B\",\n          \"city\": \"San Francisco\",\n          \"state\": \"CA\",\n          \"postal_code\": \"94105\",\n          \"country\": \"USA\"\n        },\n        {\n          \"street_line1\": \"123 Main St\",\n          \"street_line2\": \"Apt 4B\",\n          \"city\": \"San Francisco\",\n          \"state\": \"CA\",\n          \"postal_code\": \"94105\",\n          \"country\": \"USA\"\n        }\n      ],\n      \"order_lines\": [\n        {\n          \"name\": \"Couch Supreme\",\n          \"product_url\": \"www.restassured.com/couch-supreme\",\n          \"quantity\": 1,\n          \"rate\": 274999,\n          \"rewards_rate\": 2500\n        }\n      ],\n      \"total_rewards_amount\": 2500,\n      \"currency\": \"USD\",\n      \"created_at\": \"2025-02-13T19:08:07Z\",\n      \"updated_at\": \"2025-02-13T19:08:07Z\"\n    }\n  ]\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            }
+          ],
+          "event": [],
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          }
+        },
+        {
+          "id": "6485c82d-d22f-4d8c-9005-1c3a74deff55",
+          "name": "Create orders",
+          "request": {
+            "name": "Create orders",
+            "description": {
+              "content": "Create new orders",
+              "type": "text/plain"
+            },
+            "url": {
+              "path": [
+                "v2",
+                "orders"
+              ],
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "query": [],
+              "variable": []
+            },
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "method": "POST",
+            "auth": null,
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"payment_method_id\": \"<string>\",\n  \"total_order_amount\": \"<integer>\",\n  \"partner_order_id\": \"<string>\",\n  \"id\": \"<string>\",\n  \"customer_id\": \"<string>\",\n  \"merchant_id\": \"<string>\",\n  \"merchant_name\": \"<string>\",\n  \"merchant_address\": [\n    {\n      \"street_line1\": \"<string>\",\n      \"street_line2\": \"<string>\",\n      \"city\": \"<string>\",\n      \"state\": \"<string>\",\n      \"postal_code\": \"<string>\",\n      \"country\": \"<string>\"\n    },\n    {\n      \"street_line1\": \"<string>\",\n      \"street_line2\": \"<string>\",\n      \"city\": \"<string>\",\n      \"state\": \"<string>\",\n      \"postal_code\": \"<string>\",\n      \"country\": \"<string>\"\n    }\n  ],\n  \"order_lines\": [\n    {\n      \"name\": \"<string>\",\n      \"quantity\": \"<integer>\",\n      \"rate\": \"<integer>\",\n      \"rewards_rate\": \"<integer>\",\n      \"product_url\": \"<string>\"\n    },\n    {\n      \"name\": \"<string>\",\n      \"quantity\": \"<integer>\",\n      \"rate\": \"<integer>\",\n      \"rewards_rate\": \"<integer>\",\n      \"product_url\": \"<string>\"\n    }\n  ],\n  \"total_rewards_amount\": \"<integer>\",\n  \"currency\": \"<string>\",\n  \"created_at\": \"<dateTime>\",\n  \"updated_at\": \"<dateTime>\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [
+            {
+              "id": "876e1f83-7181-414f-926b-c3c094951cdf",
+              "name": "Orders created successfully",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "v2",
+                    "orders"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: basic",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Basic <credentials>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "POST",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"payment_method_id\": \"0144ea84-3c39-4382-a37a-03c699b77646\",\n  \"total_order_amount\": 274999,\n  \"partner_order_id\": \"o-c8a1fe46bbff4a18ba1d\",\n  \"id\": \"77f60af4-185e-4867-b113-34e3cf7c6acd\",\n  \"customer_id\": \"1bb0ab64-ed57-4f2f-bd8d-ab04d1a365c5\",\n  \"merchant_id\": \"m-123456789\",\n  \"merchant_name\": \"Rest Assured\",\n  \"merchant_address\": [\n    {\n      \"street_line1\": \"123 Main St\",\n      \"street_line2\": \"Apt 4B\",\n      \"city\": \"San Francisco\",\n      \"state\": \"CA\",\n      \"postal_code\": \"94105\",\n      \"country\": \"USA\"\n    },\n    {\n      \"street_line1\": \"123 Main St\",\n      \"street_line2\": \"Apt 4B\",\n      \"city\": \"San Francisco\",\n      \"state\": \"CA\",\n      \"postal_code\": \"94105\",\n      \"country\": \"USA\"\n    }\n  ],\n  \"order_lines\": [\n    {\n      \"name\": \"Couch Supreme\",\n      \"product_url\": \"www.restassured.com/couch-supreme\",\n      \"quantity\": 1,\n      \"rate\": 274999,\n      \"rewards_rate\": 2500\n    }\n  ],\n  \"total_rewards_amount\": 2500,\n  \"currency\": \"USD\",\n  \"created_at\": \"2025-02-13T19:08:07Z\",\n  \"updated_at\": \"2025-02-13T19:08:07Z\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"payment_method_id\": \"0144ea84-3c39-4382-a37a-03c699b77646\",\n  \"total_order_amount\": 274999,\n  \"partner_order_id\": \"o-c8a1fe46bbff4a18ba1d\",\n  \"id\": \"77f60af4-185e-4867-b113-34e3cf7c6acd\",\n  \"customer_id\": \"1bb0ab64-ed57-4f2f-bd8d-ab04d1a365c5\",\n  \"merchant_id\": \"m-123456789\",\n  \"merchant_name\": \"Rest Assured\",\n  \"merchant_address\": [\n    {\n      \"street_line1\": \"123 Main St\",\n      \"street_line2\": \"Apt 4B\",\n      \"city\": \"San Francisco\",\n      \"state\": \"CA\",\n      \"postal_code\": \"94105\",\n      \"country\": \"USA\"\n    },\n    {\n      \"street_line1\": \"123 Main St\",\n      \"street_line2\": \"Apt 4B\",\n      \"city\": \"San Francisco\",\n      \"state\": \"CA\",\n      \"postal_code\": \"94105\",\n      \"country\": \"USA\"\n    }\n  ],\n  \"order_lines\": [\n    {\n      \"name\": \"Couch Supreme\",\n      \"product_url\": \"www.restassured.com/couch-supreme\",\n      \"quantity\": 1,\n      \"rate\": 274999,\n      \"rewards_rate\": 2500\n    }\n  ],\n  \"total_rewards_amount\": 2500,\n  \"currency\": \"USD\",\n  \"created_at\": \"2025-02-13T19:08:07Z\",\n  \"updated_at\": \"2025-02-13T19:08:07Z\"\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            }
+          ],
+          "event": [],
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          }
+        },
+        {
+          "id": "0ad31427-84dc-4f9b-99bc-875e15c6bab1",
+          "name": "Modify order",
+          "request": {
+            "name": "Modify order",
+            "description": {
+              "content": "Modify an existing order",
+              "type": "text/plain"
+            },
+            "url": {
+              "path": [
+                "v2",
+                "orders",
+                ":order_id"
+              ],
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "query": [],
+              "variable": [
+                {
+                  "disabled": false,
+                  "type": "any",
+                  "value": "<string>",
+                  "key": "order_id",
+                  "description": "(Required) Unique identifier for the order"
+                }
+              ]
+            },
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "method": "PUT",
+            "auth": null,
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"payment_method_id\": \"<string>\",\n  \"total_order_amount\": \"<integer>\",\n  \"partner_order_id\": \"<string>\",\n  \"id\": \"<string>\",\n  \"customer_id\": \"<string>\",\n  \"merchant_id\": \"<string>\",\n  \"merchant_name\": \"<string>\",\n  \"merchant_address\": [\n    {\n      \"street_line1\": \"<string>\",\n      \"street_line2\": \"<string>\",\n      \"city\": \"<string>\",\n      \"state\": \"<string>\",\n      \"postal_code\": \"<string>\",\n      \"country\": \"<string>\"\n    },\n    {\n      \"street_line1\": \"<string>\",\n      \"street_line2\": \"<string>\",\n      \"city\": \"<string>\",\n      \"state\": \"<string>\",\n      \"postal_code\": \"<string>\",\n      \"country\": \"<string>\"\n    }\n  ],\n  \"order_lines\": [\n    {\n      \"name\": \"<string>\",\n      \"quantity\": \"<integer>\",\n      \"rate\": \"<integer>\",\n      \"rewards_rate\": \"<integer>\",\n      \"product_url\": \"<string>\"\n    },\n    {\n      \"name\": \"<string>\",\n      \"quantity\": \"<integer>\",\n      \"rate\": \"<integer>\",\n      \"rewards_rate\": \"<integer>\",\n      \"product_url\": \"<string>\"\n    }\n  ],\n  \"total_rewards_amount\": \"<integer>\",\n  \"currency\": \"<string>\",\n  \"created_at\": \"<dateTime>\",\n  \"updated_at\": \"<dateTime>\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [
+            {
+              "id": "c742ccc2-8af6-4d7e-a8f3-32b3e2229722",
+              "name": "Order modified successfully",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "v2",
+                    "orders",
+                    ":order_id"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": [
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<string>",
+                      "key": "order_id",
+                      "description": "(Required) Unique identifier for the order"
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: basic",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Basic <credentials>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "PUT",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"payment_method_id\": \"0144ea84-3c39-4382-a37a-03c699b77646\",\n  \"total_order_amount\": 274999,\n  \"partner_order_id\": \"o-c8a1fe46bbff4a18ba1d\",\n  \"id\": \"77f60af4-185e-4867-b113-34e3cf7c6acd\",\n  \"customer_id\": \"1bb0ab64-ed57-4f2f-bd8d-ab04d1a365c5\",\n  \"merchant_id\": \"m-123456789\",\n  \"merchant_name\": \"Rest Assured\",\n  \"merchant_address\": [\n    {\n      \"street_line1\": \"123 Main St\",\n      \"street_line2\": \"Apt 4B\",\n      \"city\": \"San Francisco\",\n      \"state\": \"CA\",\n      \"postal_code\": \"94105\",\n      \"country\": \"USA\"\n    },\n    {\n      \"street_line1\": \"123 Main St\",\n      \"street_line2\": \"Apt 4B\",\n      \"city\": \"San Francisco\",\n      \"state\": \"CA\",\n      \"postal_code\": \"94105\",\n      \"country\": \"USA\"\n    }\n  ],\n  \"order_lines\": [\n    {\n      \"name\": \"Couch Supreme\",\n      \"product_url\": \"www.restassured.com/couch-supreme\",\n      \"quantity\": 1,\n      \"rate\": 274999,\n      \"rewards_rate\": 2500\n    }\n  ],\n  \"total_rewards_amount\": 2500,\n  \"currency\": \"USD\",\n  \"created_at\": \"2025-02-13T19:08:07Z\",\n  \"updated_at\": \"2025-02-13T19:08:07Z\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"payment_method_id\": \"0144ea84-3c39-4382-a37a-03c699b77646\",\n  \"total_order_amount\": 274999,\n  \"partner_order_id\": \"o-c8a1fe46bbff4a18ba1d\",\n  \"id\": \"77f60af4-185e-4867-b113-34e3cf7c6acd\",\n  \"customer_id\": \"1bb0ab64-ed57-4f2f-bd8d-ab04d1a365c5\",\n  \"merchant_id\": \"m-123456789\",\n  \"merchant_name\": \"Rest Assured\",\n  \"merchant_address\": [\n    {\n      \"street_line1\": \"123 Main St\",\n      \"street_line2\": \"Apt 4B\",\n      \"city\": \"San Francisco\",\n      \"state\": \"CA\",\n      \"postal_code\": \"94105\",\n      \"country\": \"USA\"\n    },\n    {\n      \"street_line1\": \"123 Main St\",\n      \"street_line2\": \"Apt 4B\",\n      \"city\": \"San Francisco\",\n      \"state\": \"CA\",\n      \"postal_code\": \"94105\",\n      \"country\": \"USA\"\n    }\n  ],\n  \"order_lines\": [\n    {\n      \"name\": \"Couch Supreme\",\n      \"product_url\": \"www.restassured.com/couch-supreme\",\n      \"quantity\": 1,\n      \"rate\": 274999,\n      \"rewards_rate\": 2500\n    }\n  ],\n  \"total_rewards_amount\": 2500,\n  \"currency\": \"USD\",\n  \"created_at\": \"2025-02-13T19:08:07Z\",\n  \"updated_at\": \"2025-02-13T19:08:07Z\"\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            }
+          ],
+          "event": [],
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          }
+        },
+        {
+          "id": "0b29d143-7cab-4378-a37e-65e7d1d713f9",
+          "name": "Delete order",
+          "request": {
+            "name": "Delete order",
+            "description": {
+              "content": "Delete an existing order",
+              "type": "text/plain"
+            },
+            "url": {
+              "path": [
+                "v2",
+                "orders",
+                ":order_id"
+              ],
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "query": [],
+              "variable": [
+                {
+                  "disabled": false,
+                  "type": "any",
+                  "value": "<string>",
+                  "key": "order_id",
+                  "description": "(Required) Unique identifier for the order"
+                }
+              ]
+            },
+            "method": "DELETE",
+            "auth": null
+          },
+          "response": [
+            {
+              "id": "83c706f8-9e3c-40fc-9e2f-fe2d2dac51e0",
+              "name": "Order deleted successfully",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "v2",
+                    "orders",
+                    ":order_id"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": [
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<string>",
+                      "key": "order_id",
+                      "description": "(Required) Unique identifier for the order"
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: basic",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Basic <credentials>"
+                  }
+                ],
+                "method": "DELETE",
+                "body": {}
+              },
+              "status": "No Content",
+              "code": 204,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "text/plain"
+                }
+              ],
+              "body": "",
+              "cookie": [],
+              "_postman_previewlanguage": "text"
+            }
+          ],
+          "event": [],
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          }
+        }
+      ],
+      "event": []
+    }
+  ],
+  "event": [],
+  "variable": [
+    {
+      "type": "string",
+      "value": "https://dev.sbx.imprint.co",
+      "key": "baseUrl"
+    }
+  ],
+  "auth": {
+    "type": "basic",
+    "basic": [
+      {
+        "key": "username",
+        "value": "{{basicAuthUsername}}"
+      },
+      {
+        "key": "password",
+        "value": "{{basicAuthPassword}}"
+      }
+    ]
+  },
+  "info": {
+    "_postman_id": "7a50943d-2d82-4327-a21d-df2bd7a492d7",
+    "name": "Public Imprint Customer Links Orders API",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "description": {
+      "content": "",
+      "type": "text/plain"
+    }
+  }
+}

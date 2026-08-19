@@ -1,0 +1,113 @@
+{
+  "opencollection": "1.0.0",
+  "info": {
+    "name": "Public Imprint Customer Links Transaction Intents API",
+    "version": "2.0"
+  },
+  "request": {
+    "auth": {
+      "type": "basic",
+      "username": "{{username}}",
+      "password": "{{password}}"
+    }
+  },
+  "items": [
+    {
+      "info": {
+        "name": "Transaction Intents",
+        "type": "folder"
+      },
+      "items": [
+        {
+          "info": {
+            "name": "List transaction intents",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://dev.sbx.imprint.co/v2/transaction_intents",
+            "params": [
+              {
+                "name": "type",
+                "value": "",
+                "type": "query",
+                "description": "The type of transaction intent to filter by."
+              },
+              {
+                "name": "limit",
+                "value": "",
+                "type": "query",
+                "description": "Limits the number of returned results"
+              },
+              {
+                "name": "starting_after",
+                "value": "",
+                "type": "query",
+                "description": "A cursor for use in pagination. An id that defines your place in the list."
+              }
+            ]
+          },
+          "docs": "Retrieves a list of transaction intents."
+        },
+        {
+          "info": {
+            "name": "Create a transaction intent",
+            "type": "http"
+          },
+          "http": {
+            "method": "POST",
+            "url": "https://dev.sbx.imprint.co/v2/transaction_intents",
+            "body": {
+              "type": "json",
+              "data": "{}"
+            }
+          },
+          "docs": "Creates a transaction intent object that represents a pending financial transaction. Transaction intents are used to initiate, validate, and track the lifecycle of a transaction before it is finalized."
+        },
+        {
+          "info": {
+            "name": "Retrieve a transaction intent",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://dev.sbx.imprint.co/v2/transaction_intents/:intent_id",
+            "params": [
+              {
+                "name": "intent_id",
+                "value": "",
+                "type": "path",
+                "description": "The unique identifier for the transaction intent."
+              }
+            ]
+          },
+          "docs": "Retrieves the details of an existing transaction intent by `id`."
+        },
+        {
+          "info": {
+            "name": "Update a transaction intent",
+            "type": "http"
+          },
+          "http": {
+            "method": "POST",
+            "url": "https://dev.sbx.imprint.co/v2/transaction_intents/:intent_id",
+            "params": [
+              {
+                "name": "intent_id",
+                "value": "",
+                "type": "path",
+                "description": "The unique identifier for the transaction intent"
+              }
+            ],
+            "body": {
+              "type": "json",
+              "data": "{}"
+            }
+          },
+          "docs": "Updates the details of the transaction intent associated with the supplied intent_id"
+        }
+      ]
+    }
+  ],
+  "bundled": true
+}

@@ -1,0 +1,96 @@
+{
+  "opencollection": "1.0.0",
+  "info": {
+    "name": "Public Imprint Customer Links Payment Methods API",
+    "version": "2.0"
+  },
+  "request": {
+    "auth": {
+      "type": "basic",
+      "username": "{{username}}",
+      "password": "{{password}}"
+    }
+  },
+  "items": [
+    {
+      "info": {
+        "name": "Payment Methods",
+        "type": "folder"
+      },
+      "items": [
+        {
+          "info": {
+            "name": "List payment methods",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://dev.sbx.imprint.co/v2/payment_methods",
+            "params": [
+              {
+                "name": "customer_id",
+                "value": "",
+                "type": "query",
+                "description": "The unique identifier for the customer"
+              },
+              {
+                "name": "type",
+                "value": "",
+                "type": "query",
+                "description": "The type of payment method to filter by"
+              },
+              {
+                "name": "limit",
+                "value": "",
+                "type": "query",
+                "description": "Limits the number of returned results"
+              },
+              {
+                "name": "starting_after",
+                "value": "",
+                "type": "query",
+                "description": "A cursor for use in pagination. An id that defines your place in the list."
+              }
+            ]
+          },
+          "docs": "List payment methods"
+        },
+        {
+          "info": {
+            "name": "List payment methods",
+            "type": "http"
+          },
+          "http": {
+            "method": "POST",
+            "url": "https://dev.sbx.imprint.co/v2/payment_methods",
+            "body": {
+              "type": "json",
+              "data": "{}"
+            }
+          },
+          "docs": "List payment methods"
+        },
+        {
+          "info": {
+            "name": "Retrieve a payment method",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://dev.sbx.imprint.co/v2/payment_methods/:payment_method_id",
+            "params": [
+              {
+                "name": "payment_method_id",
+                "value": "",
+                "type": "path",
+                "description": "The unique identifier of the payment method"
+              }
+            ]
+          },
+          "docs": "Retrieves the details of the payment method associated with the supplied `payment_method_id`"
+        }
+      ]
+    }
+  ],
+  "bundled": true
+}

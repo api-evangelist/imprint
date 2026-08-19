@@ -1,0 +1,98 @@
+{
+  "opencollection": "1.0.0",
+  "info": {
+    "name": "Public Imprint Customer Links Rewards API",
+    "version": "2.0"
+  },
+  "request": {
+    "auth": {
+      "type": "basic",
+      "username": "{{username}}",
+      "password": "{{password}}"
+    }
+  },
+  "items": [
+    {
+      "info": {
+        "name": "Rewards",
+        "type": "folder"
+      },
+      "items": [
+        {
+          "info": {
+            "name": "Search for rewards",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://dev.sbx.imprint.co/v2/rewards",
+            "params": [
+              {
+                "name": "transaction_event_id",
+                "value": "",
+                "type": "query",
+                "description": "Reward associated to the transaction event"
+              },
+              {
+                "name": "limit",
+                "value": "",
+                "type": "query",
+                "description": "Limits the number of returned results"
+              },
+              {
+                "name": "starting_after",
+                "value": "",
+                "type": "query",
+                "description": "A cursor for use in pagination. An id that defines your place in the list."
+              }
+            ]
+          },
+          "docs": "Search for rewards"
+        },
+        {
+          "info": {
+            "name": "Retrieve a reward",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://dev.sbx.imprint.co/v2/rewards/:reward_id",
+            "params": [
+              {
+                "name": "reward_id",
+                "value": "",
+                "type": "path",
+                "description": "The unique identifier for the reward"
+              }
+            ]
+          },
+          "docs": "Retrieves the details of an existing reward by ID"
+        },
+        {
+          "info": {
+            "name": "Updates a reward",
+            "type": "http"
+          },
+          "http": {
+            "method": "PATCH",
+            "url": "https://dev.sbx.imprint.co/v2/rewards/:reward_id",
+            "params": [
+              {
+                "name": "reward_id",
+                "value": "",
+                "type": "path",
+                "description": "Unique identifier for the reward"
+              }
+            ],
+            "body": {
+              "type": "json",
+              "data": "{}"
+            }
+          },
+          "docs": "Updates the status or amount of pending rewards"
+        }
+      ]
+    }
+  ],
+  "bundled": true
+}

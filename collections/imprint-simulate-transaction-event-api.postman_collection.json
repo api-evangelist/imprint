@@ -1,0 +1,195 @@
+{
+  "item": [
+    {
+      "id": "0af0c8de-724c-4017-b250-ad00c1ef92a8",
+      "name": "Simulate Transaction Event",
+      "description": {
+        "content": "",
+        "type": "text/plain"
+      },
+      "item": [
+        {
+          "id": "d6ee8158-0649-4b93-818a-f27585216d70",
+          "name": "Simulate transaction event in sandbox environment",
+          "request": {
+            "name": "Simulate transaction event in sandbox environment",
+            "description": {},
+            "url": {
+              "path": [
+                "v2",
+                "simulate_transaction_event"
+              ],
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "query": [],
+              "variable": []
+            },
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "method": "POST",
+            "auth": null,
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"payment_method_id\": \"<string>\",\n  \"status\": \"<string>\",\n  \"event_id\": \"<string>\",\n  \"transaction_id\": \"<string>\",\n  \"amount\": \"<integer>\",\n  \"currency\": \"<string>\",\n  \"authorization_code\": \"<string>\",\n  \"network_transaction_id\": \"<string>\",\n  \"purchase_method\": \"<string>\",\n  \"merchant\": {\n    \"network_id\": \"<string>\",\n    \"name\": \"<string>\",\n    \"category\": \"<string>\",\n    \"category_code\": \"<string>\",\n    \"address\": {\n      \"street_line1\": \"<string>\",\n      \"street_line2\": \"<string>\",\n      \"city\": \"<string>\",\n      \"state\": \"<string>\",\n      \"postal_code\": \"<string>\",\n      \"country\": \"<string>\"\n    }\n  }\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [
+            {
+              "id": "9269391c-6c7b-419f-959c-451de33772bb",
+              "name": "Transaction event created successfully",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "v2",
+                    "simulate_transaction_event"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: basic",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Basic <credentials>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "POST",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"payment_method_id\": \"7f754378-dd84-4a9a-b1ce-0646bb769c29\",\n  \"status\": \"APPROVED\",\n  \"event_id\": \"e2806932-5f1b-4518-8b15-156d773e9496\",\n  \"transaction_id\": \"e2806932-5f1b-4518-8b15-156d773e9496\",\n  \"amount\": 5000,\n  \"currency\": \"USD\",\n  \"authorization_code\": \"645432\",\n  \"network_transaction_id\": \"txn-789456\",\n  \"purchase_method\": \"CHIP\",\n  \"merchant\": {\n    \"network_id\": \"234923454545\",\n    \"name\": \"Target\",\n    \"category\": \"Grocery Stores\",\n    \"category_code\": \"5411\",\n    \"address\": {\n      \"street_line1\": \"123 Main St\",\n      \"street_line2\": \"Apt 4B\",\n      \"city\": \"San Francisco\",\n      \"state\": \"CA\",\n      \"postal_code\": \"94105\",\n      \"country\": \"USA\"\n    }\n  }\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"transaction_id\": \"E777214A-2D11-4CAD-9E8F-E1BD71D9FE67\",\n  \"event_id\": \"E777214A-2D11-4CAD-9E8F-E1BD71D9FE67\",\n  \"status\": \"APPROVED\"\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "2dc04900-6663-45e7-b9a1-acfc6a9ea8df",
+              "name": "Transaction event can not be created",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "v2",
+                    "simulate_transaction_event"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: basic",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Basic <credentials>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "POST",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"payment_method_id\": \"7f754378-dd84-4a9a-b1ce-0646bb769c29\",\n  \"status\": \"APPROVED\",\n  \"event_id\": \"e2806932-5f1b-4518-8b15-156d773e9496\",\n  \"transaction_id\": \"e2806932-5f1b-4518-8b15-156d773e9496\",\n  \"amount\": 5000,\n  \"currency\": \"USD\",\n  \"authorization_code\": \"645432\",\n  \"network_transaction_id\": \"txn-789456\",\n  \"purchase_method\": \"CHIP\",\n  \"merchant\": {\n    \"network_id\": \"234923454545\",\n    \"name\": \"Target\",\n    \"category\": \"Grocery Stores\",\n    \"category_code\": \"5411\",\n    \"address\": {\n      \"street_line1\": \"123 Main St\",\n      \"street_line2\": \"Apt 4B\",\n      \"city\": \"San Francisco\",\n      \"state\": \"CA\",\n      \"postal_code\": \"94105\",\n      \"country\": \"USA\"\n    }\n  }\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "Conflict",
+              "code": 409,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"type\": \"string\",\n  \"message\": \"string\"\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            }
+          ],
+          "event": [],
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          }
+        }
+      ],
+      "event": []
+    }
+  ],
+  "event": [],
+  "variable": [
+    {
+      "type": "string",
+      "value": "https://dev.sbx.imprint.co",
+      "key": "baseUrl"
+    }
+  ],
+  "auth": {
+    "type": "basic",
+    "basic": [
+      {
+        "key": "username",
+        "value": "{{basicAuthUsername}}"
+      },
+      {
+        "key": "password",
+        "value": "{{basicAuthPassword}}"
+      }
+    ]
+  },
+  "info": {
+    "_postman_id": "28cf6d2b-cd29-4c9c-bcad-abf68c3c4b2f",
+    "name": "Public Imprint Customer Links Simulate Transaction Event API",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "description": {
+      "content": "",
+      "type": "text/plain"
+    }
+  }
+}

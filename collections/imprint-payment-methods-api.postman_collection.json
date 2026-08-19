@@ -1,0 +1,465 @@
+{
+  "item": [
+    {
+      "id": "5671e0e2-26aa-4489-b913-9e1f091a129a",
+      "name": "Payment Methods",
+      "description": {
+        "content": "",
+        "type": "text/plain"
+      },
+      "item": [
+        {
+          "id": "7334dca2-2f12-4bd2-8c14-06927181f948",
+          "name": "List payment methods",
+          "request": {
+            "name": "List payment methods",
+            "description": {},
+            "url": {
+              "path": [
+                "v2",
+                "payment_methods"
+              ],
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "query": [
+                {
+                  "disabled": false,
+                  "key": "customer_id",
+                  "value": "<string>",
+                  "description": "(Required) The unique identifier for the customer"
+                },
+                {
+                  "disabled": false,
+                  "key": "type",
+                  "value": "<string>",
+                  "description": "The type of payment method to filter by"
+                },
+                {
+                  "disabled": false,
+                  "key": "limit",
+                  "value": "10",
+                  "description": "Limits the number of returned results"
+                },
+                {
+                  "disabled": false,
+                  "key": "starting_after",
+                  "value": "<string>",
+                  "description": "A cursor for use in pagination. An id that defines your place in the list."
+                }
+              ],
+              "variable": []
+            },
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "method": "GET",
+            "auth": null
+          },
+          "response": [
+            {
+              "id": "7b4ef098-9e79-4c01-acb5-0676e6c63297",
+              "name": "List of customer payment methods",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "v2",
+                    "payment_methods"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [
+                    {
+                      "key": "customer_id",
+                      "value": "DE92AF9E-E705-4B8E-9184-6D976DBD8050"
+                    },
+                    {
+                      "key": "type",
+                      "value": "LOAN"
+                    },
+                    {
+                      "key": "limit",
+                      "value": "10"
+                    },
+                    {
+                      "key": "starting_after",
+                      "value": "<string>"
+                    }
+                  ],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: basic",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Basic <credentials>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "GET",
+                "body": {}
+              },
+              "status": "OK",
+              "code": 200,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"data\": [\n    {\n      \"id\": \"DCBFC736-2286-42DD-897D-160DCA80AED2\",\n      \"type\": \"CARD\",\n      \"customer_id\": \"B40A789E-BD46-4BB9-B63E-F9919582694C\",\n      \"created_at\": \"2025-02-13 19:08:07+00:00\",\n      \"status\": \"ACTIVE\",\n      \"metadata\": {\n        \"platform_version\": \"2.1.0\"\n      },\n      \"card\": {\n        \"last4\": \"1234\",\n        \"network\": \"VISA\",\n        \"card_type\": \"VIRTUAL\",\n        \"card_design_id\": \"3b9c1f3e-52a0-44c1-b131-a7ab0099a214\",\n        \"exp_month\": \"06\",\n        \"exp_year\": \"2027\",\n        \"pci_details\": {\n          \"pan\": \"5105105105105100\",\n          \"exp_month\": \"06\",\n          \"exp_year\": \"26\",\n          \"cvv\": \"123\"\n        },\n        \"tokens\": [\n          {\n            \"type\": \"ADYEN\",\n            \"token\": \"string\",\n            \"created_at\": \"2025-02-13 19:08:07+00:00\",\n            \"updated_at\": \"2025-02-13 19:08:07+00:00\",\n            \"pan_reference_id\": \"string\"\n          },\n          {\n            \"type\": \"WORLDPAY\",\n            \"token\": \"string\",\n            \"created_at\": \"2025-02-13 19:08:07+00:00\",\n            \"updated_at\": \"2025-02-13 19:08:07+00:00\",\n            \"pan_reference_id\": \"string\"\n          }\n        ]\n      },\n      \"bank_account\": {\n        \"last4\": \"1234\",\n        \"routing_number\": \"string\",\n        \"bank_name\": \"Wells Fargo\",\n        \"account_type\": \"SAVINGS\"\n      },\n      \"loan\": {\n        \"amount\": 10000,\n        \"term_months\": 12,\n        \"currency\": \"USD\",\n        \"remaining_balance\": 4424,\n        \"apr\": \"5.89\",\n        \"loan_status\": \"CLOSED\"\n      },\n      \"updated_at\": \"2025-02-13 19:08:07+00:00\"\n    },\n    {\n      \"id\": \"DCBFC736-2286-42DD-897D-160DCA80AED2\",\n      \"type\": \"BANK_ACCOUNT\",\n      \"customer_id\": \"B40A789E-BD46-4BB9-B63E-F9919582694C\",\n      \"created_at\": \"2025-02-13 19:08:07+00:00\",\n      \"status\": \"ACTIVE\",\n      \"metadata\": {\n        \"platform_version\": \"2.1.0\"\n      },\n      \"card\": {\n        \"last4\": \"1234\",\n        \"network\": \"MASTERCARD\",\n        \"card_type\": \"PHYSICAL\",\n        \"card_design_id\": \"3b9c1f3e-52a0-44c1-b131-a7ab0099a214\",\n        \"exp_month\": \"06\",\n        \"exp_year\": \"2027\",\n        \"pci_details\": {\n          \"pan\": \"5105105105105100\",\n          \"exp_month\": \"06\",\n          \"exp_year\": \"26\",\n          \"cvv\": \"123\"\n        },\n        \"tokens\": [\n          {\n            \"type\": \"ADYEN\",\n            \"token\": \"string\",\n            \"created_at\": \"2025-02-13 19:08:07+00:00\",\n            \"updated_at\": \"2025-02-13 19:08:07+00:00\",\n            \"pan_reference_id\": \"string\"\n          },\n          {\n            \"type\": \"ADYEN\",\n            \"token\": \"string\",\n            \"created_at\": \"2025-02-13 19:08:07+00:00\",\n            \"updated_at\": \"2025-02-13 19:08:07+00:00\",\n            \"pan_reference_id\": \"string\"\n          }\n        ]\n      },\n      \"bank_account\": {\n        \"last4\": \"1234\",\n        \"routing_number\": \"string\",\n        \"bank_name\": \"Wells Fargo\",\n        \"account_type\": \"SAVINGS\"\n      },\n      \"loan\": {\n        \"amount\": 10000,\n        \"term_months\": 12,\n        \"currency\": \"USD\",\n        \"remaining_balance\": 4561,\n        \"apr\": \"5.89\",\n        \"loan_status\": \"REJECTED\"\n      },\n      \"updated_at\": \"2025-02-13 19:08:07+00:00\"\n    }\n  ],\n  \"has_more\": true,\n  \"total\": 9954\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            }
+          ],
+          "event": [],
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          }
+        },
+        {
+          "id": "2ffb9732-68bf-4225-b21a-bf7c36334c10",
+          "name": "List payment methods",
+          "request": {
+            "name": "List payment methods",
+            "description": {},
+            "url": {
+              "path": [
+                "v2",
+                "payment_methods"
+              ],
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "query": [],
+              "variable": []
+            },
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "method": "POST",
+            "auth": null,
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"customer_id\": \"<string>\",\n  \"type\": \"<string>\",\n  \"pan\": \"<string>\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [
+            {
+              "id": "da061bea-6005-4c73-a879-86e75f2ae2e0",
+              "name": "List of customer payment methods",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "v2",
+                    "payment_methods"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: basic",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Basic <credentials>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "POST",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"customer_id\": \"54CFF41D-0AA0-4D16-853B-608C5AAF503D\",\n  \"type\": \"CARD\",\n  \"pan\": \"4111111592341815\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"data\": [\n    {\n      \"id\": \"DCBFC736-2286-42DD-897D-160DCA80AED2\",\n      \"type\": \"CARD\",\n      \"customer_id\": \"B40A789E-BD46-4BB9-B63E-F9919582694C\",\n      \"created_at\": \"2025-02-13 19:08:07+00:00\",\n      \"status\": \"ACTIVE\",\n      \"metadata\": {\n        \"platform_version\": \"2.1.0\"\n      },\n      \"card\": {\n        \"last4\": \"1234\",\n        \"network\": \"VISA\",\n        \"card_type\": \"VIRTUAL\",\n        \"card_design_id\": \"3b9c1f3e-52a0-44c1-b131-a7ab0099a214\",\n        \"exp_month\": \"06\",\n        \"exp_year\": \"2027\",\n        \"pci_details\": {\n          \"pan\": \"5105105105105100\",\n          \"exp_month\": \"06\",\n          \"exp_year\": \"26\",\n          \"cvv\": \"123\"\n        },\n        \"tokens\": [\n          {\n            \"type\": \"ADYEN\",\n            \"token\": \"string\",\n            \"created_at\": \"2025-02-13 19:08:07+00:00\",\n            \"updated_at\": \"2025-02-13 19:08:07+00:00\",\n            \"pan_reference_id\": \"string\"\n          },\n          {\n            \"type\": \"WORLDPAY\",\n            \"token\": \"string\",\n            \"created_at\": \"2025-02-13 19:08:07+00:00\",\n            \"updated_at\": \"2025-02-13 19:08:07+00:00\",\n            \"pan_reference_id\": \"string\"\n          }\n        ]\n      },\n      \"bank_account\": {\n        \"last4\": \"1234\",\n        \"routing_number\": \"string\",\n        \"bank_name\": \"Wells Fargo\",\n        \"account_type\": \"SAVINGS\"\n      },\n      \"loan\": {\n        \"amount\": 10000,\n        \"term_months\": 12,\n        \"currency\": \"USD\",\n        \"remaining_balance\": 4424,\n        \"apr\": \"5.89\",\n        \"loan_status\": \"CLOSED\"\n      },\n      \"updated_at\": \"2025-02-13 19:08:07+00:00\"\n    },\n    {\n      \"id\": \"DCBFC736-2286-42DD-897D-160DCA80AED2\",\n      \"type\": \"BANK_ACCOUNT\",\n      \"customer_id\": \"B40A789E-BD46-4BB9-B63E-F9919582694C\",\n      \"created_at\": \"2025-02-13 19:08:07+00:00\",\n      \"status\": \"ACTIVE\",\n      \"metadata\": {\n        \"platform_version\": \"2.1.0\"\n      },\n      \"card\": {\n        \"last4\": \"1234\",\n        \"network\": \"MASTERCARD\",\n        \"card_type\": \"PHYSICAL\",\n        \"card_design_id\": \"3b9c1f3e-52a0-44c1-b131-a7ab0099a214\",\n        \"exp_month\": \"06\",\n        \"exp_year\": \"2027\",\n        \"pci_details\": {\n          \"pan\": \"5105105105105100\",\n          \"exp_month\": \"06\",\n          \"exp_year\": \"26\",\n          \"cvv\": \"123\"\n        },\n        \"tokens\": [\n          {\n            \"type\": \"ADYEN\",\n            \"token\": \"string\",\n            \"created_at\": \"2025-02-13 19:08:07+00:00\",\n            \"updated_at\": \"2025-02-13 19:08:07+00:00\",\n            \"pan_reference_id\": \"string\"\n          },\n          {\n            \"type\": \"ADYEN\",\n            \"token\": \"string\",\n            \"created_at\": \"2025-02-13 19:08:07+00:00\",\n            \"updated_at\": \"2025-02-13 19:08:07+00:00\",\n            \"pan_reference_id\": \"string\"\n          }\n        ]\n      },\n      \"bank_account\": {\n        \"last4\": \"1234\",\n        \"routing_number\": \"string\",\n        \"bank_name\": \"Wells Fargo\",\n        \"account_type\": \"SAVINGS\"\n      },\n      \"loan\": {\n        \"amount\": 10000,\n        \"term_months\": 12,\n        \"currency\": \"USD\",\n        \"remaining_balance\": 4561,\n        \"apr\": \"5.89\",\n        \"loan_status\": \"REJECTED\"\n      },\n      \"updated_at\": \"2025-02-13 19:08:07+00:00\"\n    }\n  ],\n  \"has_more\": true,\n  \"total\": 9954\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "1b5d3ba2-8ff3-43ba-8638-e6fedbbab5ba",
+              "name": "Invalid request",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "v2",
+                    "payment_methods"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: basic",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Basic <credentials>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "POST",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"customer_id\": \"54CFF41D-0AA0-4D16-853B-608C5AAF503D\",\n  \"type\": \"CARD\",\n  \"pan\": \"4111111592341815\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "Bad Request",
+              "code": 400,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"path\": \"/v2/customers\",\n  \"details\": [\n    \"email: must be a well-formed email address\"\n  ],\n  \"error\": \"Bad Request\",\n  \"status\": 400,\n  \"timestamp\": \"2025-01-20T18:18:22.923+00:00\"\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            }
+          ],
+          "event": [],
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          }
+        },
+        {
+          "id": "dc131e89-0b7c-47e8-bd59-22c8de5df00e",
+          "name": "Retrieve a payment method",
+          "request": {
+            "name": "Retrieve a payment method",
+            "description": {
+              "content": "Retrieves the details of the payment method associated with the supplied `payment_method_id`",
+              "type": "text/plain"
+            },
+            "url": {
+              "path": [
+                "v2",
+                "payment_methods",
+                ":payment_method_id"
+              ],
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "query": [],
+              "variable": [
+                {
+                  "disabled": false,
+                  "type": "any",
+                  "value": "<string>",
+                  "key": "payment_method_id",
+                  "description": "(Required) The unique identifier of the payment method"
+                }
+              ]
+            },
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "method": "GET",
+            "auth": null
+          },
+          "response": [
+            {
+              "id": "9c97946f-7eab-4130-8958-edc68ac27722",
+              "name": "Payment method retrieved successfully",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "v2",
+                    "payment_methods",
+                    ":payment_method_id"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": [
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<string>",
+                      "key": "payment_method_id",
+                      "description": "(Required) The unique identifier of the payment method"
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: basic",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Basic <credentials>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "GET",
+                "body": {}
+              },
+              "status": "OK",
+              "code": 200,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"id\": \"DCBFC736-2286-42DD-897D-160DCA80AED2\",\n  \"type\": \"CARD\",\n  \"customer_id\": \"B40A789E-BD46-4BB9-B63E-F9919582694C\",\n  \"created_at\": \"2025-02-13 19:08:07+00:00\",\n  \"status\": \"ACTIVE\",\n  \"metadata\": {\n    \"platform_version\": \"2.1.0\"\n  },\n  \"card\": {\n    \"last4\": \"1234\",\n    \"network\": \"\",\n    \"card_type\": \"VIRTUAL\",\n    \"card_design_id\": \"3b9c1f3e-52a0-44c1-b131-a7ab0099a214\",\n    \"exp_month\": \"06\",\n    \"exp_year\": \"2027\",\n    \"pci_details\": {\n      \"pan\": \"5105105105105100\",\n      \"exp_month\": \"06\",\n      \"exp_year\": \"26\",\n      \"cvv\": \"123\"\n    },\n    \"tokens\": [\n      {\n        \"type\": \"APPLE_WALLET\",\n        \"token\": \"string\",\n        \"created_at\": \"2025-02-13 19:08:07+00:00\",\n        \"updated_at\": \"2025-02-13 19:08:07+00:00\",\n        \"pan_reference_id\": \"string\"\n      },\n      {\n        \"type\": \"CYBERSOURCE\",\n        \"token\": \"string\",\n        \"created_at\": \"2025-02-13 19:08:07+00:00\",\n        \"updated_at\": \"2025-02-13 19:08:07+00:00\",\n        \"pan_reference_id\": \"string\"\n      }\n    ]\n  },\n  \"bank_account\": {\n    \"last4\": \"1234\",\n    \"routing_number\": \"string\",\n    \"bank_name\": \"Wells Fargo\",\n    \"account_type\": \"SAVINGS\"\n  },\n  \"loan\": {\n    \"amount\": 10000,\n    \"term_months\": 12,\n    \"currency\": \"USD\",\n    \"remaining_balance\": 1507,\n    \"apr\": \"5.89\",\n    \"loan_status\": \"REJECTED\"\n  },\n  \"updated_at\": \"2025-02-13 19:08:07+00:00\"\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "b5c46f76-ab84-4293-9499-b3104988daab",
+              "name": "Payment method not found",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "v2",
+                    "payment_methods",
+                    ":payment_method_id"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": [
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<string>",
+                      "key": "payment_method_id",
+                      "description": "(Required) The unique identifier of the payment method"
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: basic",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Basic <credentials>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "GET",
+                "body": {}
+              },
+              "status": "Not Found",
+              "code": 404,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"type\": \"PAYMENT_METHOD_NOT_FOUND_ERROR\",\n  \"message\": \"Payment method not found for provided ID: pymd_123\",\n  \"param\": \"payment_method_id\"\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            }
+          ],
+          "event": [],
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          }
+        }
+      ],
+      "event": []
+    }
+  ],
+  "event": [],
+  "variable": [
+    {
+      "type": "string",
+      "value": "https://dev.sbx.imprint.co",
+      "key": "baseUrl"
+    }
+  ],
+  "auth": {
+    "type": "basic",
+    "basic": [
+      {
+        "key": "username",
+        "value": "{{basicAuthUsername}}"
+      },
+      {
+        "key": "password",
+        "value": "{{basicAuthPassword}}"
+      }
+    ]
+  },
+  "info": {
+    "_postman_id": "55a86078-0684-4b87-88e6-0539e59bc079",
+    "name": "Public Imprint Customer Links Payment Methods API",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "description": {
+      "content": "",
+      "type": "text/plain"
+    }
+  }
+}

@@ -1,0 +1,40 @@
+{
+  "opencollection": "1.0.0",
+  "info": {
+    "name": "Public Imprint Customer Links Simulate Reward API",
+    "version": "2.0"
+  },
+  "request": {
+    "auth": {
+      "type": "basic",
+      "username": "{{username}}",
+      "password": "{{password}}"
+    }
+  },
+  "items": [
+    {
+      "info": {
+        "name": "Simulate Reward",
+        "type": "folder"
+      },
+      "items": [
+        {
+          "info": {
+            "name": "Simulate Reward",
+            "type": "http"
+          },
+          "http": {
+            "method": "POST",
+            "url": "https://dev.sbx.imprint.co/v2/simulate_reward",
+            "body": {
+              "type": "json",
+              "data": "{}"
+            }
+          },
+          "docs": "Initiate a reward webhook in sandbox. Specify the reward type to simulate processing of pending rewards."
+        }
+      ]
+    }
+  ],
+  "bundled": true
+}

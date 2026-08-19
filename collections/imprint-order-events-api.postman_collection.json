@@ -1,0 +1,376 @@
+{
+  "item": [
+    {
+      "id": "55a2bbc4-fc75-4d90-8c05-14fa98ac2533",
+      "name": "Order Events",
+      "description": {
+        "content": "",
+        "type": "text/plain"
+      },
+      "item": [
+        {
+          "id": "00830d9e-bf3b-4fcd-a8bc-9f6279152ce2",
+          "name": "Retrieve order events",
+          "request": {
+            "name": "Retrieve order events",
+            "description": {
+              "content": "Get a list of order events",
+              "type": "text/plain"
+            },
+            "url": {
+              "path": [
+                "v2",
+                "order_events"
+              ],
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "query": [
+                {
+                  "disabled": false,
+                  "key": "order_event_id",
+                  "value": "<string>",
+                  "description": "An order event ID. If provided, the response will only have a maximum of one result."
+                },
+                {
+                  "disabled": false,
+                  "key": "order_id",
+                  "value": "<string>",
+                  "description": "Enables searching for events by order ID"
+                },
+                {
+                  "disabled": false,
+                  "key": "partner_event_id",
+                  "value": "<string>",
+                  "description": "The identifier of the order event in the partner system. If provided, the response will only have a maximum of one result."
+                },
+                {
+                  "disabled": false,
+                  "key": "network_transaction_id",
+                  "value": "<string>",
+                  "description": "The network's unique identifier for the transaction. Examples include Visa Transaction ID, Mastercard Trace ID, and American Express Network Reference ID"
+                },
+                {
+                  "disabled": false,
+                  "key": "limit",
+                  "value": "10",
+                  "description": "Limits the number of returned results"
+                },
+                {
+                  "disabled": false,
+                  "key": "starting_after",
+                  "value": "<string>",
+                  "description": "A cursor for use in pagination. An id that defines your place in the list."
+                }
+              ],
+              "variable": []
+            },
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "method": "GET",
+            "auth": null
+          },
+          "response": [
+            {
+              "id": "b87b4359-8239-4e36-b9a5-03c37bd7300b",
+              "name": "List of order events",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "v2",
+                    "order_events"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [
+                    {
+                      "key": "order_event_id",
+                      "value": "7622c07d-eb2b-4345-a9a9-345d61d32bc2"
+                    },
+                    {
+                      "key": "order_id",
+                      "value": "77f60af4-185e-4867-b113-34e3cf7c6acd"
+                    },
+                    {
+                      "key": "partner_event_id",
+                      "value": "<string>"
+                    },
+                    {
+                      "key": "network_transaction_id",
+                      "value": "txn-123456"
+                    },
+                    {
+                      "key": "limit",
+                      "value": "10"
+                    },
+                    {
+                      "key": "starting_after",
+                      "value": "<string>"
+                    }
+                  ],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: basic",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Basic <credentials>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "GET",
+                "body": {}
+              },
+              "status": "OK",
+              "code": 200,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"data\": [\n    {\n      \"order_id\": \"77f60af4-185e-4867-b113-34e3cf7c6acd\",\n      \"type\": \"CAPTURED\",\n      \"amount\": 274999,\n      \"network_transaction_id\": \"615e3ba0-6b99-495b-ade4-1f584c40f376\",\n      \"order_event_id\": \"77f60af4-185e-4867-b113-34e3cf7c6acd\",\n      \"partner_event_id\": \"7622c07d-eb2b-4345-a9a9-345d61d32bc2\",\n      \"rewards_amount\": 2500,\n      \"currency\": \"USD\",\n      \"order_lines\": [\n        {\n          \"name\": \"Couch Supreme\",\n          \"product_url\": \"www.restassured.com/couch-supreme\",\n          \"quantity\": 1,\n          \"rate\": 274999,\n          \"rewards_rate\": 2500\n        }\n      ]\n    },\n    {\n      \"order_id\": \"77f60af4-185e-4867-b113-34e3cf7c6acd\",\n      \"type\": \"CAPTURED\",\n      \"amount\": 274999,\n      \"network_transaction_id\": \"615e3ba0-6b99-495b-ade4-1f584c40f376\",\n      \"order_event_id\": \"77f60af4-185e-4867-b113-34e3cf7c6acd\",\n      \"partner_event_id\": \"7622c07d-eb2b-4345-a9a9-345d61d32bc2\",\n      \"rewards_amount\": 2500,\n      \"currency\": \"USD\",\n      \"order_lines\": [\n        {\n          \"name\": \"Couch Supreme\",\n          \"product_url\": \"www.restassured.com/couch-supreme\",\n          \"quantity\": 1,\n          \"rate\": 274999,\n          \"rewards_rate\": 2500\n        }\n      ]\n    }\n  ],\n  \"has_more\": true,\n  \"total\": 4055\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            }
+          ],
+          "event": [],
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          }
+        },
+        {
+          "id": "e12a2850-13d4-4ac6-bf92-a6c616c96c39",
+          "name": "Create order events",
+          "request": {
+            "name": "Create order events",
+            "description": {
+              "content": "Create new order events",
+              "type": "text/plain"
+            },
+            "url": {
+              "path": [
+                "v2",
+                "order_events"
+              ],
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "query": [],
+              "variable": []
+            },
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "method": "POST",
+            "auth": null,
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"order_id\": \"<string>\",\n  \"type\": \"<string>\",\n  \"amount\": \"<integer>\",\n  \"network_transaction_id\": \"<string>\",\n  \"order_event_id\": \"<string>\",\n  \"partner_event_id\": \"<string>\",\n  \"rewards_amount\": \"<integer>\",\n  \"currency\": \"<string>\",\n  \"order_lines\": [\n    {\n      \"name\": \"<string>\",\n      \"quantity\": \"<integer>\",\n      \"rate\": \"<integer>\",\n      \"rewards_rate\": \"<integer>\",\n      \"product_url\": \"<string>\"\n    },\n    {\n      \"name\": \"<string>\",\n      \"quantity\": \"<integer>\",\n      \"rate\": \"<integer>\",\n      \"rewards_rate\": \"<integer>\",\n      \"product_url\": \"<string>\"\n    }\n  ]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [
+            {
+              "id": "432405b0-9c90-4374-bd36-127f997edad8",
+              "name": "Order event created successfully",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "v2",
+                    "order_events"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: basic",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Basic <credentials>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "POST",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"order_id\": \"77f60af4-185e-4867-b113-34e3cf7c6acd\",\n  \"type\": \"CAPTURED\",\n  \"amount\": 274999,\n  \"network_transaction_id\": \"615e3ba0-6b99-495b-ade4-1f584c40f376\",\n  \"order_event_id\": \"77f60af4-185e-4867-b113-34e3cf7c6acd\",\n  \"partner_event_id\": \"7622c07d-eb2b-4345-a9a9-345d61d32bc2\",\n  \"rewards_amount\": 2500,\n  \"currency\": \"USD\",\n  \"order_lines\": [\n    {\n      \"name\": \"Couch Supreme\",\n      \"product_url\": \"www.restassured.com/couch-supreme\",\n      \"quantity\": 1,\n      \"rate\": 274999,\n      \"rewards_rate\": 2500\n    }\n  ]\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"order_id\": \"77f60af4-185e-4867-b113-34e3cf7c6acd\",\n  \"type\": \"CAPTURED\",\n  \"amount\": 274999,\n  \"network_transaction_id\": \"615e3ba0-6b99-495b-ade4-1f584c40f376\",\n  \"order_event_id\": \"77f60af4-185e-4867-b113-34e3cf7c6acd\",\n  \"partner_event_id\": \"7622c07d-eb2b-4345-a9a9-345d61d32bc2\",\n  \"rewards_amount\": 2500,\n  \"currency\": \"USD\",\n  \"order_lines\": [\n    {\n      \"name\": \"Couch Supreme\",\n      \"product_url\": \"www.restassured.com/couch-supreme\",\n      \"quantity\": 1,\n      \"rate\": 274999,\n      \"rewards_rate\": 2500\n    }\n  ]\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            }
+          ],
+          "event": [],
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          }
+        },
+        {
+          "id": "b8507b50-98c7-46ff-8d49-1cb5bdca2be4",
+          "name": "Delete order event",
+          "request": {
+            "name": "Delete order event",
+            "description": {
+              "content": "Delete an existing order event",
+              "type": "text/plain"
+            },
+            "url": {
+              "path": [
+                "v2",
+                "order_events",
+                ":order_event_id"
+              ],
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "query": [],
+              "variable": [
+                {
+                  "disabled": false,
+                  "type": "any",
+                  "value": "<string>",
+                  "key": "order_event_id",
+                  "description": "(Required) Unique identifier for the order event"
+                }
+              ]
+            },
+            "method": "DELETE",
+            "auth": null
+          },
+          "response": [
+            {
+              "id": "ec2d9a4d-2995-4b54-bfab-78386b0776e3",
+              "name": "Order event deleted successfully",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "v2",
+                    "order_events",
+                    ":order_event_id"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": [
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<string>",
+                      "key": "order_event_id",
+                      "description": "(Required) Unique identifier for the order event"
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: basic",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Basic <credentials>"
+                  }
+                ],
+                "method": "DELETE",
+                "body": {}
+              },
+              "status": "No Content",
+              "code": 204,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "text/plain"
+                }
+              ],
+              "body": "",
+              "cookie": [],
+              "_postman_previewlanguage": "text"
+            }
+          ],
+          "event": [],
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          }
+        }
+      ],
+      "event": []
+    }
+  ],
+  "event": [],
+  "variable": [
+    {
+      "type": "string",
+      "value": "https://dev.sbx.imprint.co",
+      "key": "baseUrl"
+    }
+  ],
+  "auth": {
+    "type": "basic",
+    "basic": [
+      {
+        "key": "username",
+        "value": "{{basicAuthUsername}}"
+      },
+      {
+        "key": "password",
+        "value": "{{basicAuthPassword}}"
+      }
+    ]
+  },
+  "info": {
+    "_postman_id": "e900978c-7d83-4770-8065-3a1f7baf82da",
+    "name": "Public Imprint Customer Links Order Events API",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "description": {
+      "content": "",
+      "type": "text/plain"
+    }
+  }
+}

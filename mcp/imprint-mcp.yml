@@ -2,85 +2,89 @@ generated: '2026-07-19'
 method: derived
 status: candidate
 source: openapi/imprint-openapi-original.yml
-note: >-
-  No official hosted/remote Imprint MCP server was found in provider docs, npm
-  (@modelcontextprotocol), or MCP registries as of this capture. The tools below
-  are candidates derived one-per-operation from the public OpenAPI; read-only
-  (GET) operations are the safe default surface for an agent.
+note: No official hosted/remote Imprint MCP server was found in provider docs, npm (@modelcontextprotocol),
+  or MCP registries as of this capture. The tools below are candidates derived one-per-operation from
+  the public OpenAPI; read-only (GET) operations are the safe default surface for an agent.
 server:
   name: imprint
   transport: http
   url: null
 tools:
-  - name: search_customers
-    description: Search for customers.
-    source_operation: openapi/imprint-openapi-original.yml#searchCustomers
-  - name: get_customer
-    description: Retrieve a customer by ID.
-    source_operation: openapi/imprint-openapi-original.yml#getCustomer
-  - name: get_rewards_balance
-    description: Get a customer's current rewards balance.
-    source_operation: openapi/imprint-openapi-original.yml#getRewardsBalance
-  - name: list_customer_payment_methods
-    description: List a customer's payment methods.
-    source_operation: openapi/imprint-openapi-original.yml#getPaymentMethods
-  - name: list_customer_rewards
-    description: List a customer's rewards.
-    source_operation: openapi/imprint-openapi-original.yml#getRewards
-  - name: list_customer_transaction_intents
-    description: List a customer's transaction intents.
-    source_operation: openapi/imprint-openapi-original.yml#getTransactionIntents
-  - name: list_customer_transactions
-    description: List a customer's transactions.
-    source_operation: openapi/imprint-openapi-original.yml#getTransactions
-  - name: create_customer_session
-    description: Create a new customer session and return a client_secret for the SDK.
-    source_operation: openapi/imprint-openapi-original.yml#createSession
-  - name: get_customer_session
-    description: Retrieve a customer session.
-    source_operation: openapi/imprint-openapi-original.yml#getSession
-  - name: link_customer_account
-    description: Link an Imprint customer to a partner customer account.
-    source_operation: openapi/imprint-openapi-original.yml#linkCustomerAccount
-  - name: search_payment_methods
-    description: Search payment methods.
-    source_operation: openapi/imprint-openapi-original.yml#searchPaymentMethods
-  - name: get_payment_method
-    description: Retrieve a payment method by ID.
-    source_operation: openapi/imprint-openapi-original.yml#getPaymentMethod
-  - name: create_transaction_intent
-    description: Create a transaction intent.
-    source_operation: openapi/imprint-openapi-original.yml#createTransactionIntent
-  - name: search_transaction_intents
-    description: List transaction intents.
-    source_operation: openapi/imprint-openapi-original.yml#searchTransactionIntents
-  - name: get_transaction_intent
-    description: Retrieve a transaction intent by ID.
-    source_operation: openapi/imprint-openapi-original.yml#getTransactionIntent
-  - name: update_transaction_intent
-    description: Update a transaction intent.
-    source_operation: openapi/imprint-openapi-original.yml#updateTransactionIntent
-  - name: get_transaction
-    description: Retrieve a transaction by ID.
-    source_operation: openapi/imprint-openapi-original.yml#getTransaction
-  - name: search_rewards
-    description: Search for rewards.
-    source_operation: openapi/imprint-openapi-original.yml#searchRewards
-  - name: get_reward
-    description: Retrieve a reward by ID.
-    source_operation: openapi/imprint-openapi-original.yml#getReward
-  - name: update_reward
-    description: Update the status or amount of pending rewards.
-    source_operation: openapi/imprint-openapi-original.yml#patchReward
-  - name: get_offer
-    description: Retrieve an offer for a partner customer.
-    source_operation: openapi/imprint-openapi-original.yml#getOffer
-  - name: list_orders
-    description: Retrieve a list of orders.
-    source_operation: openapi/imprint-openapi-original.yml#listOrders
-  - name: create_order
-    description: Create new orders.
-    source_operation: openapi/imprint-openapi-original.yml#createOrder
-  - name: list_order_events
-    description: Retrieve a list of order events.
-    source_operation: openapi/imprint-openapi-original.yml#listOrderEvents
+- name: search_customers
+  description: Search for customers.
+  source_operation: openapi/imprint-openapi-original.yml#searchCustomers
+- name: get_customer
+  description: Retrieve a customer by ID.
+  source_operation: openapi/imprint-openapi-original.yml#getCustomer
+- name: get_rewards_balance
+  description: Get a customer's current rewards balance.
+  source_operation: openapi/imprint-openapi-original.yml#getRewardsBalance
+- name: list_customer_payment_methods
+  description: List a customer's payment methods.
+  source_operation: openapi/imprint-openapi-original.yml#getPaymentMethods
+- name: list_customer_rewards
+  description: List a customer's rewards.
+  source_operation: openapi/imprint-openapi-original.yml#getRewards
+- name: list_customer_transaction_intents
+  description: List a customer's transaction intents.
+  source_operation: openapi/imprint-openapi-original.yml#getTransactionIntents
+- name: list_customer_transactions
+  description: List a customer's transactions.
+  source_operation: openapi/imprint-openapi-original.yml#getTransactions
+- name: create_customer_session
+  description: Create a new customer session and return a client_secret for the SDK.
+  source_operation: openapi/imprint-openapi-original.yml#createSession
+- name: get_customer_session
+  description: Retrieve a customer session.
+  source_operation: openapi/imprint-openapi-original.yml#getSession
+- name: link_customer_account
+  description: Link an Imprint customer to a partner customer account.
+  source_operation: openapi/imprint-openapi-original.yml#linkCustomerAccount
+- name: search_payment_methods
+  description: Search payment methods.
+  source_operation: openapi/imprint-openapi-original.yml#searchPaymentMethods
+- name: get_payment_method
+  description: Retrieve a payment method by ID.
+  source_operation: openapi/imprint-openapi-original.yml#getPaymentMethod
+- name: create_transaction_intent
+  description: Create a transaction intent.
+  source_operation: openapi/imprint-openapi-original.yml#createTransactionIntent
+- name: search_transaction_intents
+  description: List transaction intents.
+  source_operation: openapi/imprint-openapi-original.yml#searchTransactionIntents
+- name: get_transaction_intent
+  description: Retrieve a transaction intent by ID.
+  source_operation: openapi/imprint-openapi-original.yml#getTransactionIntent
+- name: update_transaction_intent
+  description: Update a transaction intent.
+  source_operation: openapi/imprint-openapi-original.yml#updateTransactionIntent
+- name: get_transaction
+  description: Retrieve a transaction by ID.
+  source_operation: openapi/imprint-openapi-original.yml#getTransaction
+- name: search_rewards
+  description: Search for rewards.
+  source_operation: openapi/imprint-openapi-original.yml#searchRewards
+- name: get_reward
+  description: Retrieve a reward by ID.
+  source_operation: openapi/imprint-openapi-original.yml#getReward
+- name: update_reward
+  description: Update the status or amount of pending rewards.
+  source_operation: openapi/imprint-openapi-original.yml#patchReward
+- name: get_offer
+  description: Retrieve an offer for a partner customer.
+  source_operation: openapi/imprint-openapi-original.yml#getOffer
+- name: list_orders
+  description: Retrieve a list of orders.
+  source_operation: openapi/imprint-openapi-original.yml#listOrders
+- name: create_order
+  description: Create new orders.
+  source_operation: openapi/imprint-openapi-original.yml#createOrder
+- name: list_order_events
+  description: Retrieve a list of order events.
+  source_operation: openapi/imprint-openapi-original.yml#listOrderEvents
+deployment:
+  mode: none
+  verified: derived
+  tools: 24
+  checked: '2026-08-12'
+  source: catalog MCP census

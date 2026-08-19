@@ -1,0 +1,196 @@
+{
+  "item": [
+    {
+      "id": "f454e8b2-bb79-472d-919a-43229eb843ef",
+      "name": "Transactions",
+      "description": {
+        "content": "",
+        "type": "text/plain"
+      },
+      "item": [
+        {
+          "id": "6443d54f-82a7-4a1f-aa69-446eb3ccd7db",
+          "name": "Retrieve a transaction",
+          "request": {
+            "name": "Retrieve a transaction",
+            "description": {
+              "content": "Retrieves the details of an existing transaction by `id`",
+              "type": "text/plain"
+            },
+            "url": {
+              "path": [
+                "v2",
+                "transactions",
+                ":transaction_id"
+              ],
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "query": [],
+              "variable": [
+                {
+                  "disabled": false,
+                  "type": "any",
+                  "value": "<string>",
+                  "key": "transaction_id",
+                  "description": "(Required) The unique identifier for the transaction"
+                }
+              ]
+            },
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "method": "GET",
+            "auth": null
+          },
+          "response": [
+            {
+              "id": "72f929fc-efd2-4f80-967b-6f7c25bd51e7",
+              "name": "Transaction retrieved successfully",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "v2",
+                    "transactions",
+                    ":transaction_id"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": [
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<string>",
+                      "key": "transaction_id",
+                      "description": "(Required) The unique identifier for the transaction"
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: basic",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Basic <credentials>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "GET",
+                "body": {}
+              },
+              "status": "OK",
+              "code": 200,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"id\": \"E777214A-2D11-4CAD-9E8F-E1BD71D9FE67\",\n  \"customer_id\": \"9B5E1EE0-2E1C-46E7-81B9-3C3917204BE4\",\n  \"payment_method_id\": \"DCBFC736-2286-42DD-897D-160DCA80AED2\",\n  \"amount\": 3851,\n  \"currency\": \"USD\",\n  \"status\": \"APPROVED\",\n  \"network_transaction_id\": \"string\",\n  \"created_at\": \"2025-02-13 19:08:07+00:00\",\n  \"intent_id\": \"5B30532B-5B5B-4826-8DE2-429C57B705FD\",\n  \"authorization_code\": \"ABCD\",\n  \"purchase_method\": \"CHIP\",\n  \"partner_transaction_id\": \"string\",\n  \"updated_at\": \"2025-02-13 19:08:07+00:00\",\n  \"merchant\": {\n    \"network_id\": \"234923454545\",\n    \"name\": \"Target\",\n    \"category\": \"Grocery Stores\",\n    \"category_code\": \"5411\",\n    \"address\": {\n      \"street_line1\": \"123 Main St\",\n      \"street_line2\": \"Apt 4B\",\n      \"city\": \"San Francisco\",\n      \"state\": \"CA\",\n      \"postal_code\": \"94105\",\n      \"country\": \"USA\"\n    }\n  },\n  \"metadata\": {\n    \"platform_version\": \"2.1.0\"\n  }\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "3748d86f-d459-43e6-99c7-3c3e25e34c68",
+              "name": "Transaction not found",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "v2",
+                    "transactions",
+                    ":transaction_id"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": [
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<string>",
+                      "key": "transaction_id",
+                      "description": "(Required) The unique identifier for the transaction"
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: basic",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Basic <credentials>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "GET",
+                "body": {}
+              },
+              "status": "Not Found",
+              "code": 404,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"type\": \"TRANSACTION_FOUND_ERROR\",\n  \"message\": \"Transaction intent not found for provided ID: txn_123\",\n  \"param\": \"transaction_id\"\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            }
+          ],
+          "event": [],
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          }
+        }
+      ],
+      "event": []
+    }
+  ],
+  "event": [],
+  "variable": [
+    {
+      "type": "string",
+      "value": "https://dev.sbx.imprint.co",
+      "key": "baseUrl"
+    }
+  ],
+  "auth": {
+    "type": "basic",
+    "basic": [
+      {
+        "key": "username",
+        "value": "{{basicAuthUsername}}"
+      },
+      {
+        "key": "password",
+        "value": "{{basicAuthPassword}}"
+      }
+    ]
+  },
+  "info": {
+    "_postman_id": "391d9977-19d0-433f-a79f-4fa4bc58b249",
+    "name": "Public Imprint Customer Links Transactions API",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "description": {
+      "content": "",
+      "type": "text/plain"
+    }
+  }
+}

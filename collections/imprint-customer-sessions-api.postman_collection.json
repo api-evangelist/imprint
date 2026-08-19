@@ -1,0 +1,346 @@
+{
+  "item": [
+    {
+      "id": "5fbec083-b077-40b6-aa94-b30f5c21df5e",
+      "name": "Customer Sessions",
+      "description": {
+        "content": "",
+        "type": "text/plain"
+      },
+      "item": [
+        {
+          "id": "6fe355a9-231d-42aa-a0f1-6db84f6ae63e",
+          "name": "Create a new customer session",
+          "request": {
+            "name": "Create a new customer session",
+            "description": {
+              "content": "Creates a new session for a customer with a client_secret that can be passed to the SDK, providing client access to modify their own profile, card, or card/loan application. If required, a new customer will be created to attach this session to. Customer history can be attached to this session and will be included in the customer's profile if created, or attached to the application the customer creates during the session",
+              "type": "text/plain"
+            },
+            "url": {
+              "path": [
+                "v2",
+                "customer_sessions"
+              ],
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "query": [],
+              "variable": []
+            },
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "method": "POST",
+            "auth": null,
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"customer_id\": \"<string>\",\n  \"partner_customer_id\": \"<string>\",\n  \"transaction_amount\": \"<integer>\",\n  \"transaction_currency\": \"<string>\",\n  \"customer_history\": {\n    \"email\": \"<email>\",\n    \"phone\": \"<string>\",\n    \"first_name\": \"<string>\",\n    \"last_name\": \"<string>\",\n    \"preferred_language\": \"<string>\",\n    \"address\": {\n      \"street_line1\": \"<string>\",\n      \"street_line2\": \"<string>\",\n      \"city\": \"<string>\",\n      \"state\": \"<string>\",\n      \"postal_code\": \"<string>\",\n      \"country\": \"<string>\"\n    },\n    \"account_tenure\": \"<integer>\",\n    \"ltv_amount\": \"<integer>\",\n    \"ltv_currency\": \"<string>\",\n    \"loyalty_tier\": \"<string>\",\n    \"account_created_at\": \"<string>\",\n    \"transaction_count\": \"<integer>\"\n  },\n  \"source\": \"<string>\",\n  \"metadata\": {\n    \"key_0\": 6157.635979570435\n  },\n  \"customer_metadata\": {\n    \"key_0\": \"<string>\"\n  }\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [
+            {
+              "id": "0251b13a-1518-4d86-8b55-dea3acf4d23f",
+              "name": "Customer session created successfully",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "v2",
+                    "customer_sessions"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: basic",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Basic <credentials>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "POST",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"customer_id\": \"AD87A18A-A4BE-49FF-BC46-BF6F0779DBAA\",\n  \"partner_customer_id\": \"CUST_03476998\",\n  \"transaction_amount\": 34000,\n  \"transaction_currency\": \"USD\",\n  \"customer_history\": {\n    \"email\": \"customer@example.com\",\n    \"phone\": \"+14155552671\",\n    \"first_name\": \"John\",\n    \"last_name\": \"Doe\",\n    \"preferred_language\": \"en\",\n    \"address\": {\n      \"street_line1\": \"123 Main St\",\n      \"street_line2\": \"Apt 4B\",\n      \"city\": \"San Francisco\",\n      \"state\": \"CA\",\n      \"postal_code\": \"94105\",\n      \"country\": \"USA\"\n    },\n    \"account_tenure\": 13,\n    \"ltv_amount\": 34000,\n    \"ltv_currency\": \"USD\",\n    \"loyalty_tier\": \"GOLD\",\n    \"account_created_at\": \"2025-02-13 19:08:07+00:00\",\n    \"transaction_count\": 100\n  },\n  \"source\": \"<string>\",\n  \"metadata\": {\n    \"store_number\": \"123\"\n  },\n  \"customer_metadata\": {\n    \"loyalty_id\": \"840012345678\",\n    \"membership_tier\": \"gold\"\n  }\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "Created",
+              "code": 201,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"id\": \"2EE24580-B97B-4949-A65C-929CCB9B9B8D\",\n  \"client_secret\": \"QzMyNzg4QzgtNEUwOS00QkU4LThDMjEtMkU5OUQ3QzkwRDhGCg==\",\n  \"expires_at\": \"2025-02-13 19:08:07+00:00\",\n  \"metadata\": {\n    \"store_number\": \"123\"\n  },\n  \"customer_metadata\": {\n    \"loyalty_id\": \"840012345678\",\n    \"membership_tier\": \"gold\"\n  },\n  \"source\": \"web_signup\"\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "5a3c2342-5c56-42b0-b17c-abffe32c81ac",
+              "name": "Invalid request",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "v2",
+                    "customer_sessions"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: basic",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Basic <credentials>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "POST",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"customer_id\": \"AD87A18A-A4BE-49FF-BC46-BF6F0779DBAA\",\n  \"partner_customer_id\": \"CUST_03476998\",\n  \"transaction_amount\": 34000,\n  \"transaction_currency\": \"USD\",\n  \"customer_history\": {\n    \"email\": \"customer@example.com\",\n    \"phone\": \"+14155552671\",\n    \"first_name\": \"John\",\n    \"last_name\": \"Doe\",\n    \"preferred_language\": \"en\",\n    \"address\": {\n      \"street_line1\": \"123 Main St\",\n      \"street_line2\": \"Apt 4B\",\n      \"city\": \"San Francisco\",\n      \"state\": \"CA\",\n      \"postal_code\": \"94105\",\n      \"country\": \"USA\"\n    },\n    \"account_tenure\": 13,\n    \"ltv_amount\": 34000,\n    \"ltv_currency\": \"USD\",\n    \"loyalty_tier\": \"GOLD\",\n    \"account_created_at\": \"2025-02-13 19:08:07+00:00\",\n    \"transaction_count\": 100\n  },\n  \"source\": \"<string>\",\n  \"metadata\": {\n    \"store_number\": \"123\"\n  },\n  \"customer_metadata\": {\n    \"loyalty_id\": \"840012345678\",\n    \"membership_tier\": \"gold\"\n  }\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "Bad Request",
+              "code": 400,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"path\": \"/v2/customers\",\n  \"details\": [\n    \"email: must be a well-formed email address\"\n  ],\n  \"error\": \"Bad Request\",\n  \"status\": 400,\n  \"timestamp\": \"2025-01-20T18:18:22.923+00:00\"\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            }
+          ],
+          "event": [],
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          }
+        },
+        {
+          "id": "2ced5b03-57a2-49ff-a31d-a3efca0fd95d",
+          "name": "Retrieve a session",
+          "request": {
+            "name": "Retrieve a session",
+            "description": {},
+            "url": {
+              "path": [
+                "v2",
+                "customer_sessions",
+                ":session_id"
+              ],
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "query": [],
+              "variable": [
+                {
+                  "disabled": false,
+                  "type": "any",
+                  "value": "<string>",
+                  "key": "session_id",
+                  "description": "(Required) "
+                }
+              ]
+            },
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "method": "GET",
+            "auth": null
+          },
+          "response": [
+            {
+              "id": "dbe6e31e-48f8-4a32-8e5d-dd113766e928",
+              "name": "Customer session retrieved successfully",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "v2",
+                    "customer_sessions",
+                    ":session_id"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": [
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<string>",
+                      "key": "session_id",
+                      "description": "(Required) "
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: basic",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Basic <credentials>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "GET",
+                "body": {}
+              },
+              "status": "OK",
+              "code": 200,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"id\": \"2EE24580-B97B-4949-A65C-929CCB9B9B8D\",\n  \"client_secret\": \"QzMyNzg4QzgtNEUwOS00QkU4LThDMjEtMkU5OUQ3QzkwRDhGCg==\",\n  \"expires_at\": \"2025-02-13 19:08:07+00:00\",\n  \"metadata\": {\n    \"store_number\": \"123\"\n  },\n  \"customer_metadata\": {\n    \"loyalty_id\": \"840012345678\",\n    \"membership_tier\": \"gold\"\n  },\n  \"source\": \"web_signup\"\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "4af93384-626f-43c8-9c7b-2b1be4034cf1",
+              "name": "Session not found",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "v2",
+                    "customer_sessions",
+                    ":session_id"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": [
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<string>",
+                      "key": "session_id",
+                      "description": "(Required) "
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: basic",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Basic <credentials>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "GET",
+                "body": {}
+              },
+              "status": "Not Found",
+              "code": 404,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"type\": \"SESSION_NOT_FOUND_ERROR\",\n  \"message\": \"Session not found for provided ID: cs_123\",\n  \"param\": \"session_id\"\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            }
+          ],
+          "event": [],
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          }
+        }
+      ],
+      "event": []
+    }
+  ],
+  "event": [],
+  "variable": [
+    {
+      "type": "string",
+      "value": "https://dev.sbx.imprint.co",
+      "key": "baseUrl"
+    }
+  ],
+  "auth": {
+    "type": "basic",
+    "basic": [
+      {
+        "key": "username",
+        "value": "{{basicAuthUsername}}"
+      },
+      {
+        "key": "password",
+        "value": "{{basicAuthPassword}}"
+      }
+    ]
+  },
+  "info": {
+    "_postman_id": "cf40eeb4-a6d3-445d-a6d2-28a590e5fc96",
+    "name": "Public Imprint Customer Links Customer Sessions API",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "description": {
+      "content": "",
+      "type": "text/plain"
+    }
+  }
+}

@@ -1,0 +1,40 @@
+{
+  "opencollection": "1.0.0",
+  "info": {
+    "name": "Public Imprint Customer Links Simulate Transaction Event API",
+    "version": "2.0"
+  },
+  "request": {
+    "auth": {
+      "type": "basic",
+      "username": "{{username}}",
+      "password": "{{password}}"
+    }
+  },
+  "items": [
+    {
+      "info": {
+        "name": "Simulate Transaction Event",
+        "type": "folder"
+      },
+      "items": [
+        {
+          "info": {
+            "name": "Simulate transaction event in sandbox environment",
+            "type": "http"
+          },
+          "http": {
+            "method": "POST",
+            "url": "https://dev.sbx.imprint.co/v2/simulate_transaction_event",
+            "body": {
+              "type": "json",
+              "data": "{}"
+            }
+          },
+          "docs": "Simulate transaction event in sandbox environment"
+        }
+      ]
+    }
+  ],
+  "bundled": true
+}
