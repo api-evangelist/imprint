@@ -38,6 +38,17 @@ created: '2026-07-17'
 modified: '2026-07-19'
 tags:
 - Company
+- Financial-Services
+- Fintech
+- Credit Cards
+- Co-Branded Cards
+- Payments
+- Loans
+- Rewards
+- Loyalty
+- Embedded Finance
+tags_raw:
+- Company
 - Financial Services
 - Fintech
 - Credit Cards
@@ -150,6 +161,8 @@ apis:
   humanURL: https://docs.imprint.co/
   baseURL: https://dev.imprint.co
   tags:
+  - Order
+  tags_raw:
   - Orders
   properties:
   - type: OpenAPI
@@ -264,6 +277,8 @@ apis:
   humanURL: https://docs.imprint.co/
   baseURL: https://dev.imprint.co
   tags:
+  - Transaction
+  tags_raw:
   - Transactions
   properties:
   - type: OpenAPI
