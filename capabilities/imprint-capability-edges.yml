@@ -1,0 +1,56 @@
+slug: imprint
+provider: Imprint
+generated_by: planning/capability-mapping/scripts/classify_capabilities.py
+model: claude-opus-5
+frame:
+- Banking & Capital Markets
+min_confidence: 0.7
+capability_model:
+  source: https://github.com/vincentmakes/turbo-ea-capabilities
+  license: CC-BY-4.0
+  attribution: Turbo EA Capabilities by Vincent Verdet — Turbo EA, https://github.com/vincentmakes/turbo-ea-capabilities,
+    CC BY 4.0
+  notice: NOTICE
+edge_count: 4
+edges:
+- tag: Transactions
+  spec_file: imprint-transactions-api-openapi.yml
+  capability_id: BC-1340.70
+  capability_id_l1: BC-1340
+  capability_name: Card Transaction Processing Management
+  confidence: 0.8
+  evidence: 'GET /v2/transactions/{transaction_id} getTransaction; schemas: Transaction, Merchant, PurchaseMethod,
+    TransactionStatus'
+  reason: Card purchase transaction records with merchant and purchase method on a card issuing platform
+    — card transaction processing.
+- tag: Rewards
+  spec_file: imprint-rewards-api-openapi.yml
+  capability_id: BC-420.40
+  capability_id_l1: BC-420
+  capability_name: Loyalty & Retention Management
+  confidence: 0.75
+  evidence: 'GET /v2/rewards searchRewards Search for rewards; schemas: RewardType, Reward, RewardCurrency,
+    RewardStatus'
+  reason: Co-branded card rewards management — loyalty/rewards earning and status, best fit is Loyalty
+    & Retention Management. Not a core banking capability in the list.
+- tag: Customers
+  spec_file: imprint-customers-api-openapi.yml
+  capability_id: BC-1300.40
+  capability_id_l1: BC-1300
+  capability_name: Customer Information Management
+  confidence: 0.7
+  evidence: GET /v2/customers/{customer_id}  getCustomer; GET /v2/customers/{customer_id}/rewards_balance;
+    GET /v2/customers/{customer_id}/transactions; schema CustomerProgramStatus
+  reason: Read/search access to co-branded credit card customer records plus their payment methods, transactions
+    and rewards — banking customer information management. Breadth across rewards and transactions makes
+    the exact sub-capability somewhat ambiguous.
+- tag: Transaction Intents
+  spec_file: imprint-transaction-intents-api-openapi.yml
+  capability_id: BC-1340.70
+  capability_id_l1: BC-1340
+  capability_name: Card Transaction Processing Management
+  confidence: 0.7
+  evidence: 'POST /v2/transaction_intents createTransactionIntent Create a transaction intent; schemas:
+    TransactionCurrency, TransactionIntentStatus'
+  reason: Card transaction intent creation/authorisation lifecycle on a co-branded credit card platform;
+    fits card transaction processing, though the sub-capability choice is somewhat uncertain.
