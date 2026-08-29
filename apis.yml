@@ -301,6 +301,16 @@ apis:
     url: https://docs.imprint.co/api-reference
   - type: Authentication
     url: authentication/imprint-authentication.yml
+- aid: imprint:imprint-webhooks-api
+  name: Imprint Webhooks API
+  description: The Webhooks API from Imprint — 0 operation(s) for webhooks.
+  humanURL: https://docs.imprint.co/
+  baseURL: https://dev.imprint.co
+  tags:
+  - Webhooks
+  properties:
+  - type: OpenAPI
+    url: openapi/imprint-webhooks-api-openapi.yml
 maintainers:
 - FN: Kin Lane
   email: kin@apievangelist.com
