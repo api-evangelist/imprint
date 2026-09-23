@@ -203,6 +203,12 @@ paths:
                 $ref: '#/components/schemas/InvalidRequestError'
 components:
   parameters:
+    startingAfterParam:
+      name: starting_after
+      in: query
+      description: A cursor for use in pagination. An id that defines your place in the list.
+      schema:
+        type: string
     limitParam:
       name: limit
       in: query
@@ -212,13 +218,61 @@ components:
         minimum: 1
         default: 10
         format: int32
-    startingAfterParam:
-      name: starting_after
-      in: query
-      description: A cursor for use in pagination. An id that defines your place in the list.
-      schema:
-        type: string
   schemas:
+    TransactionIntent:
+      type: object
+      required:
+      - id
+      - customer_id
+      - amount
+      - currency
+      - status
+      - created_at
+      properties:
+        id:
+          type: string
+          example: 5B30532B-5B5B-4826-8DE2-429C57B705FD
+        customer_id:
+          type: string
+          example: 9B5E1EE0-2E1C-46E7-81B9-3C3917204BE4
+        payment_method_id:
+          type: string
+          description: The `payment_method_id` that this `transaction_intent` was executed with.
+          example: DCBFC736-2286-42DD-897D-160DCA80AED2
+        amount:
+          type: integer
+          description: Currency amount
+          example: 10000
+        currency:
+          $ref: '#/components/schemas/TransactionCurrency'
+        status:
+          $ref: '#/components/schemas/TransactionIntentStatus'
+        network_transaction_id:
+          type: string
+          description: The network's unique identifier for the transaction. Examples include Visa Transaction ID, Mastercard Trace ID, and American Express Network Reference ID
+        partner_transaction_id:
+          type: string
+          description: The partner's unique transaction id
+        created_at:
+          type: string
+          description: the RFC-3339 timestamp when the transaction intent was created
+          example: 2025-02-13 19:08:07+00:00
+        updated_at:
+          type: string
+          description: the RFC-3339 timestamp when the transaction intent was last updated
+          example: 2025-02-13 19:08:07+00:00
+        metadata:
+          type: object
+          description: Additional transaction intent data
+          additionalProperties: true
+          example:
+            platform_version: 2.1.0
+    TransactionIntentStatus:
+      type: string
+      enum:
+      - CONFIRMED
+      - CANCELED
+      example: CONFIRMED
     InvalidRequestError:
       type: object
       properties:
@@ -295,60 +349,6 @@ components:
           type: string
           description: The param causing the error.
           example: intent_id
-    TransactionIntent:
-      type: object
-      required:
-      - id
-      - customer_id
-      - amount
-      - currency
-      - status
-      - created_at
-      properties:
-        id:
-          type: string
-          example: 5B30532B-5B5B-4826-8DE2-429C57B705FD
-        customer_id:
-          type: string
-          example: 9B5E1EE0-2E1C-46E7-81B9-3C3917204BE4
-        payment_method_id:
-          type: string
-          description: The `payment_method_id` that this `transaction_intent` was executed with.
-          example: DCBFC736-2286-42DD-897D-160DCA80AED2
-        amount:
-          type: integer
-          description: Currency amount
-          example: 10000
-        currency:
-          $ref: '#/components/schemas/TransactionCurrency'
-        status:
-          $ref: '#/components/schemas/TransactionIntentStatus'
-        network_transaction_id:
-          type: string
-          description: The network's unique identifier for the transaction. Examples include Visa Transaction ID, Mastercard Trace ID, and American Express Network Reference ID
-        partner_transaction_id:
-          type: string
-          description: The partner's unique transaction id
-        created_at:
-          type: string
-          description: the RFC-3339 timestamp when the transaction intent was created
-          example: 2025-02-13 19:08:07+00:00
-        updated_at:
-          type: string
-          description: the RFC-3339 timestamp when the transaction intent was last updated
-          example: 2025-02-13 19:08:07+00:00
-        metadata:
-          type: object
-          description: Additional transaction intent data
-          additionalProperties: true
-          example:
-            platform_version: 2.1.0
-    TransactionIntentStatus:
-      type: string
-      enum:
-      - CONFIRMED
-      - CANCELED
-      example: CONFIRMED
   securitySchemes:
     basicAuth:
       type: http

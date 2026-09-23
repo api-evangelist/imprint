@@ -136,52 +136,32 @@ paths:
               schema:
                 $ref: '#/components/schemas/PaymentMethodNotFoundError'
 components:
-  parameters:
-    limitParam:
-      name: limit
-      in: query
-      description: Limits the number of returned results
-      schema:
-        type: integer
-        minimum: 1
-        default: 10
-        format: int32
-    startingAfterParam:
-      name: starting_after
-      in: query
-      description: A cursor for use in pagination. An id that defines your place in the list.
-      schema:
-        type: string
   schemas:
-    PaymentMethodToken:
+    PaymentMethodNotFoundError:
       type: object
       required:
       - type
-      - token
-      - created_at
-      - updated_at
+      - message
       properties:
         type:
           type: string
-          enum:
-          - ADYEN
-          - APPLE_WALLET
-          - CYBERSOURCE
-          - WORLDPAY
-        token:
+          description: The category of error being returned
+          example: PAYMENT_METHOD_NOT_FOUND_ERROR
+        message:
           type: string
-          description: The token, as defined by the processor
-        pan_reference_id:
+          description: A message describing the cause of the error.
+          example: 'Payment method not found for provided ID: pymd_123'
+        param:
           type: string
-          description: An ID that represents the PAN and is defined by the processor
-        created_at:
-          type: string
-          description: the RFC-3339 timestamp when the payment method was created
-          example: 2025-02-13 19:08:07+00:00
-        updated_at:
-          type: string
-          example: 2025-02-13 19:08:07+00:00
-          description: the RFC-3339 timestamp when the payment method was updated
+          description: The param causing the error
+          example: payment_method_id
+    CardType:
+      type: string
+      description: The type of card
+      enum:
+      - PHYSICAL
+      - VIRTUAL
+      - UNIFIED
     InvalidRequestError:
       type: object
       properties:
@@ -208,6 +188,10 @@ components:
           type: string
           description: The timestamp that the error occurred
           example: '2025-01-20T18:18:22.923+00:00'
+    CardDesignID:
+      type: string
+      description: Imprint ID for the graphic design printed on the card
+      example: 3b9c1f3e-52a0-44c1-b131-a7ab0099a214
     PaymentMethod:
       type: object
       required:
@@ -376,35 +360,51 @@ components:
       type: string
       description: The 3-character currency code of the amount in ISO 4217 format (e.g., "USD")
       example: USD
-    CardType:
-      type: string
-      description: The type of card
-      enum:
-      - PHYSICAL
-      - VIRTUAL
-      - UNIFIED
-    CardDesignID:
-      type: string
-      description: Imprint ID for the graphic design printed on the card
-      example: 3b9c1f3e-52a0-44c1-b131-a7ab0099a214
-    PaymentMethodNotFoundError:
+    PaymentMethodToken:
       type: object
       required:
       - type
-      - message
+      - token
+      - created_at
+      - updated_at
       properties:
         type:
           type: string
-          description: The category of error being returned
-          example: PAYMENT_METHOD_NOT_FOUND_ERROR
-        message:
+          enum:
+          - ADYEN
+          - APPLE_WALLET
+          - CYBERSOURCE
+          - WORLDPAY
+        token:
           type: string
-          description: A message describing the cause of the error.
-          example: 'Payment method not found for provided ID: pymd_123'
-        param:
+          description: The token, as defined by the processor
+        pan_reference_id:
           type: string
-          description: The param causing the error
-          example: payment_method_id
+          description: An ID that represents the PAN and is defined by the processor
+        created_at:
+          type: string
+          description: the RFC-3339 timestamp when the payment method was created
+          example: 2025-02-13 19:08:07+00:00
+        updated_at:
+          type: string
+          example: 2025-02-13 19:08:07+00:00
+          description: the RFC-3339 timestamp when the payment method was updated
+  parameters:
+    startingAfterParam:
+      name: starting_after
+      in: query
+      description: A cursor for use in pagination. An id that defines your place in the list.
+      schema:
+        type: string
+    limitParam:
+      name: limit
+      in: query
+      description: Limits the number of returned results
+      schema:
+        type: integer
+        minimum: 1
+        default: 10
+        format: int32
   securitySchemes:
     basicAuth:
       type: http

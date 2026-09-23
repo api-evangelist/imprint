@@ -104,9 +104,50 @@ paths:
           description: Order deleted successfully
 components:
   schemas:
+    OrdersResponse:
+      type: object
+      required:
+      - orders
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/Order'
+          description: List of orders
+    Order:
+      allOf:
+      - $ref: '#/components/schemas/OrderBase'
     CurrencyAmount:
       type: integer
       description: Amount in the smallest currency unit (e.g., cents for USD)
+    Address:
+      type: object
+      description: Mailing address information
+      properties:
+        street_line1:
+          type: string
+          description: Primary street address
+          example: 123 Main St
+        street_line2:
+          type: string
+          description: Secondary street address (apartment, suite, etc.)
+          example: Apt 4B
+        city:
+          type: string
+          description: City name
+          example: San Francisco
+        state:
+          type: string
+          description: State or province
+          example: CA
+        postal_code:
+          type: string
+          description: ZIP or postal code
+          example: '94105'
+        country:
+          type: string
+          description: ISO-3166-1 alpha-3 Country Code
+          example: USA
     OrderBase:
       type: object
       required:
@@ -215,47 +256,6 @@ components:
           allOf:
           - $ref: '#/components/schemas/CurrencyAmount'
           - example: 2500
-    Address:
-      type: object
-      description: Mailing address information
-      properties:
-        street_line1:
-          type: string
-          description: Primary street address
-          example: 123 Main St
-        street_line2:
-          type: string
-          description: Secondary street address (apartment, suite, etc.)
-          example: Apt 4B
-        city:
-          type: string
-          description: City name
-          example: San Francisco
-        state:
-          type: string
-          description: State or province
-          example: CA
-        postal_code:
-          type: string
-          description: ZIP or postal code
-          example: '94105'
-        country:
-          type: string
-          description: ISO-3166-1 alpha-3 Country Code
-          example: USA
-    Order:
-      allOf:
-      - $ref: '#/components/schemas/OrderBase'
-    OrdersResponse:
-      type: object
-      required:
-      - orders
-      properties:
-        data:
-          type: array
-          items:
-            $ref: '#/components/schemas/Order'
-          description: List of orders
   securitySchemes:
     basicAuth:
       type: http

@@ -92,6 +92,24 @@ components:
       type: string
       description: The unique identifier for the customer in the partner's system
       example: PARTNER_USER_456
+    CustomerNotFoundError:
+      type: object
+      required:
+      - type
+      - message
+      properties:
+        type:
+          type: string
+          description: The category of error being returned
+          example: CUSTOMER_NOT_FOUND_ERROR
+        message:
+          type: string
+          description: A message describing the cause of the error
+          example: 'Customer not found for provided ID: CSMR-v1-123'
+        param:
+          type: string
+          description: The param causing the error
+          example: customer_id
     CustomerLink:
       type: object
       required:
@@ -154,24 +172,6 @@ components:
           type: string
           description: The timestamp that the error occurred
           example: '2025-01-20T18:18:22.923+00:00'
-    CustomerNotFoundError:
-      type: object
-      required:
-      - type
-      - message
-      properties:
-        type:
-          type: string
-          description: The category of error being returned
-          example: CUSTOMER_NOT_FOUND_ERROR
-        message:
-          type: string
-          description: A message describing the cause of the error
-          example: 'Customer not found for provided ID: CSMR-v1-123'
-        param:
-          type: string
-          description: The param causing the error
-          example: customer_id
   securitySchemes:
     basicAuth:
       type: http

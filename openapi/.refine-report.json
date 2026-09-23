@@ -40,7 +40,8 @@
     "imprint-openapi-original.yml: declared missing tag: Simulate Transaction Event",
     "imprint-openapi-original.yml: declared missing tag: Transaction Intents",
     "imprint-openapi-original.yml: declared missing tag: Transactions",
-    "imprint-openapi-original.yml: declared missing tag: Webhooks"
+    "imprint-openapi-original.yml: declared missing tag: Webhooks",
+    "apis.yml register: already-registered"
   ],
   "skipped": [
     "imprint-customer-links-api-openapi.yml: previously refined output, superseded by openapi/_original/",
@@ -56,6 +57,7 @@
     "imprint-simulate-statement-reward-api-openapi.yml: previously refined output, superseded by openapi/_original/",
     "imprint-simulate-transaction-event-api-openapi.yml: previously refined output, superseded by openapi/_original/",
     "imprint-transaction-intents-api-openapi.yml: previously refined output, superseded by openapi/_original/",
-    "imprint-transactions-api-openapi.yml: previously refined output, superseded by openapi/_original/"
+    "imprint-transactions-api-openapi.yml: previously refined output, superseded by openapi/_original/",
+    "imprint-webhooks-api-openapi.yml: previously refined output, superseded by openapi/_original/"
   ]
 }

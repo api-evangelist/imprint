@@ -91,56 +91,23 @@ paths:
         '204':
           description: Order event deleted successfully
 components:
+  parameters:
+    startingAfterParam:
+      name: starting_after
+      in: query
+      description: A cursor for use in pagination. An id that defines your place in the list.
+      schema:
+        type: string
+    limitParam:
+      name: limit
+      in: query
+      description: Limits the number of returned results
+      schema:
+        type: integer
+        minimum: 1
+        default: 10
+        format: int32
   schemas:
-    CurrencyAmount:
-      type: integer
-      description: Amount in the smallest currency unit (e.g., cents for USD)
-    OrderEvent:
-      allOf:
-      - $ref: '#/components/schemas/OrderEventBase'
-    OrderLine:
-      type: object
-      required:
-      - name
-      - quantity
-      - rate
-      - rewards_rate
-      properties:
-        name:
-          type: string
-          description: Name of the order line item
-          example: Couch Supreme
-        product_url:
-          type: string
-          nullable: true
-          description: URL to the product
-          example: www.restassured.com/couch-supreme
-        quantity:
-          type: integer
-          description: Quantity of the item
-          example: 1
-        rate:
-          allOf:
-          - $ref: '#/components/schemas/CurrencyAmount'
-          - example: 274999
-        rewards_rate:
-          allOf:
-          - $ref: '#/components/schemas/CurrencyAmount'
-          - example: 2500
-    OrderEventsResponse:
-      type: object
-      required:
-      - data
-      properties:
-        data:
-          type: array
-          items:
-            $ref: '#/components/schemas/OrderEvent'
-          description: List of order events
-        has_more:
-          type: boolean
-        total:
-          type: integer
     OrderEventBase:
       type: object
       required:
@@ -199,22 +166,55 @@ components:
             quantity: 1
             rate: 274999
             rewards_rate: 2500
-  parameters:
-    limitParam:
-      name: limit
-      in: query
-      description: Limits the number of returned results
-      schema:
-        type: integer
-        minimum: 1
-        default: 10
-        format: int32
-    startingAfterParam:
-      name: starting_after
-      in: query
-      description: A cursor for use in pagination. An id that defines your place in the list.
-      schema:
-        type: string
+    OrderEvent:
+      allOf:
+      - $ref: '#/components/schemas/OrderEventBase'
+    CurrencyAmount:
+      type: integer
+      description: Amount in the smallest currency unit (e.g., cents for USD)
+    OrderEventsResponse:
+      type: object
+      required:
+      - data
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/OrderEvent'
+          description: List of order events
+        has_more:
+          type: boolean
+        total:
+          type: integer
+    OrderLine:
+      type: object
+      required:
+      - name
+      - quantity
+      - rate
+      - rewards_rate
+      properties:
+        name:
+          type: string
+          description: Name of the order line item
+          example: Couch Supreme
+        product_url:
+          type: string
+          nullable: true
+          description: URL to the product
+          example: www.restassured.com/couch-supreme
+        quantity:
+          type: integer
+          description: Quantity of the item
+          example: 1
+        rate:
+          allOf:
+          - $ref: '#/components/schemas/CurrencyAmount'
+          - example: 274999
+        rewards_rate:
+          allOf:
+          - $ref: '#/components/schemas/CurrencyAmount'
+          - example: 2500
   securitySchemes:
     basicAuth:
       type: http
