@@ -52,7 +52,7 @@ created: '2026-07-17'
 modified: '2026-07-19'
 tags:
 - Company
-- Financial-Services
+- Financial Services
 - Fintech
 - Credit Cards
 - Co-Branded Cards
@@ -72,6 +72,7 @@ tags_raw:
 - Rewards
 - Loyalty
 - Embedded Finance
+- Financial-Services
 apis:
 - aid: imprint:imprint-customer-links-api
   name: Imprint Customer Links API

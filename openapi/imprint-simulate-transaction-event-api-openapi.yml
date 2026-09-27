@@ -76,23 +76,6 @@ paths:
                 $ref: '#/components/schemas/ConflictError'
 components:
   schemas:
-    ConflictError:
-      type: object
-      description: object's current state prevents the requested update
-      properties:
-        type:
-          type: string
-        message:
-          type: string
-    TransactionStatus:
-      type: string
-      enum:
-      - APPROVED
-      - UPDATED
-      - VOIDED
-      - CAPTURED
-      - REFUNDED
-      example: APPROVED
     PurchaseMethod:
       type: string
       enum:
@@ -107,6 +90,19 @@ components:
       nullable: true
       description: How the purchase was completed.
       example: CHIP
+    TransactionCurrency:
+      type: string
+      description: The 3-character currency code of the amount in ISO 4217 format (e.g., "USD")
+      example: USD
+    TransactionStatus:
+      type: string
+      enum:
+      - APPROVED
+      - UPDATED
+      - VOIDED
+      - CAPTURED
+      - REFUNDED
+      example: APPROVED
     Merchant:
       type: object
       properties:
@@ -131,6 +127,27 @@ components:
         address:
           $ref: '#/components/schemas/Address'
           type: object
+    ConflictError:
+      type: object
+      description: object's current state prevents the requested update
+      properties:
+        type:
+          type: string
+        message:
+          type: string
+    TransactionEvent:
+      type: object
+      properties:
+        transaction_id:
+          type: string
+          description: Unique identifier of the transaction
+          example: E777214A-2D11-4CAD-9E8F-E1BD71D9FE67
+        event_id:
+          type: string
+          description: Unique identifier of the event generated, matches the event_id in the transaction event notification
+          example: E777214A-2D11-4CAD-9E8F-E1BD71D9FE67
+        status:
+          $ref: '#/components/schemas/TransactionStatus'
     Address:
       type: object
       description: Mailing address information
@@ -159,23 +176,6 @@ components:
           type: string
           description: ISO-3166-1 alpha-3 Country Code
           example: USA
-    TransactionEvent:
-      type: object
-      properties:
-        transaction_id:
-          type: string
-          description: Unique identifier of the transaction
-          example: E777214A-2D11-4CAD-9E8F-E1BD71D9FE67
-        event_id:
-          type: string
-          description: Unique identifier of the event generated, matches the event_id in the transaction event notification
-          example: E777214A-2D11-4CAD-9E8F-E1BD71D9FE67
-        status:
-          $ref: '#/components/schemas/TransactionStatus'
-    TransactionCurrency:
-      type: string
-      description: The 3-character currency code of the amount in ISO 4217 format (e.g., "USD")
-      example: USD
   securitySchemes:
     basicAuth:
       type: http

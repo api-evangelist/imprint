@@ -41,15 +41,6 @@ paths:
                 $ref: '#/components/schemas/TransactionNotFoundError'
 components:
   schemas:
-    TransactionStatus:
-      type: string
-      enum:
-      - APPROVED
-      - UPDATED
-      - VOIDED
-      - CAPTURED
-      - REFUNDED
-      example: APPROVED
     PurchaseMethod:
       type: string
       enum:
@@ -64,6 +55,61 @@ components:
       nullable: true
       description: How the purchase was completed.
       example: CHIP
+    TransactionCurrency:
+      type: string
+      description: The 3-character currency code of the amount in ISO 4217 format (e.g., "USD")
+      example: USD
+    TransactionStatus:
+      type: string
+      enum:
+      - APPROVED
+      - UPDATED
+      - VOIDED
+      - CAPTURED
+      - REFUNDED
+      example: APPROVED
+    Merchant:
+      type: object
+      properties:
+        network_id:
+          type: string
+          description: Unique identifier of the merchant assigned by the payment network.
+          example: '234923454545'
+        name:
+          type: string
+          description: Name of the merchant where the transaction occurred.
+          example: Target
+        category:
+          type: string
+          nullable: true
+          description: Name of the merchant category.
+          example: Grocery Stores
+        category_code:
+          type: string
+          nullable: true
+          description: Code associated with the merchant category.
+          example: '5411'
+        address:
+          $ref: '#/components/schemas/Address'
+          type: object
+    TransactionNotFoundError:
+      type: object
+      required:
+      - type
+      - message
+      properties:
+        type:
+          type: string
+          description: The category of error being returned.
+          example: TRANSACTION_FOUND_ERROR
+        message:
+          type: string
+          description: A message describing the cause of the error.
+          example: 'Transaction intent not found for provided ID: txn_123'
+        param:
+          type: string
+          description: The param causing the error.
+          example: transaction_id
     Transaction:
       type: object
       required:
@@ -125,30 +171,6 @@ components:
           additionalProperties: true
           example:
             platform_version: 2.1.0
-    Merchant:
-      type: object
-      properties:
-        network_id:
-          type: string
-          description: Unique identifier of the merchant assigned by the payment network.
-          example: '234923454545'
-        name:
-          type: string
-          description: Name of the merchant where the transaction occurred.
-          example: Target
-        category:
-          type: string
-          nullable: true
-          description: Name of the merchant category.
-          example: Grocery Stores
-        category_code:
-          type: string
-          nullable: true
-          description: Code associated with the merchant category.
-          example: '5411'
-        address:
-          $ref: '#/components/schemas/Address'
-          type: object
     Address:
       type: object
       description: Mailing address information
@@ -177,28 +199,6 @@ components:
           type: string
           description: ISO-3166-1 alpha-3 Country Code
           example: USA
-    TransactionCurrency:
-      type: string
-      description: The 3-character currency code of the amount in ISO 4217 format (e.g., "USD")
-      example: USD
-    TransactionNotFoundError:
-      type: object
-      required:
-      - type
-      - message
-      properties:
-        type:
-          type: string
-          description: The category of error being returned.
-          example: TRANSACTION_FOUND_ERROR
-        message:
-          type: string
-          description: A message describing the cause of the error.
-          example: 'Transaction intent not found for provided ID: txn_123'
-        param:
-          type: string
-          description: The param causing the error.
-          example: transaction_id
   securitySchemes:
     basicAuth:
       type: http

@@ -99,24 +99,6 @@ paths:
                 $ref: '#/components/schemas/SessionNotFoundError'
 components:
   schemas:
-    SessionNotFoundError:
-      type: object
-      required:
-      - type
-      - message
-      properties:
-        type:
-          type: string
-          description: The category of error being returned
-          example: SESSION_NOT_FOUND_ERROR
-        message:
-          type: string
-          description: A message describing the cause of the error
-          example: 'Session not found for provided ID: cs_123'
-        param:
-          type: string
-          description: The param causing the error
-          example: session_id
     InvalidRequestError:
       type: object
       properties:
@@ -143,34 +125,62 @@ components:
           type: string
           description: The timestamp that the error occurred
           example: '2025-01-20T18:18:22.923+00:00'
-    Address:
+    SessionNotFoundError:
       type: object
-      description: Mailing address information
+      required:
+      - type
+      - message
       properties:
-        street_line1:
+        type:
           type: string
-          description: Primary street address
-          example: 123 Main St
-        street_line2:
+          description: The category of error being returned
+          example: SESSION_NOT_FOUND_ERROR
+        message:
           type: string
-          description: Secondary street address (apartment, suite, etc.)
-          example: Apt 4B
-        city:
+          description: A message describing the cause of the error
+          example: 'Session not found for provided ID: cs_123'
+        param:
           type: string
-          description: City name
-          example: San Francisco
-        state:
+          description: The param causing the error
+          example: session_id
+    CustomerSession:
+      type: object
+      description: Represents a session created on behalf of an Imprint customer
+      required:
+      - id
+      - client_secret
+      - expires_at
+      properties:
+        id:
           type: string
-          description: State or province
-          example: CA
-        postal_code:
+          example: 2EE24580-B97B-4949-A65C-929CCB9B9B8D
+          description: The unique ID Imprint assigns to the session.
+        client_secret:
           type: string
-          description: ZIP or postal code
-          example: '94105'
-        country:
+          example: QzMyNzg4QzgtNEUwOS00QkU4LThDMjEtMkU5OUQ3QzkwRDhGCg==
+          description: Not to be logged or stored. Provide this one time use token to the Imprint SDK or other client side code to allow the customer access to edit their own account or apply
+        expires_at:
           type: string
-          description: ISO-3166-1 alpha-3 Country Code
-          example: USA
+          description: the RFC-3339 timestamp when the `client_secret` will expire.
+          example: 2025-02-13 19:08:07+00:00
+        metadata:
+          type: object
+          description: Set of key-value pairs for storing additional information about the customer session.
+          additionalProperties: true
+          example:
+            store_number: '123'
+        customer_metadata:
+          type: object
+          description: A set of key-value pairs attached to the customer. These values will be included in webhook event payloads for the partner to receive information about the customer.
+          additionalProperties:
+            type: string
+          example:
+            loyalty_id: '840012345678'
+            membership_tier: gold
+        source:
+          type: string
+          description: The source where the session was initiated
+          example: web_signup
     CustomerAccountHistory:
       type: object
       description: A Customer's account history with the partner
@@ -222,44 +232,34 @@ components:
           type: integer
           description: The number of lifetime transactions the customer has made with the partner
           example: 100
-    CustomerSession:
+    Address:
       type: object
-      description: Represents a session created on behalf of an Imprint customer
-      required:
-      - id
-      - client_secret
-      - expires_at
+      description: Mailing address information
       properties:
-        id:
+        street_line1:
           type: string
-          example: 2EE24580-B97B-4949-A65C-929CCB9B9B8D
-          description: The unique ID Imprint assigns to the session.
-        client_secret:
+          description: Primary street address
+          example: 123 Main St
+        street_line2:
           type: string
-          example: QzMyNzg4QzgtNEUwOS00QkU4LThDMjEtMkU5OUQ3QzkwRDhGCg==
-          description: Not to be logged or stored. Provide this one time use token to the Imprint SDK or other client side code to allow the customer access to edit their own account or apply
-        expires_at:
+          description: Secondary street address (apartment, suite, etc.)
+          example: Apt 4B
+        city:
           type: string
-          description: the RFC-3339 timestamp when the `client_secret` will expire.
-          example: 2025-02-13 19:08:07+00:00
-        metadata:
-          type: object
-          description: Set of key-value pairs for storing additional information about the customer session.
-          additionalProperties: true
-          example:
-            store_number: '123'
-        customer_metadata:
-          type: object
-          description: A set of key-value pairs attached to the customer. These values will be included in webhook event payloads for the partner to receive information about the customer.
-          additionalProperties:
-            type: string
-          example:
-            loyalty_id: '840012345678'
-            membership_tier: gold
-        source:
+          description: City name
+          example: San Francisco
+        state:
           type: string
-          description: The source where the session was initiated
-          example: web_signup
+          description: State or province
+          example: CA
+        postal_code:
+          type: string
+          description: ZIP or postal code
+          example: '94105'
+        country:
+          type: string
+          description: ISO-3166-1 alpha-3 Country Code
+          example: USA
   securitySchemes:
     basicAuth:
       type: http

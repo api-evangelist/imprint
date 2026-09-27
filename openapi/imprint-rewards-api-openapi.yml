@@ -107,27 +107,16 @@ paths:
               schema:
                 $ref: '#/components/schemas/Reward'
 components:
-  parameters:
-    startingAfterParam:
-      name: starting_after
-      in: query
-      description: A cursor for use in pagination. An id that defines your place in the list.
-      schema:
-        type: string
-    limitParam:
-      name: limit
-      in: query
-      description: Limits the number of returned results
-      schema:
-        type: integer
-        minimum: 1
-        default: 10
-        format: int32
   schemas:
-    RewardCurrency:
+    RewardType:
       type: string
-      description: The 3-character currency code of the amount in ISO 4217 format (e.g., "USD") or a reward unit (e.g., "POINTS")
-      example: POINTS
+      enum:
+      - OFFER
+      - TRANSACTION
+      - ONE_TIME
+      - STATEMENT
+      - REFERRAL
+      example: TRANSACTION
     RewardNotFoundError:
       type: object
       required:
@@ -196,15 +185,26 @@ components:
           additionalProperties: true
           example:
             platform_version: 2.1.0
-    RewardType:
+    RewardCurrency:
       type: string
-      enum:
-      - OFFER
-      - TRANSACTION
-      - ONE_TIME
-      - STATEMENT
-      - REFERRAL
-      example: TRANSACTION
+      description: The 3-character currency code of the amount in ISO 4217 format (e.g., "USD") or a reward unit (e.g., "POINTS")
+      example: POINTS
+  parameters:
+    limitParam:
+      name: limit
+      in: query
+      description: Limits the number of returned results
+      schema:
+        type: integer
+        minimum: 1
+        default: 10
+        format: int32
+    startingAfterParam:
+      name: starting_after
+      in: query
+      description: A cursor for use in pagination. An id that defines your place in the list.
+      schema:
+        type: string
   securitySchemes:
     basicAuth:
       type: http

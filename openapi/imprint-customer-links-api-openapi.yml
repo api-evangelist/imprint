@@ -88,10 +88,32 @@ paths:
                         $ref: '#/components/schemas/CustomerLink'
 components:
   schemas:
-    PartnerCustomerId:
-      type: string
-      description: The unique identifier for the customer in the partner's system
-      example: PARTNER_USER_456
+    InvalidRequestError:
+      type: object
+      properties:
+        path:
+          type: string
+          description: The path of the endpoint returning the error
+          example: /v2/customers
+        details:
+          type: array
+          items:
+            type: string
+          description: The details of the error being returned
+          example:
+          - 'email: must be a well-formed email address'
+        error:
+          type: string
+          description: The category of error being returned
+          example: Bad Request
+        status:
+          type: integer
+          description: The HTTP status code of the error
+          example: 400
+        timestamp:
+          type: string
+          description: The timestamp that the error occurred
+          example: '2025-01-20T18:18:22.923+00:00'
     CustomerNotFoundError:
       type: object
       required:
@@ -110,6 +132,10 @@ components:
           type: string
           description: The param causing the error
           example: customer_id
+    PartnerCustomerId:
+      type: string
+      description: The unique identifier for the customer in the partner's system
+      example: PARTNER_USER_456
     CustomerLink:
       type: object
       required:
@@ -146,32 +172,6 @@ components:
           example:
             store_id: store_789
             platform_version: 2.1.0
-    InvalidRequestError:
-      type: object
-      properties:
-        path:
-          type: string
-          description: The path of the endpoint returning the error
-          example: /v2/customers
-        details:
-          type: array
-          items:
-            type: string
-          description: The details of the error being returned
-          example:
-          - 'email: must be a well-formed email address'
-        error:
-          type: string
-          description: The category of error being returned
-          example: Bad Request
-        status:
-          type: integer
-          description: The HTTP status code of the error
-          example: 400
-        timestamp:
-          type: string
-          description: The timestamp that the error occurred
-          example: '2025-01-20T18:18:22.923+00:00'
   securitySchemes:
     basicAuth:
       type: http
