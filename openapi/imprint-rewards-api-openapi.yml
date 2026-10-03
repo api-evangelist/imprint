@@ -108,33 +108,6 @@ paths:
                 $ref: '#/components/schemas/Reward'
 components:
   schemas:
-    RewardType:
-      type: string
-      enum:
-      - OFFER
-      - TRANSACTION
-      - ONE_TIME
-      - STATEMENT
-      - REFERRAL
-      example: TRANSACTION
-    RewardNotFoundError:
-      type: object
-      required:
-      - type
-      - message
-      properties:
-        type:
-          type: string
-          description: The category of error being returned
-          example: REWARD_NOT_FOUND_ERROR
-        message:
-          type: string
-          description: A message describing the cause of the error.
-          example: 'Reward not found for provided ID: pymd_123'
-        param:
-          type: string
-          description: The param causing the error
-          example: reward_id
     RewardStatus:
       type: string
       enum:
@@ -185,10 +158,37 @@ components:
           additionalProperties: true
           example:
             platform_version: 2.1.0
+    RewardType:
+      type: string
+      enum:
+      - OFFER
+      - TRANSACTION
+      - ONE_TIME
+      - STATEMENT
+      - REFERRAL
+      example: TRANSACTION
     RewardCurrency:
       type: string
       description: The 3-character currency code of the amount in ISO 4217 format (e.g., "USD") or a reward unit (e.g., "POINTS")
       example: POINTS
+    RewardNotFoundError:
+      type: object
+      required:
+      - type
+      - message
+      properties:
+        type:
+          type: string
+          description: The category of error being returned
+          example: REWARD_NOT_FOUND_ERROR
+        message:
+          type: string
+          description: A message describing the cause of the error.
+          example: 'Reward not found for provided ID: pymd_123'
+        param:
+          type: string
+          description: The param causing the error
+          example: reward_id
   parameters:
     limitParam:
       name: limit

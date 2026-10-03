@@ -95,9 +95,6 @@ components:
     OrderEvent:
       allOf:
       - $ref: '#/components/schemas/OrderEventBase'
-    CurrencyAmount:
-      type: integer
-      description: Amount in the smallest currency unit (e.g., cents for USD)
     OrderLine:
       type: object
       required:
@@ -185,6 +182,9 @@ components:
             quantity: 1
             rate: 274999
             rewards_rate: 2500
+    CurrencyAmount:
+      type: integer
+      description: Amount in the smallest currency unit (e.g., cents for USD)
     OrderEventsResponse:
       type: object
       required:
