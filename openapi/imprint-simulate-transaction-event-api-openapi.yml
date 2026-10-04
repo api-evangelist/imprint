@@ -76,30 +76,6 @@ paths:
                 $ref: '#/components/schemas/ConflictError'
 components:
   schemas:
-    Merchant:
-      type: object
-      properties:
-        network_id:
-          type: string
-          description: Unique identifier of the merchant assigned by the payment network.
-          example: '234923454545'
-        name:
-          type: string
-          description: Name of the merchant where the transaction occurred.
-          example: Target
-        category:
-          type: string
-          nullable: true
-          description: Name of the merchant category.
-          example: Grocery Stores
-        category_code:
-          type: string
-          nullable: true
-          description: Code associated with the merchant category.
-          example: '5411'
-        address:
-          $ref: '#/components/schemas/Address'
-          type: object
     ConflictError:
       type: object
       description: object's current state prevents the requested update
@@ -108,33 +84,6 @@ components:
           type: string
         message:
           type: string
-    TransactionEvent:
-      type: object
-      properties:
-        transaction_id:
-          type: string
-          description: Unique identifier of the transaction
-          example: E777214A-2D11-4CAD-9E8F-E1BD71D9FE67
-        event_id:
-          type: string
-          description: Unique identifier of the event generated, matches the event_id in the transaction event notification
-          example: E777214A-2D11-4CAD-9E8F-E1BD71D9FE67
-        status:
-          $ref: '#/components/schemas/TransactionStatus'
-    PurchaseMethod:
-      type: string
-      enum:
-      - CHIP
-      - CONTACTLESS
-      - KEYEDIN
-      - ONLINE
-      - SWIPE
-      - QRCODE
-      - OCR
-      - UNKNOWN
-      nullable: true
-      description: How the purchase was completed.
-      example: CHIP
     Address:
       type: object
       description: Mailing address information
@@ -163,10 +112,6 @@ components:
           type: string
           description: ISO-3166-1 alpha-3 Country Code
           example: USA
-    TransactionCurrency:
-      type: string
-      description: The 3-character currency code of the amount in ISO 4217 format (e.g., "USD")
-      example: USD
     TransactionStatus:
       type: string
       enum:
@@ -176,6 +121,61 @@ components:
       - CAPTURED
       - REFUNDED
       example: APPROVED
+    Merchant:
+      type: object
+      properties:
+        network_id:
+          type: string
+          description: Unique identifier of the merchant assigned by the payment network.
+          example: '234923454545'
+        name:
+          type: string
+          description: Name of the merchant where the transaction occurred.
+          example: Target
+        category:
+          type: string
+          nullable: true
+          description: Name of the merchant category.
+          example: Grocery Stores
+        category_code:
+          type: string
+          nullable: true
+          description: Code associated with the merchant category.
+          example: '5411'
+        address:
+          $ref: '#/components/schemas/Address'
+          type: object
+    TransactionCurrency:
+      type: string
+      description: The 3-character currency code of the amount in ISO 4217 format (e.g., "USD")
+      example: USD
+    TransactionEvent:
+      type: object
+      properties:
+        transaction_id:
+          type: string
+          description: Unique identifier of the transaction
+          example: E777214A-2D11-4CAD-9E8F-E1BD71D9FE67
+        event_id:
+          type: string
+          description: Unique identifier of the event generated, matches the event_id in the transaction event notification
+          example: E777214A-2D11-4CAD-9E8F-E1BD71D9FE67
+        status:
+          $ref: '#/components/schemas/TransactionStatus'
+    PurchaseMethod:
+      type: string
+      enum:
+      - CHIP
+      - CONTACTLESS
+      - KEYEDIN
+      - ONLINE
+      - SWIPE
+      - QRCODE
+      - OCR
+      - UNKNOWN
+      nullable: true
+      description: How the purchase was completed.
+      example: CHIP
   securitySchemes:
     basicAuth:
       type: http

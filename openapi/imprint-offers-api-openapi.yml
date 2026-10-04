@@ -40,6 +40,24 @@ paths:
                 $ref: '#/components/schemas/PartnerCustomerNotFoundError'
 components:
   schemas:
+    PartnerCustomerNotFoundError:
+      type: object
+      required:
+      - type
+      - message
+      properties:
+        type:
+          type: string
+          description: The category of error being returned
+          example: PARTNER_CUSTOMER_NOT_FOUND_ERROR
+        message:
+          type: string
+          description: A message describing the cause of the error
+          example: 'Partner Customer not found for provided ID: abcd-efgh-123'
+        param:
+          type: string
+          description: The param causing the error
+          example: partner_customer_id
     Offer:
       type: object
       description: Offer marketing placement returned for a partner customer
@@ -65,24 +83,6 @@ components:
           type: string
           description: Full marketing copy for the offer
           example: Sign-up, accept your offer, and spend $500 in the first 90 days of becoming a cardholder to unlock your $25 welcome bonus. To qualify for the $25 bonus, you must make qualifying purchases totaling $500 or more using your Company® Card within 90 days of account approval.
-    PartnerCustomerNotFoundError:
-      type: object
-      required:
-      - type
-      - message
-      properties:
-        type:
-          type: string
-          description: The category of error being returned
-          example: PARTNER_CUSTOMER_NOT_FOUND_ERROR
-        message:
-          type: string
-          description: A message describing the cause of the error
-          example: 'Partner Customer not found for provided ID: abcd-efgh-123'
-        param:
-          type: string
-          description: The param causing the error
-          example: partner_customer_id
   securitySchemes:
     basicAuth:
       type: http

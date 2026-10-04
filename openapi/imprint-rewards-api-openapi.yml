@@ -108,14 +108,6 @@ paths:
                 $ref: '#/components/schemas/Reward'
 components:
   schemas:
-    RewardStatus:
-      type: string
-      enum:
-      - PENDING
-      - AVAILABLE
-      - PENDING_DEDUCTION
-      - DEDUCTED
-      example: PENDING
     Reward:
       type: object
       required:
@@ -167,10 +159,6 @@ components:
       - STATEMENT
       - REFERRAL
       example: TRANSACTION
-    RewardCurrency:
-      type: string
-      description: The 3-character currency code of the amount in ISO 4217 format (e.g., "USD") or a reward unit (e.g., "POINTS")
-      example: POINTS
     RewardNotFoundError:
       type: object
       required:
@@ -189,6 +177,18 @@ components:
           type: string
           description: The param causing the error
           example: reward_id
+    RewardCurrency:
+      type: string
+      description: The 3-character currency code of the amount in ISO 4217 format (e.g., "USD") or a reward unit (e.g., "POINTS")
+      example: POINTS
+    RewardStatus:
+      type: string
+      enum:
+      - PENDING
+      - AVAILABLE
+      - PENDING_DEDUCTION
+      - DEDUCTED
+      example: PENDING
   parameters:
     limitParam:
       name: limit

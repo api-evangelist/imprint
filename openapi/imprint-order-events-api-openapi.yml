@@ -91,39 +91,23 @@ paths:
         '204':
           description: Order event deleted successfully
 components:
+  parameters:
+    limitParam:
+      name: limit
+      in: query
+      description: Limits the number of returned results
+      schema:
+        type: integer
+        minimum: 1
+        default: 10
+        format: int32
+    startingAfterParam:
+      name: starting_after
+      in: query
+      description: A cursor for use in pagination. An id that defines your place in the list.
+      schema:
+        type: string
   schemas:
-    OrderEvent:
-      allOf:
-      - $ref: '#/components/schemas/OrderEventBase'
-    OrderLine:
-      type: object
-      required:
-      - name
-      - quantity
-      - rate
-      - rewards_rate
-      properties:
-        name:
-          type: string
-          description: Name of the order line item
-          example: Couch Supreme
-        product_url:
-          type: string
-          nullable: true
-          description: URL to the product
-          example: www.restassured.com/couch-supreme
-        quantity:
-          type: integer
-          description: Quantity of the item
-          example: 1
-        rate:
-          allOf:
-          - $ref: '#/components/schemas/CurrencyAmount'
-          - example: 274999
-        rewards_rate:
-          allOf:
-          - $ref: '#/components/schemas/CurrencyAmount'
-          - example: 2500
     OrderEventBase:
       type: object
       required:
@@ -182,9 +166,41 @@ components:
             quantity: 1
             rate: 274999
             rewards_rate: 2500
+    OrderLine:
+      type: object
+      required:
+      - name
+      - quantity
+      - rate
+      - rewards_rate
+      properties:
+        name:
+          type: string
+          description: Name of the order line item
+          example: Couch Supreme
+        product_url:
+          type: string
+          nullable: true
+          description: URL to the product
+          example: www.restassured.com/couch-supreme
+        quantity:
+          type: integer
+          description: Quantity of the item
+          example: 1
+        rate:
+          allOf:
+          - $ref: '#/components/schemas/CurrencyAmount'
+          - example: 274999
+        rewards_rate:
+          allOf:
+          - $ref: '#/components/schemas/CurrencyAmount'
+          - example: 2500
     CurrencyAmount:
       type: integer
       description: Amount in the smallest currency unit (e.g., cents for USD)
+    OrderEvent:
+      allOf:
+      - $ref: '#/components/schemas/OrderEventBase'
     OrderEventsResponse:
       type: object
       required:
@@ -199,22 +215,6 @@ components:
           type: boolean
         total:
           type: integer
-  parameters:
-    limitParam:
-      name: limit
-      in: query
-      description: Limits the number of returned results
-      schema:
-        type: integer
-        minimum: 1
-        default: 10
-        format: int32
-    startingAfterParam:
-      name: starting_after
-      in: query
-      description: A cursor for use in pagination. An id that defines your place in the list.
-      schema:
-        type: string
   securitySchemes:
     basicAuth:
       type: http

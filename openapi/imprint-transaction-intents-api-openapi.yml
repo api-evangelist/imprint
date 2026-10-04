@@ -219,12 +219,6 @@ components:
       schema:
         type: string
   schemas:
-    TransactionIntentStatus:
-      type: string
-      enum:
-      - CONFIRMED
-      - CANCELED
-      example: CONFIRMED
     TransactionIntent:
       type: object
       required:
@@ -273,24 +267,6 @@ components:
           additionalProperties: true
           example:
             platform_version: 2.1.0
-    TransactionIntentFoundError:
-      type: object
-      required:
-      - type
-      - message
-      properties:
-        type:
-          type: string
-          description: The category of error being returned.
-          example: TRANSACTION_INTENT_FOUND_ERROR
-        message:
-          type: string
-          description: A message describing the cause of the error.
-          example: 'Transaction intent not found for provided ID: txint_123'
-        param:
-          type: string
-          description: The param causing the error.
-          example: intent_id
     InvalidRequestError:
       type: object
       properties:
@@ -345,10 +321,34 @@ components:
           type: string
           description: ISO-3166-1 alpha-3 Country Code
           example: USA
+    TransactionIntentStatus:
+      type: string
+      enum:
+      - CONFIRMED
+      - CANCELED
+      example: CONFIRMED
     TransactionCurrency:
       type: string
       description: The 3-character currency code of the amount in ISO 4217 format (e.g., "USD")
       example: USD
+    TransactionIntentFoundError:
+      type: object
+      required:
+      - type
+      - message
+      properties:
+        type:
+          type: string
+          description: The category of error being returned.
+          example: TRANSACTION_INTENT_FOUND_ERROR
+        message:
+          type: string
+          description: A message describing the cause of the error.
+          example: 'Transaction intent not found for provided ID: txint_123'
+        param:
+          type: string
+          description: The param causing the error.
+          example: intent_id
   securitySchemes:
     basicAuth:
       type: http

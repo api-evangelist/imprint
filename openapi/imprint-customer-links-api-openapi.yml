@@ -88,10 +88,6 @@ paths:
                         $ref: '#/components/schemas/CustomerLink'
 components:
   schemas:
-    PartnerCustomerId:
-      type: string
-      description: The unique identifier for the customer in the partner's system
-      example: PARTNER_USER_456
     CustomerLink:
       type: object
       required:
@@ -146,6 +142,10 @@ components:
           type: string
           description: The param causing the error
           example: customer_id
+    PartnerCustomerId:
+      type: string
+      description: The unique identifier for the customer in the partner's system
+      example: PARTNER_USER_456
     InvalidRequestError:
       type: object
       properties:

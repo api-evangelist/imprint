@@ -217,19 +217,14 @@ webhooks:
                 type: string
 components:
   schemas:
-    RewardType:
+    StreakStatus:
       type: string
+      description: The status of the streak, derived from the event. ENROLLED and PERIOD_COMPLETED carry IN_PROGRESS; STREAK_COMPLETED carries COMPLETED; STREAK_FAILED carries FAILED.
       enum:
-      - OFFER
-      - TRANSACTION
-      - ONE_TIME
-      - STATEMENT
-      - REFERRAL
-      example: TRANSACTION
-    TransactionCurrency:
-      type: string
-      description: The 3-character currency code of the amount in ISO 4217 format (e.g., "USD")
-      example: USD
+      - IN_PROGRESS
+      - COMPLETED
+      - FAILED
+      example: COMPLETED
     TransactionStatus:
       type: string
       enum:
@@ -239,6 +234,34 @@ components:
       - CAPTURED
       - REFUNDED
       example: APPROVED
+    Merchant:
+      type: object
+      properties:
+        network_id:
+          type: string
+          description: Unique identifier of the merchant assigned by the payment network.
+          example: '234923454545'
+        name:
+          type: string
+          description: Name of the merchant where the transaction occurred.
+          example: Target
+        category:
+          type: string
+          nullable: true
+          description: Name of the merchant category.
+          example: Grocery Stores
+        category_code:
+          type: string
+          nullable: true
+          description: Code associated with the merchant category.
+          example: '5411'
+        address:
+          $ref: '#/components/schemas/Address'
+          type: object
+    RewardCurrency:
+      type: string
+      description: The 3-character currency code of the amount in ISO 4217 format (e.g., "USD") or a reward unit (e.g., "POINTS")
+      example: POINTS
     PaymentMethodToken:
       type: object
       required:
@@ -268,208 +291,10 @@ components:
           type: string
           example: 2025-02-13 19:08:07+00:00
           description: the RFC-3339 timestamp when the payment method was updated
-    StreakEvent:
+    PartnerCustomerId:
       type: string
-      description: The streak lifecycle event being signalled.
-      enum:
-      - ENROLLED
-      - PERIOD_COMPLETED
-      - STREAK_COMPLETED
-      - STREAK_FAILED
-      example: STREAK_COMPLETED
-    RewardWebhookPayload:
-      type: object
-      properties:
-        object:
-          type: string
-          description: The type of object associated with this webhook event. This field indicates what kind of resource has been created or updated.
-          enum:
-          - REWARD
-          example: REWARD
-        data:
-          type: object
-          properties:
-            merchant_key:
-              type: string
-              description: Unique identifier for the merchant associated with this webhook event.
-              example: MERCHANT_ABC
-            reward_id:
-              type: string
-              description: Unique identifier for the reward. Use this reward_id in the Retrieve a reward API to details about the reward
-              example: DCBFC736-2286-42DD-897D-160DCA80AED2
-            customer_id:
-              type: string
-              description: Unique identifier for the associated customer
-              example: 2EE24580-B97B-4949-A65C-929CCB9B9B8D
-            transaction_id:
-              type: string
-              description: Identifies the transaction related to this reward for TRANSACTION typed reward
-              example: 34E24580-B97B-4949-A65C-929CCB9B9B8D
-            type:
-              $ref: '#/components/schemas/RewardType'
-            amount:
-              type: integer
-              description: Amount of the reward in the smallest currency unit (e.g., cents for USD).
-              example: 5000
-            status:
-              $ref: '#/components/schemas/RewardStatus'
-            currency:
-              $ref: '#/components/schemas/RewardCurrency'
-            created_at:
-              type: string
-              description: the RFC-3339 timestamp when the reward was created
-              example: 2025-02-13 19:08:07+00:00
-            metadata:
-              type: object
-              additionalProperties: true
-            customer_metadata:
-              type: object
-              description: A set of key-value pairs of metadata attached to the customer.
-              additionalProperties:
-                type: string
-              example:
-                loyalty_id: '840012345678'
-                membership_tier: gold
-    StreakStatus:
-      type: string
-      description: The status of the streak, derived from the event. ENROLLED and PERIOD_COMPLETED carry IN_PROGRESS; STREAK_COMPLETED carries COMPLETED; STREAK_FAILED carries FAILED.
-      enum:
-      - IN_PROGRESS
-      - COMPLETED
-      - FAILED
-      example: COMPLETED
-    AccountStatusValue:
-      type: string
-      description: The customer's account status.
-      enum:
-      - CLOSED
-      example: CLOSED
-    RewardCurrency:
-      type: string
-      description: The 3-character currency code of the amount in ISO 4217 format (e.g., "USD") or a reward unit (e.g., "POINTS")
-      example: POINTS
-    PurchaseMethod:
-      type: string
-      enum:
-      - CHIP
-      - CONTACTLESS
-      - KEYEDIN
-      - ONLINE
-      - SWIPE
-      - QRCODE
-      - OCR
-      - UNKNOWN
-      nullable: true
-      description: How the purchase was completed.
-      example: CHIP
-    CustomerLinkWebhookPayload:
-      type: object
-      properties:
-        object:
-          type: string
-          description: The type of object associated with this webhook event.
-          enum:
-          - CUSTOMER_LINK
-        data:
-          type: object
-          properties:
-            merchant_key:
-              type: string
-              description: Unique identifier for the merchant associated with this webhook event.
-              example: MERCHANT_ABC
-            customer_id:
-              type: string
-              description: Imprint's unique identifier for the customer
-              example: 2EE24580-B97B-4949-A65C-929CCB9B9B8D
-            partner_customer_id:
-              $ref: '#/components/schemas/PartnerCustomerId'
-            status:
-              type: string
-              description: The status of the customer link
-              enum:
-              - ACTIVE
-              example: ACTIVE
-            created_at:
-              type: string
-              description: The RFC-3339 timestamp when the customer link was created
-              example: '2025-02-13T19:08:07Z'
-            updated_at:
-              type: string
-              description: The RFC-3339 timestamp when the customer link was last updated
-              example: '2025-02-13T19:08:07Z'
-            customer_metadata:
-              type: object
-              description: A set of key-value pairs of metadata attached to the customer.
-              additionalProperties:
-                type: string
-              example:
-                loyalty_id: '840012345678'
-                membership_tier: gold
-    PaymentMethodWebhookPayload:
-      type: object
-      properties:
-        object:
-          type: string
-          description: The type of object associated with this webhook event. This field indicates what kind of resource has been created or updated.
-          enum:
-          - PAYMENT_METHOD
-          example: PAYMENT_METHOD
-        data:
-          type: object
-          properties:
-            merchant_key:
-              type: string
-              description: Unique identifier for the merchant associated with this webhook event.
-              example: MERCHANT_ABC
-            payment_method_id:
-              type: string
-              description: Unique identifier for the payment method.
-              example: DCBFC736-2286-42DD-897D-160DCA80AED2
-            customer_id:
-              type: string
-              description: Unique identifier for the associated customer
-              example: 2EE24580-B97B-4949-A65C-929CCB9B9B8D
-            partner_customer_id:
-              $ref: '#/components/schemas/PartnerCustomerId'
-            previous_status:
-              type: string
-              description: The previous status of the card.
-              enum:
-              - ACTIVE
-              - INACTIVE
-              - CANCELED
-            new_status:
-              type: string
-              description: The new status of the card
-              enum:
-              - ACTIVE
-              - INACTIVE
-              - CANCELED
-            card_type:
-              $ref: '#/components/schemas/CardType'
-            card_design_id:
-              $ref: '#/components/schemas/CardDesignID'
-            tokens:
-              type: array
-              description: Payment method tokens that are defined by a third-party provider are included in this array by Imprint.
-              items:
-                $ref: '#/components/schemas/PaymentMethodToken'
-            created_at:
-              type: string
-              description: the RFC-3339 timestamp when the payment method was created
-              example: 2025-02-13 19:08:07+00:00
-            updated_at:
-              type: string
-              example: 2025-02-13 19:08:07+00:00
-              description: the RFC-3339 timestamp when the payment method was updated
-            customer_metadata:
-              type: object
-              description: A set of key-value pairs of metadata attached to the customer.
-              additionalProperties:
-                type: string
-              example:
-                loyalty_id: '840012345678'
-                membership_tier: gold
+      description: The unique identifier for the customer in the partner's system
+      example: PARTNER_USER_456
     TransactionWebhookPayload:
       type: object
       properties:
@@ -542,6 +367,88 @@ components:
               $ref: '#/components/schemas/PurchaseMethod'
             merchant:
               $ref: '#/components/schemas/Merchant'
+            customer_metadata:
+              type: object
+              description: A set of key-value pairs of metadata attached to the customer.
+              additionalProperties:
+                type: string
+              example:
+                loyalty_id: '840012345678'
+                membership_tier: gold
+    Address:
+      type: object
+      description: Mailing address information
+      properties:
+        street_line1:
+          type: string
+          description: Primary street address
+          example: 123 Main St
+        street_line2:
+          type: string
+          description: Secondary street address (apartment, suite, etc.)
+          example: Apt 4B
+        city:
+          type: string
+          description: City name
+          example: San Francisco
+        state:
+          type: string
+          description: State or province
+          example: CA
+        postal_code:
+          type: string
+          description: ZIP or postal code
+          example: '94105'
+        country:
+          type: string
+          description: ISO-3166-1 alpha-3 Country Code
+          example: USA
+    CardDesignID:
+      type: string
+      description: Imprint ID for the graphic design printed on the card
+      example: 3b9c1f3e-52a0-44c1-b131-a7ab0099a214
+    AccountStatusValue:
+      type: string
+      description: The customer's account status.
+      enum:
+      - CLOSED
+      example: CLOSED
+    RewardStatus:
+      type: string
+      enum:
+      - PENDING
+      - AVAILABLE
+      - PENDING_DEDUCTION
+      - DEDUCTED
+      example: PENDING
+    AccountStatusWebhookPayload:
+      type: object
+      properties:
+        object:
+          type: string
+          description: The type of object this webhook event relates to.
+          enum:
+          - ACCOUNT_STATUS
+          example: ACCOUNT_STATUS
+        data:
+          type: object
+          properties:
+            merchant_key:
+              type: string
+              description: Unique identifier for the merchant associated with this webhook event.
+              example: MERCHANT_ABC
+            customer_id:
+              type: string
+              description: Imprint's unique identifier for the associated customer.
+              example: 2EE24580-B97B-4949-A65C-929CCB9B9B8D
+            partner_customer_id:
+              $ref: '#/components/schemas/PartnerCustomerId'
+            status:
+              $ref: '#/components/schemas/AccountStatusValue'
+            updated_at:
+              type: string
+              description: RFC-3339 timestamp when the account status transition took effect. May be backdated when the transition has an effective date earlier than delivery (e.g. a debt sale).
+              example: '2026-05-01T12:00:00Z'
             customer_metadata:
               type: object
               description: A set of key-value pairs of metadata attached to the customer.
@@ -675,62 +582,145 @@ components:
               example:
                 loyalty_id: '840012345678'
                 membership_tier: gold
-    CardDesignID:
-      type: string
-      description: Imprint ID for the graphic design printed on the card
-      example: 3b9c1f3e-52a0-44c1-b131-a7ab0099a214
-    RewardStatus:
-      type: string
-      enum:
-      - PENDING
-      - AVAILABLE
-      - PENDING_DEDUCTION
-      - DEDUCTED
-      example: PENDING
-    PartnerCustomerId:
-      type: string
-      description: The unique identifier for the customer in the partner's system
-      example: PARTNER_USER_456
-    Merchant:
-      type: object
-      properties:
-        network_id:
-          type: string
-          description: Unique identifier of the merchant assigned by the payment network.
-          example: '234923454545'
-        name:
-          type: string
-          description: Name of the merchant where the transaction occurred.
-          example: Target
-        category:
-          type: string
-          nullable: true
-          description: Name of the merchant category.
-          example: Grocery Stores
-        category_code:
-          type: string
-          nullable: true
-          description: Code associated with the merchant category.
-          example: '5411'
-        address:
-          $ref: '#/components/schemas/Address'
-          type: object
-    CardType:
-      type: string
-      description: The type of card
-      enum:
-      - PHYSICAL
-      - VIRTUAL
-      - UNIFIED
-    AccountStatusWebhookPayload:
+    RewardWebhookPayload:
       type: object
       properties:
         object:
           type: string
-          description: The type of object this webhook event relates to.
+          description: The type of object associated with this webhook event. This field indicates what kind of resource has been created or updated.
           enum:
-          - ACCOUNT_STATUS
-          example: ACCOUNT_STATUS
+          - REWARD
+          example: REWARD
+        data:
+          type: object
+          properties:
+            merchant_key:
+              type: string
+              description: Unique identifier for the merchant associated with this webhook event.
+              example: MERCHANT_ABC
+            reward_id:
+              type: string
+              description: Unique identifier for the reward. Use this reward_id in the Retrieve a reward API to details about the reward
+              example: DCBFC736-2286-42DD-897D-160DCA80AED2
+            customer_id:
+              type: string
+              description: Unique identifier for the associated customer
+              example: 2EE24580-B97B-4949-A65C-929CCB9B9B8D
+            transaction_id:
+              type: string
+              description: Identifies the transaction related to this reward for TRANSACTION typed reward
+              example: 34E24580-B97B-4949-A65C-929CCB9B9B8D
+            type:
+              $ref: '#/components/schemas/RewardType'
+            amount:
+              type: integer
+              description: Amount of the reward in the smallest currency unit (e.g., cents for USD).
+              example: 5000
+            status:
+              $ref: '#/components/schemas/RewardStatus'
+            currency:
+              $ref: '#/components/schemas/RewardCurrency'
+            created_at:
+              type: string
+              description: the RFC-3339 timestamp when the reward was created
+              example: 2025-02-13 19:08:07+00:00
+            metadata:
+              type: object
+              additionalProperties: true
+            customer_metadata:
+              type: object
+              description: A set of key-value pairs of metadata attached to the customer.
+              additionalProperties:
+                type: string
+              example:
+                loyalty_id: '840012345678'
+                membership_tier: gold
+    TransactionCurrency:
+      type: string
+      description: The 3-character currency code of the amount in ISO 4217 format (e.g., "USD")
+      example: USD
+    StreakEvent:
+      type: string
+      description: The streak lifecycle event being signalled.
+      enum:
+      - ENROLLED
+      - PERIOD_COMPLETED
+      - STREAK_COMPLETED
+      - STREAK_FAILED
+      example: STREAK_COMPLETED
+    PaymentMethodWebhookPayload:
+      type: object
+      properties:
+        object:
+          type: string
+          description: The type of object associated with this webhook event. This field indicates what kind of resource has been created or updated.
+          enum:
+          - PAYMENT_METHOD
+          example: PAYMENT_METHOD
+        data:
+          type: object
+          properties:
+            merchant_key:
+              type: string
+              description: Unique identifier for the merchant associated with this webhook event.
+              example: MERCHANT_ABC
+            payment_method_id:
+              type: string
+              description: Unique identifier for the payment method.
+              example: DCBFC736-2286-42DD-897D-160DCA80AED2
+            customer_id:
+              type: string
+              description: Unique identifier for the associated customer
+              example: 2EE24580-B97B-4949-A65C-929CCB9B9B8D
+            partner_customer_id:
+              $ref: '#/components/schemas/PartnerCustomerId'
+            previous_status:
+              type: string
+              description: The previous status of the card.
+              enum:
+              - ACTIVE
+              - INACTIVE
+              - CANCELED
+            new_status:
+              type: string
+              description: The new status of the card
+              enum:
+              - ACTIVE
+              - INACTIVE
+              - CANCELED
+            card_type:
+              $ref: '#/components/schemas/CardType'
+            card_design_id:
+              $ref: '#/components/schemas/CardDesignID'
+            tokens:
+              type: array
+              description: Payment method tokens that are defined by a third-party provider are included in this array by Imprint.
+              items:
+                $ref: '#/components/schemas/PaymentMethodToken'
+            created_at:
+              type: string
+              description: the RFC-3339 timestamp when the payment method was created
+              example: 2025-02-13 19:08:07+00:00
+            updated_at:
+              type: string
+              example: 2025-02-13 19:08:07+00:00
+              description: the RFC-3339 timestamp when the payment method was updated
+            customer_metadata:
+              type: object
+              description: A set of key-value pairs of metadata attached to the customer.
+              additionalProperties:
+                type: string
+              example:
+                loyalty_id: '840012345678'
+                membership_tier: gold
+    CustomerLinkWebhookPayload:
+      type: object
+      properties:
+        object:
+          type: string
+          description: The type of object associated with this webhook event.
+          enum:
+          - CUSTOMER_LINK
         data:
           type: object
           properties:
@@ -740,16 +730,24 @@ components:
               example: MERCHANT_ABC
             customer_id:
               type: string
-              description: Imprint's unique identifier for the associated customer.
+              description: Imprint's unique identifier for the customer
               example: 2EE24580-B97B-4949-A65C-929CCB9B9B8D
             partner_customer_id:
               $ref: '#/components/schemas/PartnerCustomerId'
             status:
-              $ref: '#/components/schemas/AccountStatusValue'
+              type: string
+              description: The status of the customer link
+              enum:
+              - ACTIVE
+              example: ACTIVE
+            created_at:
+              type: string
+              description: The RFC-3339 timestamp when the customer link was created
+              example: '2025-02-13T19:08:07Z'
             updated_at:
               type: string
-              description: RFC-3339 timestamp when the account status transition took effect. May be backdated when the transition has an effective date earlier than delivery (e.g. a debt sale).
-              example: '2026-05-01T12:00:00Z'
+              description: The RFC-3339 timestamp when the customer link was last updated
+              example: '2025-02-13T19:08:07Z'
             customer_metadata:
               type: object
               description: A set of key-value pairs of metadata attached to the customer.
@@ -758,34 +756,36 @@ components:
               example:
                 loyalty_id: '840012345678'
                 membership_tier: gold
-    Address:
-      type: object
-      description: Mailing address information
-      properties:
-        street_line1:
-          type: string
-          description: Primary street address
-          example: 123 Main St
-        street_line2:
-          type: string
-          description: Secondary street address (apartment, suite, etc.)
-          example: Apt 4B
-        city:
-          type: string
-          description: City name
-          example: San Francisco
-        state:
-          type: string
-          description: State or province
-          example: CA
-        postal_code:
-          type: string
-          description: ZIP or postal code
-          example: '94105'
-        country:
-          type: string
-          description: ISO-3166-1 alpha-3 Country Code
-          example: USA
+    RewardType:
+      type: string
+      enum:
+      - OFFER
+      - TRANSACTION
+      - ONE_TIME
+      - STATEMENT
+      - REFERRAL
+      example: TRANSACTION
+    PurchaseMethod:
+      type: string
+      enum:
+      - CHIP
+      - CONTACTLESS
+      - KEYEDIN
+      - ONLINE
+      - SWIPE
+      - QRCODE
+      - OCR
+      - UNKNOWN
+      nullable: true
+      description: How the purchase was completed.
+      example: CHIP
+    CardType:
+      type: string
+      description: The type of card
+      enum:
+      - PHYSICAL
+      - VIRTUAL
+      - UNIFIED
   securitySchemes:
     basicAuth:
       type: http
