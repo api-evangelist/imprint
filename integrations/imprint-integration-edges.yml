@@ -1,0 +1,16 @@
+generated: '2026-10-12'
+method: none
+source:
+- https://zapier.com/apps/imprint/integrations
+- https://n8n.io/integrations/imprint/
+- https://composio.dev/toolkits/imprint
+- https://monid.ai/tools/imprint
+checked:
+- https://composio.dev/toolkits/imprint
+- https://monid.ai/tools/imprint
+- https://n8n.io/integrations/imprint/
+- https://zapier.com/apps/imprint/integrations
+summary: null
+marketplace_apps: []
+edges: []
+templates: []
