@@ -2,6 +2,13 @@
   "repo": "imprint",
   "feeds": [
     {
+      "source": "https://tech.imprint.co/",
+      "feed_url": "https://tech.imprint.co/index.xml",
+      "title": "",
+      "saved": 0,
+      "method": "discovered"
+    },
+    {
       "source": "https://imprint.co/support",
       "feed_url": "https://imprint.co/support",
       "title": "",
@@ -10,5 +17,5 @@
     }
   ],
   "post_count": 0,
-  "fetched": "2026-10-03T12:30:02Z"
+  "fetched": "2026-10-10T13:15:00Z"
 }
