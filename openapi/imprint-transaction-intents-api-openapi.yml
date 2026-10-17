@@ -219,6 +219,88 @@ components:
       schema:
         type: string
   schemas:
+    TransactionCurrency:
+      type: string
+      description: The 3-character currency code of the amount in ISO 4217 format (e.g., "USD")
+      example: USD
+    TransactionIntentFoundError:
+      type: object
+      required:
+      - type
+      - message
+      properties:
+        type:
+          type: string
+          description: The category of error being returned.
+          example: TRANSACTION_INTENT_FOUND_ERROR
+        message:
+          type: string
+          description: A message describing the cause of the error.
+          example: 'Transaction intent not found for provided ID: txint_123'
+        param:
+          type: string
+          description: The param causing the error.
+          example: intent_id
+    InvalidRequestError:
+      type: object
+      properties:
+        path:
+          type: string
+          description: The path of the endpoint returning the error
+          example: /v2/customers
+        details:
+          type: array
+          items:
+            type: string
+          description: The details of the error being returned
+          example:
+          - 'email: must be a well-formed email address'
+        error:
+          type: string
+          description: The category of error being returned
+          example: Bad Request
+        status:
+          type: integer
+          description: The HTTP status code of the error
+          example: 400
+        timestamp:
+          type: string
+          description: The timestamp that the error occurred
+          example: '2025-01-20T18:18:22.923+00:00'
+    TransactionIntentStatus:
+      type: string
+      enum:
+      - CONFIRMED
+      - CANCELED
+      example: CONFIRMED
+    Address:
+      type: object
+      description: Mailing address information
+      properties:
+        street_line1:
+          type: string
+          description: Primary street address
+          example: 123 Main St
+        street_line2:
+          type: string
+          description: Secondary street address (apartment, suite, etc.)
+          example: Apt 4B
+        city:
+          type: string
+          description: City name
+          example: San Francisco
+        state:
+          type: string
+          description: State or province
+          example: CA
+        postal_code:
+          type: string
+          description: ZIP or postal code
+          example: '94105'
+        country:
+          type: string
+          description: ISO-3166-1 alpha-3 Country Code
+          example: USA
     TransactionIntent:
       type: object
       required:
@@ -267,88 +349,6 @@ components:
           additionalProperties: true
           example:
             platform_version: 2.1.0
-    InvalidRequestError:
-      type: object
-      properties:
-        path:
-          type: string
-          description: The path of the endpoint returning the error
-          example: /v2/customers
-        details:
-          type: array
-          items:
-            type: string
-          description: The details of the error being returned
-          example:
-          - 'email: must be a well-formed email address'
-        error:
-          type: string
-          description: The category of error being returned
-          example: Bad Request
-        status:
-          type: integer
-          description: The HTTP status code of the error
-          example: 400
-        timestamp:
-          type: string
-          description: The timestamp that the error occurred
-          example: '2025-01-20T18:18:22.923+00:00'
-    Address:
-      type: object
-      description: Mailing address information
-      properties:
-        street_line1:
-          type: string
-          description: Primary street address
-          example: 123 Main St
-        street_line2:
-          type: string
-          description: Secondary street address (apartment, suite, etc.)
-          example: Apt 4B
-        city:
-          type: string
-          description: City name
-          example: San Francisco
-        state:
-          type: string
-          description: State or province
-          example: CA
-        postal_code:
-          type: string
-          description: ZIP or postal code
-          example: '94105'
-        country:
-          type: string
-          description: ISO-3166-1 alpha-3 Country Code
-          example: USA
-    TransactionIntentStatus:
-      type: string
-      enum:
-      - CONFIRMED
-      - CANCELED
-      example: CONFIRMED
-    TransactionCurrency:
-      type: string
-      description: The 3-character currency code of the amount in ISO 4217 format (e.g., "USD")
-      example: USD
-    TransactionIntentFoundError:
-      type: object
-      required:
-      - type
-      - message
-      properties:
-        type:
-          type: string
-          description: The category of error being returned.
-          example: TRANSACTION_INTENT_FOUND_ERROR
-        message:
-          type: string
-          description: A message describing the cause of the error.
-          example: 'Transaction intent not found for provided ID: txint_123'
-        param:
-          type: string
-          description: The param causing the error.
-          example: intent_id
   securitySchemes:
     basicAuth:
       type: http

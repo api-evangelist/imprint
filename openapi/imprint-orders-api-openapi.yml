@@ -104,6 +104,9 @@ paths:
           description: Order deleted successfully
 components:
   schemas:
+    CurrencyAmount:
+      type: integer
+      description: Amount in the smallest currency unit (e.g., cents for USD)
     Address:
       type: object
       description: Mailing address information
@@ -132,16 +135,6 @@ components:
           type: string
           description: ISO-3166-1 alpha-3 Country Code
           example: USA
-    OrdersResponse:
-      type: object
-      required:
-      - orders
-      properties:
-        data:
-          type: array
-          items:
-            $ref: '#/components/schemas/Order'
-          description: List of orders
     OrderLine:
       type: object
       required:
@@ -171,12 +164,19 @@ components:
           allOf:
           - $ref: '#/components/schemas/CurrencyAmount'
           - example: 2500
+    OrdersResponse:
+      type: object
+      required:
+      - orders
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/Order'
+          description: List of orders
     Order:
       allOf:
       - $ref: '#/components/schemas/OrderBase'
-    CurrencyAmount:
-      type: integer
-      description: Amount in the smallest currency unit (e.g., cents for USD)
     OrderBase:
       type: object
       required:

@@ -107,7 +107,45 @@ paths:
               schema:
                 $ref: '#/components/schemas/Reward'
 components:
+  parameters:
+    limitParam:
+      name: limit
+      in: query
+      description: Limits the number of returned results
+      schema:
+        type: integer
+        minimum: 1
+        default: 10
+        format: int32
+    startingAfterParam:
+      name: starting_after
+      in: query
+      description: A cursor for use in pagination. An id that defines your place in the list.
+      schema:
+        type: string
   schemas:
+    RewardCurrency:
+      type: string
+      description: The 3-character currency code of the amount in ISO 4217 format (e.g., "USD") or a reward unit (e.g., "POINTS")
+      example: POINTS
+    RewardNotFoundError:
+      type: object
+      required:
+      - type
+      - message
+      properties:
+        type:
+          type: string
+          description: The category of error being returned
+          example: REWARD_NOT_FOUND_ERROR
+        message:
+          type: string
+          description: A message describing the cause of the error.
+          example: 'Reward not found for provided ID: pymd_123'
+        param:
+          type: string
+          description: The param causing the error
+          example: reward_id
     Reward:
       type: object
       required:
@@ -159,28 +197,6 @@ components:
       - STATEMENT
       - REFERRAL
       example: TRANSACTION
-    RewardNotFoundError:
-      type: object
-      required:
-      - type
-      - message
-      properties:
-        type:
-          type: string
-          description: The category of error being returned
-          example: REWARD_NOT_FOUND_ERROR
-        message:
-          type: string
-          description: A message describing the cause of the error.
-          example: 'Reward not found for provided ID: pymd_123'
-        param:
-          type: string
-          description: The param causing the error
-          example: reward_id
-    RewardCurrency:
-      type: string
-      description: The 3-character currency code of the amount in ISO 4217 format (e.g., "USD") or a reward unit (e.g., "POINTS")
-      example: POINTS
     RewardStatus:
       type: string
       enum:
@@ -189,22 +205,6 @@ components:
       - PENDING_DEDUCTION
       - DEDUCTED
       example: PENDING
-  parameters:
-    limitParam:
-      name: limit
-      in: query
-      description: Limits the number of returned results
-      schema:
-        type: integer
-        minimum: 1
-        default: 10
-        format: int32
-    startingAfterParam:
-      name: starting_after
-      in: query
-      description: A cursor for use in pagination. An id that defines your place in the list.
-      schema:
-        type: string
   securitySchemes:
     basicAuth:
       type: http

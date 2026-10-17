@@ -102,24 +102,10 @@ components:
           additionalProperties: true
           example:
             platform_version: 2.1.0
-    TransactionNotFoundError:
-      type: object
-      required:
-      - type
-      - message
-      properties:
-        type:
-          type: string
-          description: The category of error being returned.
-          example: TRANSACTION_FOUND_ERROR
-        message:
-          type: string
-          description: A message describing the cause of the error.
-          example: 'Transaction intent not found for provided ID: txn_123'
-        param:
-          type: string
-          description: The param causing the error.
-          example: transaction_id
+    TransactionCurrency:
+      type: string
+      description: The 3-character currency code of the amount in ISO 4217 format (e.g., "USD")
+      example: USD
     Address:
       type: object
       description: Mailing address information
@@ -148,15 +134,20 @@ components:
           type: string
           description: ISO-3166-1 alpha-3 Country Code
           example: USA
-    TransactionStatus:
+    PurchaseMethod:
       type: string
       enum:
-      - APPROVED
-      - UPDATED
-      - VOIDED
-      - CAPTURED
-      - REFUNDED
-      example: APPROVED
+      - CHIP
+      - CONTACTLESS
+      - KEYEDIN
+      - ONLINE
+      - SWIPE
+      - QRCODE
+      - OCR
+      - UNKNOWN
+      nullable: true
+      description: How the purchase was completed.
+      example: CHIP
     Merchant:
       type: object
       properties:
@@ -181,24 +172,33 @@ components:
         address:
           $ref: '#/components/schemas/Address'
           type: object
-    TransactionCurrency:
-      type: string
-      description: The 3-character currency code of the amount in ISO 4217 format (e.g., "USD")
-      example: USD
-    PurchaseMethod:
+    TransactionNotFoundError:
+      type: object
+      required:
+      - type
+      - message
+      properties:
+        type:
+          type: string
+          description: The category of error being returned.
+          example: TRANSACTION_FOUND_ERROR
+        message:
+          type: string
+          description: A message describing the cause of the error.
+          example: 'Transaction intent not found for provided ID: txn_123'
+        param:
+          type: string
+          description: The param causing the error.
+          example: transaction_id
+    TransactionStatus:
       type: string
       enum:
-      - CHIP
-      - CONTACTLESS
-      - KEYEDIN
-      - ONLINE
-      - SWIPE
-      - QRCODE
-      - OCR
-      - UNKNOWN
-      nullable: true
-      description: How the purchase was completed.
-      example: CHIP
+      - APPROVED
+      - UPDATED
+      - VOIDED
+      - CAPTURED
+      - REFUNDED
+      example: APPROVED
   securitySchemes:
     basicAuth:
       type: http

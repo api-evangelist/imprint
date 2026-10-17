@@ -91,22 +91,6 @@ paths:
         '204':
           description: Order event deleted successfully
 components:
-  parameters:
-    limitParam:
-      name: limit
-      in: query
-      description: Limits the number of returned results
-      schema:
-        type: integer
-        minimum: 1
-        default: 10
-        format: int32
-    startingAfterParam:
-      name: starting_after
-      in: query
-      description: A cursor for use in pagination. An id that defines your place in the list.
-      schema:
-        type: string
   schemas:
     OrderEventBase:
       type: object
@@ -166,6 +150,23 @@ components:
             quantity: 1
             rate: 274999
             rewards_rate: 2500
+    CurrencyAmount:
+      type: integer
+      description: Amount in the smallest currency unit (e.g., cents for USD)
+    OrderEventsResponse:
+      type: object
+      required:
+      - data
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/OrderEvent'
+          description: List of order events
+        has_more:
+          type: boolean
+        total:
+          type: integer
     OrderLine:
       type: object
       required:
@@ -195,26 +196,25 @@ components:
           allOf:
           - $ref: '#/components/schemas/CurrencyAmount'
           - example: 2500
-    CurrencyAmount:
-      type: integer
-      description: Amount in the smallest currency unit (e.g., cents for USD)
     OrderEvent:
       allOf:
       - $ref: '#/components/schemas/OrderEventBase'
-    OrderEventsResponse:
-      type: object
-      required:
-      - data
-      properties:
-        data:
-          type: array
-          items:
-            $ref: '#/components/schemas/OrderEvent'
-          description: List of order events
-        has_more:
-          type: boolean
-        total:
-          type: integer
+  parameters:
+    limitParam:
+      name: limit
+      in: query
+      description: Limits the number of returned results
+      schema:
+        type: integer
+        minimum: 1
+        default: 10
+        format: int32
+    startingAfterParam:
+      name: starting_after
+      in: query
+      description: A cursor for use in pagination. An id that defines your place in the list.
+      schema:
+        type: string
   securitySchemes:
     basicAuth:
       type: http
