@@ -1,16 +1,53 @@
 generated: '2026-10-12'
-method: none
+method: searched
 source:
 - https://zapier.com/apps/imprint/integrations
 - https://n8n.io/integrations/imprint/
 - https://composio.dev/toolkits/imprint
 - https://monid.ai/tools/imprint
 checked:
+- https://api.nuget.org/v3
 - https://composio.dev/toolkits/imprint
+- https://crates.io/api/v1
 - https://monid.ai/tools/imprint
 - https://n8n.io/integrations/imprint/
+- https://proxy.golang.org
+- https://pypi.org/pypi
+- https://registry.npmjs.org
+- https://repo1.maven.org/maven2
+- https://rubygems.org/api/v1
 - https://zapier.com/apps/imprint/integrations
 summary: null
 marketplace_apps: []
-edges: []
+edges:
+- partner_name: Maven Central
+  partner: maven-central
+  partner_match: register
+  type: register
+  direction: provider-built
+  category: official SDK (Java/JVM)
+  evidence: https://central.sonatype.com/artifact/co.imprint.sdk/imprint-sdk
+  channel: package-registry
+  relationship: distribution-channel
+  contract_reference:
+    register: Maven Central (public registry JSON)
+    spec_file: null
+    language: Java/JVM
+    packages:
+    - name: co.imprint.sdk:imprint-sdk
+      version: 1.0.0
+      released: '2026-10-15'
+      released_field: lastUpdated
+      lapsed: false
+      page: https://central.sonatype.com/artifact/co.imprint.sdk/imprint-sdk
+      repo_leg: github-org:imprint-tech
+      publisher_leg: groupId:imprint.co
+      matched_by: domain
+    current: true
+    signal_note: 'an official package on the registry: distribution, not an integration; lapsed = no release in
+      24 months'
+    detected_by: sweep-official-sdks.py
+    detected: '2026-10-18'
+  detected_by: sweep-official-sdks.py
+  first_seen: '2026-10-18'
 templates: []
