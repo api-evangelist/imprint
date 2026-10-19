@@ -44,6 +44,44 @@ paths:
                     type: boolean
                   total:
                     type: integer
+  /v2/rewards/rewards_categories:
+    get:
+      tags:
+      - Rewards
+      summary: List the product's reward categories
+      description: 'Returns the authenticated API key''s product-level standard earning
+
+        categories and active signup categories. The product is inferred from
+
+        the API key; this endpoint does not accept product, customer, or account
+
+        identifiers.
+
+
+        The response is assembled from the same live product, accrual, and offer
+
+        configuration used by Imprint''s application and servicing experiences;
+
+        it is not read from static rewards assets.
+
+
+        `earn_rate` is the configured exchange rate as a decimal string: reward
+
+        units earned per one transaction-currency unit, in the currency named by
+
+        `currency`. Its decimal places carry the precision the rate is
+
+        configured with.'
+      operationId: listProductRewardCategories
+      parameters:
+      - $ref: '#/components/parameters/localeParam'
+      responses:
+        '200':
+          description: Reward categories and earn rates
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RewardCategoriesResponse'
   /v2/rewards/{reward_id}:
     get:
       tags:
@@ -107,45 +145,71 @@ paths:
               schema:
                 $ref: '#/components/schemas/Reward'
 components:
-  parameters:
-    limitParam:
-      name: limit
-      in: query
-      description: Limits the number of returned results
-      schema:
-        type: integer
-        minimum: 1
-        default: 10
-        format: int32
-    startingAfterParam:
-      name: starting_after
-      in: query
-      description: A cursor for use in pagination. An id that defines your place in the list.
-      schema:
-        type: string
   schemas:
+    RewardCategoriesResponse:
+      type: object
+      required:
+      - currency
+      - categories
+      - special_categories
+      properties:
+        currency:
+          type: string
+          description: The reward currency configured for the account's program
+          example: FanCash
+        categories:
+          type: array
+          description: Standard transaction earning categories in display order
+          items:
+            $ref: '#/components/schemas/RewardCategory'
+        special_categories:
+          type: array
+          description: Active non-transaction categories, such as a signup bonus
+          items:
+            $ref: '#/components/schemas/SpecialRewardCategory'
     RewardCurrency:
       type: string
       description: The 3-character currency code of the amount in ISO 4217 format (e.g., "USD") or a reward unit (e.g., "POINTS")
       example: POINTS
-    RewardNotFoundError:
+    RewardStatus:
+      type: string
+      enum:
+      - PENDING
+      - AVAILABLE
+      - PENDING_DEDUCTION
+      - DEDUCTED
+      example: PENDING
+    SpecialRewardCategory:
       type: object
       required:
+      - name
+      - description
+      - amount
       - type
-      - message
       properties:
+        name:
+          type: string
+          example: Signup Bonus
+        description:
+          type: string
+          example: One-time bonus after first purchase
+        amount:
+          type: string
+          description: Display-formatted reward amount (e.g. "$200", "10,000 points").
+          example: $200
         type:
           type: string
-          description: The category of error being returned
-          example: REWARD_NOT_FOUND_ERROR
-        message:
-          type: string
-          description: A message describing the cause of the error.
-          example: 'Reward not found for provided ID: pymd_123'
-        param:
-          type: string
-          description: The param causing the error
-          example: reward_id
+          enum:
+          - SIGNUP
+    RewardType:
+      type: string
+      enum:
+      - OFFER
+      - TRANSACTION
+      - ONE_TIME
+      - STATEMENT
+      - REFERRAL
+      example: TRANSACTION
     Reward:
       type: object
       required:
@@ -188,23 +252,100 @@ components:
           additionalProperties: true
           example:
             platform_version: 2.1.0
-    RewardType:
+    RewardNotFoundError:
+      type: object
+      required:
+      - type
+      - message
+      properties:
+        type:
+          type: string
+          description: The category of error being returned
+          example: REWARD_NOT_FOUND_ERROR
+        message:
+          type: string
+          description: A message describing the cause of the error.
+          example: 'Reward not found for provided ID: pymd_123'
+        param:
+          type: string
+          description: The param causing the error
+          example: reward_id
+    RewardCategory:
+      type: object
+      required:
+      - name
+      - description
+      - earn_rate
+      - type
+      - merchants
+      properties:
+        name:
+          type: string
+          example: On-Merchant
+        description:
+          type: string
+          example: Purchases at Fanatics stores
+        earn_rate:
+          type: string
+          description: 'Reward units earned per one transaction-currency unit, as a decimal
+
+            string in the currency named by the response''s `currency` field. The
+
+            number of decimal places is the precision the rate is configured
+
+            with, so `"10.00"` and `"10"` are the same rate configured at
+
+            different precisions.
+
+            '
+          pattern: ^-?\d+(\.\d+)?$
+          example: '10.00'
+        type:
+          $ref: '#/components/schemas/RewardCategoryType'
+        merchants:
+          type: array
+          items:
+            type: string
+          example:
+          - Fanatics
+          - NFL Shop
+          - NBA Store
+    RewardCategoryType:
       type: string
       enum:
-      - OFFER
-      - TRANSACTION
-      - ONE_TIME
-      - STATEMENT
-      - REFERRAL
-      example: TRANSACTION
-    RewardStatus:
-      type: string
-      enum:
-      - PENDING
-      - AVAILABLE
-      - PENDING_DEDUCTION
-      - DEDUCTED
-      example: PENDING
+      - ON_MERCHANT
+      - OFF_MERCHANT
+  parameters:
+    startingAfterParam:
+      name: starting_after
+      in: query
+      description: A cursor for use in pagination. An id that defines your place in the list.
+      schema:
+        type: string
+    localeParam:
+      name: locale
+      in: query
+      required: false
+      description: 'Locale for translated category copy. English (`en`) is used when omitted
+
+        or unsupported; Spanish (`es`) and regional variants such as `es-MX` are
+
+        also supported.
+
+        '
+      schema:
+        type: string
+        default: en
+      example: en
+    limitParam:
+      name: limit
+      in: query
+      description: Limits the number of returned results
+      schema:
+        type: integer
+        minimum: 1
+        default: 10
+        format: int32
   securitySchemes:
     basicAuth:
       type: http

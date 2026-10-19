@@ -64,7 +64,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/CustomerNotFoundError'
         '409':
-          description: Customer already linked
+          description: Customer already linked. To change the linked `partner_customer_id`, use `PATCH /v2/customers/{customer_id}/link`.
           content:
             application/json:
               schema:
@@ -86,38 +86,59 @@ paths:
                         example: Customer already linked to a partner account
                       existing_link:
                         $ref: '#/components/schemas/CustomerLink'
+    patch:
+      tags:
+      - Customer Links
+      summary: Update the partner customer ID of a customer link
+      description: Changes the `partner_customer_id` of the customer's existing active link to a new value. Use this when the partner customer account an Imprint customer is linked to has changed, for example after a partner account merge. The link must already exist and be active; to create a link, use `POST /v2/customers/{customer_id}/link`. If the provided `partner_customer_id` already matches the active link, the link is returned unchanged. A successful change sends a `CUSTOMER_LINK` webhook with the new `partner_customer_id`.
+      operationId: updateCustomerLink
+      parameters:
+      - name: customer_id
+        in: path
+        required: true
+        description: The unique identifier for the Imprint customer
+        schema:
+          type: string
+          example: BBB815E9-F654-438D-9AD3-3F7BB8136FC0
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - partner_customer_id
+              properties:
+                partner_customer_id:
+                  $ref: '#/components/schemas/PartnerCustomerId'
+                metadata:
+                  type: object
+                  description: Additional linking metadata
+                  additionalProperties: true
+                  example:
+                    store_id: store_789
+                    platform_version: 2.1.0
+      responses:
+        '200':
+          description: Customer link updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CustomerLink'
+        '400':
+          description: Invalid request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InvalidRequestError'
+        '404':
+          description: Customer not found, or the customer has no active link to update
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CustomerNotFoundError'
 components:
   schemas:
-    PartnerCustomerId:
-      type: string
-      description: The unique identifier for the customer in the partner's system
-      example: PARTNER_USER_456
-    InvalidRequestError:
-      type: object
-      properties:
-        path:
-          type: string
-          description: The path of the endpoint returning the error
-          example: /v2/customers
-        details:
-          type: array
-          items:
-            type: string
-          description: The details of the error being returned
-          example:
-          - 'email: must be a well-formed email address'
-        error:
-          type: string
-          description: The category of error being returned
-          example: Bad Request
-        status:
-          type: integer
-          description: The HTTP status code of the error
-          example: 400
-        timestamp:
-          type: string
-          description: The timestamp that the error occurred
-          example: '2025-01-20T18:18:22.923+00:00'
     CustomerNotFoundError:
       type: object
       required:
@@ -172,6 +193,57 @@ components:
           example:
             store_id: store_789
             platform_version: 2.1.0
+    InvalidRequestError:
+      type: object
+      properties:
+        path:
+          type: string
+          description: The path of the endpoint returning the error
+          example: /v2/customers
+        details:
+          type: array
+          items:
+            type: string
+          description: The details of the error being returned
+          example:
+          - 'email: must be a well-formed email address'
+        error:
+          type: string
+          description: The category of error being returned
+          example: Bad Request
+        status:
+          type: integer
+          description: The HTTP status code of the error
+          example: 400
+        timestamp:
+          type: string
+          description: The timestamp that the error occurred
+          example: '2025-01-20T18:18:22.923+00:00'
+    PartnerCustomerId:
+      type: string
+      minLength: 1
+      maxLength: 128
+      pattern: ^[\x20-\x7E]+$
+      description: 'The unique identifier for the customer in the partner''s system.
+
+
+        Compared byte-for-byte, so `PARTNER_USER_456` and `partner_user_456` are
+
+        two different customers. Send the same casing everywhere or a later
+
+        lookup silently returns no match.
+
+
+        Restricted to printable ASCII (`\x20`–`\x7E`) rather than arbitrary
+
+        UTF-8: the value is propagated between internal services as an HTTP/2
+
+        header, which cannot carry non-ASCII bytes. The bound is published
+
+        rather than discovered.
+
+        '
+      example: PARTNER_USER_456
   securitySchemes:
     basicAuth:
       type: http

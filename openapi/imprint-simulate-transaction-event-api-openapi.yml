@@ -61,6 +61,10 @@ paths:
                   $ref: '#/components/schemas/PurchaseMethod'
                 merchant:
                   $ref: '#/components/schemas/Merchant'
+                evaluate_authorization:
+                  type: boolean
+                  default: false
+                  description: When true, runs the transaction through the real authorization engine. Only supported for APPROVED events.
       responses:
         '200':
           description: Transaction event created successfully
@@ -76,10 +80,28 @@ paths:
                 $ref: '#/components/schemas/ConflictError'
 components:
   schemas:
-    TransactionCurrency:
+    ConflictError:
+      type: object
+      description: object's current state prevents the requested update
+      properties:
+        type:
+          type: string
+        message:
+          type: string
+    PurchaseMethod:
       type: string
-      description: The 3-character currency code of the amount in ISO 4217 format (e.g., "USD")
-      example: USD
+      enum:
+      - CHIP
+      - CONTACTLESS
+      - KEYEDIN
+      - ONLINE
+      - SWIPE
+      - QRCODE
+      - OCR
+      - UNKNOWN
+      nullable: true
+      description: How the purchase was completed.
+      example: CHIP
     Address:
       type: object
       description: Mailing address information
@@ -102,34 +124,26 @@ components:
           example: CA
         postal_code:
           type: string
-          description: ZIP or postal code
-          example: '94105'
+          examples:
+          - '94105'
+          - 94105-1234
         country:
           type: string
           description: ISO-3166-1 alpha-3 Country Code
           example: USA
-    PurchaseMethod:
+    TransactionStatus:
       type: string
       enum:
-      - CHIP
-      - CONTACTLESS
-      - KEYEDIN
-      - ONLINE
-      - SWIPE
-      - QRCODE
-      - OCR
-      - UNKNOWN
-      nullable: true
-      description: How the purchase was completed.
-      example: CHIP
-    ConflictError:
-      type: object
-      description: object's current state prevents the requested update
-      properties:
-        type:
-          type: string
-        message:
-          type: string
+      - APPROVED
+      - UPDATED
+      - VOIDED
+      - CAPTURED
+      - REFUNDED
+      example: APPROVED
+    TransactionCurrency:
+      type: string
+      description: The 3-character currency code of the amount in ISO 4217 format (e.g., "USD")
+      example: USD
     Merchant:
       type: object
       properties:
@@ -154,6 +168,15 @@ components:
         address:
           $ref: '#/components/schemas/Address'
           type: object
+    SimulatedTransactionStatus:
+      type: string
+      enum:
+      - APPROVED
+      - DECLINED
+      - UPDATED
+      - VOIDED
+      - CAPTURED
+      - REFUNDED
     TransactionEvent:
       type: object
       properties:
@@ -166,16 +189,13 @@ components:
           description: Unique identifier of the event generated, matches the event_id in the transaction event notification
           example: E777214A-2D11-4CAD-9E8F-E1BD71D9FE67
         status:
-          $ref: '#/components/schemas/TransactionStatus'
-    TransactionStatus:
-      type: string
-      enum:
-      - APPROVED
-      - UPDATED
-      - VOIDED
-      - CAPTURED
-      - REFUNDED
-      example: APPROVED
+          $ref: '#/components/schemas/SimulatedTransactionStatus'
+        authorization_approved:
+          type: boolean
+          description: Whether the authorization engine approved the transaction. Present only when evaluate_authorization is true.
+        authorization_reason:
+          type: string
+          description: Authorization decision reason. Present only when evaluate_authorization is true and a reason is available.
   securitySchemes:
     basicAuth:
       type: http

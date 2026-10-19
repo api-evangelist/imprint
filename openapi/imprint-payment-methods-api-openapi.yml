@@ -16,7 +16,10 @@ paths:
       tags:
       - Payment Methods
       summary: List payment methods
+      description: '**Optional scope:** `PCI_DETAILS_READ`. Without it the request still succeeds, but `card.pci_details` (PAN, CVV, expiry) is omitted from the response.'
       operationId: searchPaymentMethods
+      x-optional-scopes:
+      - PCI_DETAILS_READ
       parameters:
       - name: customer_id
         in: query
@@ -59,7 +62,10 @@ paths:
       tags:
       - Payment Methods
       summary: List payment methods
+      description: '**Optional scope:** `PCI_DETAILS_READ`. Without it the request still succeeds, but `card.pci_details` (PAN, CVV, expiry) is omitted from the response.'
       operationId: searchPaymentMethodsPost
+      x-optional-scopes:
+      - PCI_DETAILS_READ
       requestBody:
         required: true
         content:
@@ -112,8 +118,13 @@ paths:
       tags:
       - Payment Methods
       summary: Retrieve a payment method
-      description: Retrieves the details of the payment method associated with the supplied `payment_method_id`
+      description: 'Retrieves the details of the payment method associated with the supplied `payment_method_id`.
+
+
+        **Optional scope:** `PCI_DETAILS_READ`. Without it the request still succeeds, but `card.pci_details` (PAN, CVV, expiry) is omitted from the response.'
       operationId: getPaymentMethod
+      x-optional-scopes:
+      - PCI_DETAILS_READ
       parameters:
       - name: payment_method_id
         in: path
@@ -135,8 +146,297 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/PaymentMethodNotFoundError'
+  /v2/payment_methods/{payment_method_id}/provision/{wallet}:
+    post:
+      tags:
+      - Payment Methods
+      summary: Add a payment method to a device wallet
+      description: 'Provisions the payment method into the device wallet named by the `wallet` path parameter, returning the encrypted payload the platform wallet SDK needs to finish adding the card. `apple_pay` expects the PassKit handshake; `google_pay` expects the Google wallet and device identifiers.
+
+
+        For `apple_pay`, your app must obtain the PassKit handshake before calling this endpoint. The `certificates`, `nonce`, and `nonce_signature` values come from the `PKAddPaymentPassViewControllerDelegate` callback and must be Base64-encoded — PassKit supplies them as `Data`, not strings. For `google_pay`, send the active wallet ID and stable device ID from the TapAndPay client.
+
+
+        The returned payload is single-use. Hand it straight to the wallet SDK; do not cache, log, or persist it. See the Add to Wallet guide for the full integration flow.
+
+
+        **Required scope:** `CARD_WRITE`'
+      operationId: provisionPaymentMethod
+      x-required-scopes:
+      - CARD_WRITE
+      parameters:
+      - name: payment_method_id
+        in: path
+        required: true
+        description: The unique identifier of the payment method
+        schema:
+          type: string
+          example: 9ED4FE47-8E9C-48E9-BBEF-094DF1789012
+      - name: wallet
+        in: path
+        required: true
+        description: The target device wallet.
+        schema:
+          type: string
+          enum:
+          - apple_pay
+          - google_pay
+          example: apple_pay
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ProvisionPaymentMethodRequest'
+      responses:
+        '200':
+          description: Provisioning payload for the selected wallet SDK.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProvisionPaymentMethodResponse'
+        '400':
+          description: Malformed body, failed field validation, or unsupported wallet.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProvisioningError'
+        '403':
+          description: The API key does not have card write access.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProvisioningError'
+        '404':
+          description: The payment method does not exist or is not owned by the caller.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProvisioningError'
+        '409':
+          description: Already provisioned to this wallet on this device.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProvisioningError'
+        '422':
+          description: 'Well-formed but not actionable — an ineligible device, or a PassKit nonce that has gone stale.
+
+            '
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProvisioningError'
+  /v2/payment_methods/{payment_method_id}/card_design:
+    get:
+      tags:
+      - Payment Methods
+      summary: Retrieve a payment method's card design
+      operationId: getPaymentMethodCardDesign
+      description: 'Returns the card design printed on this payment method.
+
+
+        The design belongs to the card, not the customer: a customer with several
+
+        cards can have a different design on each, so read it per payment method.
+
+        Enumerate a customer''s cards with
+
+        `GET /v2/customers/{customer_id}/payment_methods` and call this for the one
+
+        you care about.
+
+
+        A card may have no design resolved yet — some programs assign a default
+
+        asynchronously. That is a normal state, not an error: the response is `200`
+
+        with `selected: false` and no `card_design`.
+
+
+        Only `CARD` payment methods carry a design. A loan or bank account returns
+
+        `200` with `selected: false`.'
+      parameters:
+      - name: payment_method_id
+        $ref: '#/components/parameters/paymentMethodIdParam'
+      responses:
+        '200':
+          description: The payment method's card design, if any
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaymentMethodCardDesignResponse'
+        '404':
+          description: Payment method not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaymentMethodNotFoundError'
 components:
   schemas:
+    GooglePayProvisionResponse:
+      title: Google Pay (google_pay)
+      type: object
+      required:
+      - wallet
+      - provisioning_payload
+      properties:
+        wallet:
+          type: string
+          enum:
+          - google_pay
+          description: The wallet the payment method was provisioned into.
+        provisioning_payload:
+          $ref: '#/components/schemas/GooglePayPayload'
+    GooglePayProvisionRequest:
+      title: Google Pay (google_pay)
+      type: object
+      required:
+      - wallet_id
+      - device_id
+      additionalProperties: false
+      properties:
+        wallet_id:
+          type: string
+          minLength: 1
+          description: The device-scoped Google Pay wallet identifier.
+        device_id:
+          type: string
+          minLength: 1
+          description: The Android device identifier that will receive the token.
+    ProvisioningError:
+      type: object
+      required:
+      - error
+      properties:
+        error:
+          type: object
+          required:
+          - code
+          - message
+          properties:
+            code:
+              type: string
+              description: A machine-readable code identifying the failure.
+              enum:
+              - invalid_request
+              - wallet_unsupported
+              - permission_denied
+              - payment_method_not_found
+              - already_provisioned
+              - device_ineligible
+              example: device_ineligible
+            message:
+              type: string
+              description: A message describing the cause of the error.
+              example: this device cannot accept this card
+            details:
+              type: object
+              additionalProperties: true
+              description: Additional context about the failure, when available.
+    ApplePayProvisionRequest:
+      title: Apple Pay (apple_pay)
+      type: object
+      required:
+      - certificates
+      - nonce
+      - nonce_signature
+      additionalProperties: false
+      properties:
+        certificates:
+          type: array
+          minItems: 1
+          description: 'The Base64-encoded DER certificate chain from the PassKit delegate (`generateRequestWithCertificateChain:`), leaf first, then intermediate. PassKit supplies these as `[Data]` — Base64-encode each element.
+
+            '
+          items:
+            type: string
+          example:
+          - MIIEgjCCBCmgAwIBAgI
+          - MIIDxTCCA2ugAwIBAgI
+        nonce:
+          type: string
+          description: The Base64-encoded nonce from PassKit.
+          example: 3vT9Kw==
+        nonce_signature:
+          type: string
+          description: The Base64-encoded nonce signature from PassKit.
+          example: R0hJSktMTU5PUFE=
+    ProvisionPaymentMethodResponse:
+      description: 'The response shape matches the selected wallet: Option 1 is Apple Pay (`apple_pay`) and Option 2 is Google Pay (`google_pay`).
+
+        '
+      oneOf:
+      - $ref: '#/components/schemas/ApplePayProvisionResponse'
+      - $ref: '#/components/schemas/GooglePayProvisionResponse'
+    PaymentMethodCardDesignResponse:
+      type: object
+      required:
+      - selected
+      properties:
+        selected:
+          type: boolean
+          description: 'Whether a card design is resolved for this payment method. When `false`,
+
+            `card_design` is omitted.
+
+            '
+        card_design:
+          $ref: '#/components/schemas/CardDesign'
+    PaymentMethodNotFoundError:
+      type: object
+      required:
+      - type
+      - message
+      properties:
+        type:
+          type: string
+          description: The category of error being returned
+          example: PAYMENT_METHOD_NOT_FOUND_ERROR
+        message:
+          type: string
+          description: A message describing the cause of the error.
+          example: 'Payment method not found for provided ID: pymd_123'
+        param:
+          type: string
+          description: The param causing the error
+          example: payment_method_id
+    ApplePayProvisionResponse:
+      title: Apple Pay (apple_pay)
+      type: object
+      required:
+      - wallet
+      - provisioning_payload
+      properties:
+        wallet:
+          type: string
+          enum:
+          - apple_pay
+          description: The wallet the payment method was provisioned into.
+        provisioning_payload:
+          $ref: '#/components/schemas/ApplePayPayload'
+    ApplePayPayload:
+      type: object
+      required:
+      - activation_data
+      - encrypted_pass_data
+      - ephemeral_public_key
+      description: 'Maps field-for-field onto `PKAddPaymentPassRequest`. All values are Base64-encoded.
+
+        '
+      properties:
+        activation_data:
+          type: string
+          description: Assign to `PKAddPaymentPassRequest.activationData`.
+        encrypted_pass_data:
+          type: string
+          description: Assign to `PKAddPaymentPassRequest.encryptedPassData`.
+        ephemeral_public_key:
+          type: string
+          description: 'Assign to `PKAddPaymentPassRequest.ephemeralPublicKey`. Imprint uses elliptic-curve key exchange, so this is always the key field — the RSA `wrappedKey` variant is not used.
+
+            '
     PaymentMethod:
       type: object
       required:
@@ -163,63 +463,13 @@ components:
           description: The `id` of the Imprint customer that the payment method belongs to.
           example: B40A789E-BD46-4BB9-B63E-F9919582694C
         card:
-          type: object
-          description: When payment method is a `CARD` type, this object will have card specific data.
-          required:
-          - last4
-          - brand
-          properties:
-            last4:
-              type: string
-              example: '1234'
-              minLength: 4
-              maxLength: 4
-              description: The last 4 digits of the card PAN
-            network:
-              type: string
-              description: Name of the card issuer
-              enum:
-              - VISA
-              - MASTERCARD
-              - AMEX
-              - ''
-            card_type:
-              $ref: '#/components/schemas/CardType'
-            card_design_id:
-              $ref: '#/components/schemas/CardDesignID'
-            exp_month:
-              type: string
-              description: The month the card expires (MM format).
-              example: '06'
-            exp_year:
-              type: string
-              description: The year the card expires (YYYY format).
-              example: '2027'
-            pci_details:
-              type: object
-              description: The pci details of the returned card. Only verified PCI compliant partners will be able to retrieve pci details in production environments.
-              properties:
-                pan:
-                  type: string
-                  description: The unique 16-digit number printed on the front of a payment card, used to identify the cardholder's account.
-                  example: '5105105105105100'
-                exp_month:
-                  type: string
-                  description: The month the card expires
-                  example: '06'
-                exp_year:
-                  type: string
-                  description: The year the card expires
-                  example: '26'
-                cvv:
-                  type: string
-                  description: A three- or four-digit security code used to verify card-not-present transactions and prevent fraud.
-                  example: '123'
-            tokens:
-              type: array
-              description: Payment method tokens that are defined by a third-party provider are included in this array by Imprint.
-              items:
-                $ref: '#/components/schemas/PaymentMethodToken'
+          allOf:
+          - $ref: '#/components/schemas/PaymentMethodCardDetails'
+          description: When the payment method is a non-secured `CARD` type, this object holds its card-specific data. Exactly one of `card` or `secured_credit_card` is present.
+        secured_credit_card:
+          allOf:
+          - $ref: '#/components/schemas/PaymentMethodCardDetails'
+          description: Card-specific data for a secured-credit-card product, emitted in place of `card` when the payment method's product is a secured credit card. Exactly one of `card` or `secured_credit_card` is present.
         bank_account:
           type: object
           description: When payment method is a `BANK_ACCOUNT` type, this object will have bank account specific data.
@@ -305,6 +555,234 @@ components:
       type: string
       description: The 3-character currency code of the amount in ISO 4217 format (e.g., "USD")
       example: USD
+    CardType:
+      type: string
+      description: The type of card
+      enum:
+      - PHYSICAL
+      - VIRTUAL
+      - UNIFIED
+    PaymentMethodCardDetails:
+      type: object
+      description: Card-specific data for a `CARD` payment method. Shared by the `card` and `secured_credit_card` properties on `PaymentMethod`; exactly one of those is present.
+      required:
+      - last4
+      - brand
+      properties:
+        last4:
+          type: string
+          example: '1234'
+          minLength: 4
+          maxLength: 4
+          description: The last 4 digits of the card PAN
+        network:
+          type: string
+          description: Name of the card issuer
+          enum:
+          - VISA
+          - MASTERCARD
+          - AMEX
+          - ''
+        card_type:
+          $ref: '#/components/schemas/CardType'
+        card_design_id:
+          $ref: '#/components/schemas/CardDesignID'
+        exp_month:
+          type: string
+          description: The month the card expires (MM format).
+          example: '06'
+        exp_year:
+          type: string
+          description: The year the card expires (YYYY format).
+          example: '2027'
+        pci_details:
+          type: object
+          description: The pci details of the returned card. Only verified PCI compliant partners will be able to retrieve pci details in production environments.
+          properties:
+            pan:
+              type: string
+              description: The unique 16-digit number printed on the front of a payment card, used to identify the member's account.
+              example: '5105105105105100'
+            exp_month:
+              type: string
+              description: The month the card expires
+              example: '06'
+            exp_year:
+              type: string
+              description: The year the card expires
+              example: '26'
+            cvv:
+              type: string
+              description: A three- or four-digit security code used to verify card-not-present transactions and prevent fraud.
+              example: '123'
+        tokens:
+          type: array
+          description: Payment method tokens that are defined by a third-party provider are included in this array by Imprint.
+          items:
+            $ref: '#/components/schemas/PaymentMethodToken'
+    ProvisionPaymentMethodRequest:
+      description: 'Select the request body that matches the `wallet` path value: Option 1 is Apple Pay (`apple_pay`) and Option 2 is Google Pay (`google_pay`). Fields from the two options cannot be mixed.
+
+        '
+      oneOf:
+      - $ref: '#/components/schemas/ApplePayProvisionRequest'
+      - $ref: '#/components/schemas/GooglePayProvisionRequest'
+    CardDesignID:
+      type: string
+      description: Imprint ID for the graphic design printed on the card
+      example: 3b9c1f3e-52a0-44c1-b131-a7ab0099a214
+    PaymentMethodToken:
+      type: object
+      required:
+      - type
+      - token
+      - created_at
+      - updated_at
+      properties:
+        type:
+          type: string
+          enum:
+          - ADYEN
+          - APPLE_WALLET
+          - CYBERSOURCE
+          - WORLDPAY
+        token:
+          type: string
+          description: The token, as defined by the processor
+        pan_reference_id:
+          type: string
+          description: An ID that represents the PAN and is defined by the processor
+        expires_at:
+          type: string
+          description: Only present for tokens that expire. If this field is absent, the token has no expiration and no action is needed. When present, this is the RFC-3339 timestamp after which the token can no longer be used. A timestamp in the past means the token is stale and should not be used. Retrieving the payment method refreshes expired tokens where possible; if a newly retrieved token's `expires_at` is still in the past, it cannot be used.
+          example: 2025-02-14 19:08:07+00:00
+        created_at:
+          type: string
+          description: the RFC-3339 timestamp when the payment method was created
+          example: 2025-02-13 19:08:07+00:00
+        updated_at:
+          type: string
+          example: 2025-02-13 19:08:07+00:00
+          description: the RFC-3339 timestamp when the payment method was updated
+    GooglePayPayload:
+      type: object
+      required:
+      - opaque_payment_card
+      - network
+      - wallet_type
+      description: Values passed to the Google Pay push-tokenization SDK.
+      properties:
+        opaque_payment_card:
+          type: string
+          description: The opaque payment card returned by the card processor.
+        network:
+          type: string
+          description: The card network identifier returned by the card processor.
+        wallet_type:
+          type: string
+          enum:
+          - GOOGLE_PAY
+          description: The processor wallet type used for provisioning.
+    CardDesignStatus:
+      type: string
+      description: 'Availability of the design. Only `ACTIVE` designs can be selected.
+
+        '
+      enum:
+      - UNSPECIFIED
+      - ACTIVE
+      - INACTIVE
+      - DELETED
+      example: ACTIVE
+    CardDesignOrientation:
+      type: string
+      description: Orientation of the card design artwork
+      enum:
+      - UNSPECIFIED
+      - VERTICAL
+      - HORIZONTAL
+      example: VERTICAL
+    CardDesignType:
+      type: string
+      description: 'Whether this is the program''s default design or one of its selectable alternates.
+
+        '
+      enum:
+      - UNSPECIFIED
+      - DEFAULT
+      - REGULAR
+      example: REGULAR
+    CardDesign:
+      type: object
+      required:
+      - id
+      - name
+      - access_min_rank
+      - type
+      - status
+      properties:
+        id:
+          $ref: '#/components/schemas/CardDesignID'
+        name:
+          type: string
+          description: Human-readable name of the card design
+          example: Midnight Black
+        access_min_rank:
+          type: integer
+          format: int64
+          description: 'Minimum loyalty tier rank a customer must hold to select this design. `0`
+
+            means available to everyone. A design with a rank above the customer''s own
+
+            tier is returned but cannot be selected by them.
+
+            '
+          example: 0
+        loyalty_tier_name:
+          type: string
+          description: 'Name of the loyalty tier corresponding to `access_min_rank`. Currently always
+
+            omitted; use `access_min_rank` to determine gating.
+
+            '
+          example: GOLD
+        categories:
+          type: object
+          additionalProperties:
+            type: string
+          description: Partner-defined key/value labels for grouping designs
+        image_orientation:
+          $ref: '#/components/schemas/CardDesignOrientation'
+        type:
+          $ref: '#/components/schemas/CardDesignType'
+        status:
+          $ref: '#/components/schemas/CardDesignStatus'
+        light_asset_url_path:
+          type: string
+          description: 'Absolute URL of the card design artwork for light mode. Artwork is served
+
+            from `https://assets.imprint.co` or `https://app.imprint.co` depending on
+
+            where it was uploaded.
+
+            '
+          example: https://assets.imprint.co/brand-assets/card-designs/light/midnight-black.svg
+        dark_asset_url_path:
+          type: string
+          description: 'Absolute URL of the card design artwork for dark mode. Artwork is served
+
+            from `https://assets.imprint.co` or `https://app.imprint.co` depending on
+
+            where it was uploaded.
+
+            '
+          example: https://assets.imprint.co/brand-assets/card-designs/dark/midnight-black.svg
+        virtual_digital_card_art_id:
+          type: string
+          description: Processor-side art identifier for the virtual card
+        physical_digital_card_art_id:
+          type: string
+          description: Processor-side art identifier for the physical card
     InvalidRequestError:
       type: object
       properties:
@@ -331,65 +809,15 @@ components:
           type: string
           description: The timestamp that the error occurred
           example: '2025-01-20T18:18:22.923+00:00'
-    CardDesignID:
-      type: string
-      description: Imprint ID for the graphic design printed on the card
-      example: 3b9c1f3e-52a0-44c1-b131-a7ab0099a214
-    PaymentMethodNotFoundError:
-      type: object
-      required:
-      - type
-      - message
-      properties:
-        type:
-          type: string
-          description: The category of error being returned
-          example: PAYMENT_METHOD_NOT_FOUND_ERROR
-        message:
-          type: string
-          description: A message describing the cause of the error.
-          example: 'Payment method not found for provided ID: pymd_123'
-        param:
-          type: string
-          description: The param causing the error
-          example: payment_method_id
-    CardType:
-      type: string
-      description: The type of card
-      enum:
-      - PHYSICAL
-      - VIRTUAL
-      - UNIFIED
-    PaymentMethodToken:
-      type: object
-      required:
-      - type
-      - token
-      - created_at
-      - updated_at
-      properties:
-        type:
-          type: string
-          enum:
-          - ADYEN
-          - APPLE_WALLET
-          - CYBERSOURCE
-          - WORLDPAY
-        token:
-          type: string
-          description: The token, as defined by the processor
-        pan_reference_id:
-          type: string
-          description: An ID that represents the PAN and is defined by the processor
-        created_at:
-          type: string
-          description: the RFC-3339 timestamp when the payment method was created
-          example: 2025-02-13 19:08:07+00:00
-        updated_at:
-          type: string
-          example: 2025-02-13 19:08:07+00:00
-          description: the RFC-3339 timestamp when the payment method was updated
   parameters:
+    paymentMethodIdParam:
+      name: payment_method_id
+      in: path
+      required: true
+      description: The unique identifier of the payment method
+      schema:
+        type: string
+        example: 9ED4FE47-8E9C-48E9-BBEF-094DF1789012
     startingAfterParam:
       name: starting_after
       in: query

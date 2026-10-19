@@ -22,7 +22,7 @@ paths:
         in: query
         description: The unique identifier for the customer in the partner's system
         schema:
-          type: string
+          $ref: '#/components/schemas/PartnerCustomerId'
       - name: limit
         $ref: '#/components/parameters/limitParam'
       - name: starting_after
@@ -47,8 +47,7 @@ paths:
               type: object
               properties:
                 partner_customer_id:
-                  description: The unique identifier for the customer in the partner's system
-                  type: string
+                  $ref: '#/components/schemas/PartnerCustomerId'
                 ssn:
                   description: The ssn of the customer without hyphens
                   example: '123456789'
@@ -76,8 +75,13 @@ paths:
       tags:
       - Customers
       summary: Retrieve a customer
-      description: Retrieves the details of an existing customer by ID
+      description: 'Retrieves the details of an existing customer by ID
+
+
+        **Optional scope:** `AUTHORIZED_USER_READ`. Without it the request still succeeds, but `authorized_users` is omitted from the response.'
       operationId: getCustomer
+      x-optional-scopes:
+      - AUTHORIZED_USER_READ
       parameters:
       - name: customer_id
         in: path
@@ -95,6 +99,317 @@ paths:
                 $ref: '#/components/schemas/Customer'
         '404':
           description: Customer not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CustomerNotFoundError'
+  /v2/customers/{customer_id}/accounts:
+    get:
+      tags:
+      - Customers
+      summary: List a customer's accounts
+      description: 'Lists the accounts a customer holds with your program, each with the
+
+        `account_id` needed to read it in detail and the type of product it is.
+
+
+        Scoped to the product your API key is issued for, so it never returns an
+
+        account a customer holds with another program. A customer who has no
+
+        account with your program returns `404`.
+
+
+        **Required scope:** `ACCOUNT_READ`'
+      operationId: listAccounts
+      x-required-scopes:
+      - ACCOUNT_READ
+      parameters:
+      - name: customer_id
+        in: path
+        $ref: '#/components/parameters/customerIdParam'
+      responses:
+        '200':
+          description: The customer's accounts
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                - accounts
+                properties:
+                  accounts:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/AccountSummary'
+        '403':
+          description: API key is missing the required `ACCOUNT_READ` scope
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+        '404':
+          description: Customer not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CustomerNotFoundError'
+  /v2/customers/{customer_id}/accounts/{account_id}:
+    get:
+      tags:
+      - Customers
+      summary: Get customer's account
+      description: 'Returns the servicing snapshot for one of a customer''s card accounts:
+
+        account status, credit limit and available credit, the amounts they owe,
+
+        the statement due date, and the APR.
+
+
+        Every amount is a positive integer in the smallest currency unit and
+
+        represents what the customer owes. A customer who owes nothing — or who
+
+        is in credit — reads as `0` rather than a negative number.
+
+
+        Per-statement figures — the statement balance, the minimum due, and
+
+        interest — are not on this response. Read them from the statements API.
+
+
+        `as_of` is when the snapshot was calculated, which is when the request
+
+        was served. It is the instant the figures were true, and what a cached
+
+        copy should be labelled with.
+
+
+        A secured account whose security deposit has not been funded reads as
+
+        `PENDING_FUNDING` and carries status and `as_of` alone: it has no credit
+
+        line yet, so there is no credit limit, balance, due date or APR to
+
+        report. This endpoint answers whether the account is usable now, not
+
+        where the application got to — the deposit amount, the offer terms and
+
+        the deadline to fund by are on `GET /v2/applications/{application_id}`,
+
+        whose `product_offers[].result` is `ACCEPTED_PENDING_ACTION` for the
+
+        same account.
+
+
+        **Required scope:** `ACCOUNT_READ`'
+      operationId: getAccount
+      x-required-scopes:
+      - ACCOUNT_READ
+      parameters:
+      - name: customer_id
+        in: path
+        $ref: '#/components/parameters/customerIdParam'
+      - name: account_id
+        in: path
+        $ref: '#/components/parameters/accountIdParam'
+      responses:
+        '200':
+          description: Customer account
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Account'
+        '403':
+          description: API key is missing the required `ACCOUNT_READ` scope
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+        '404':
+          description: 'The customer was not found, or the account does not belong to them.
+
+            `type` distinguishes the two: `CUSTOMER_NOT_FOUND_ERROR` means we hold
+
+            no record of the customer, `ACCOUNT_NOT_FOUND_ERROR` means the
+
+            `account_id` is not one of theirs.
+
+            '
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CustomerNotFoundError'
+  /v2/customers/{customer_id}/accounts/{account_id}/rewards_categories:
+    get:
+      tags:
+      - Customers
+      summary: List an account's reward categories
+      description: 'Returns the account program''s standard earning categories and active
+
+        signup categories. The response is assembled from the same live product,
+
+        accrual, and offer configuration used by Imprint''s application and
+
+        servicing experiences; it is not read from static rewards assets.
+
+
+        `earn_rate` is the configured exchange rate as a decimal string: reward
+
+        units earned per one transaction-currency unit, in the currency named by
+
+        `currency`. Its decimal places carry the precision the rate is
+
+        configured with.
+
+
+        **Required scope:** `ACCOUNT_READ`'
+      operationId: listRewardCategories
+      x-required-scopes:
+      - ACCOUNT_READ
+      parameters:
+      - name: customer_id
+        in: path
+        $ref: '#/components/parameters/customerIdParam'
+      - name: account_id
+        in: path
+        $ref: '#/components/parameters/accountIdParam'
+      - $ref: '#/components/parameters/localeParam'
+      responses:
+        '200':
+          description: Reward categories and earn rates
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RewardCategoriesResponse'
+        '403':
+          description: API key is missing the required `ACCOUNT_READ` scope
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+        '404':
+          description: 'The customer was not found, or the account does not belong to them.
+
+            `type` distinguishes the two cases.
+
+            '
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CustomerNotFoundError'
+  /v2/customers/{customer_id}/accounts/{account_id}/statements:
+    get:
+      tags:
+      - Customers
+      summary: List an account's statements
+      description: 'Returns the account''s closed billing statements, newest first. A
+
+        statement appears here once its cycle has closed; the cycle in progress
+
+        is not a statement yet — read the account itself for where the customer
+
+        stands today.
+
+
+        Amounts follow the convention on a card statement: what the customer was
+
+        charged is positive and what was credited back to them is negative. So
+
+        `purchases`, `interest`, and `fees` are positive, while `payments`,
+
+        `credits`, and `refunds` are negative.
+
+
+        Each statement carries a `pdf_url`: a short-lived link to the statement
+
+        document as the cardholder sees it. Fetch it promptly rather than storing
+
+        it — see the field description for how long it lasts.
+
+
+        Results are paginated. When `has_more` is `true`, pass the response''s
+
+        `next_page_token` back as `starting_after` to retrieve the next page.
+
+
+        Each statement carries `as_of`: when it was read, which is when the
+
+        request was served. Not when the cycle closed — that is
+
+        `period_end_date`.
+
+
+        **Required scope:** `ACCOUNT_READ` — the same scope as the account reads.
+
+        A statement is a closed cycle of the account, so a key that can read the
+
+        account can read its statements.'
+      operationId: listStatements
+      x-required-scopes:
+      - ACCOUNT_READ
+      parameters:
+      - name: customer_id
+        in: path
+        $ref: '#/components/parameters/customerIdParam'
+      - name: account_id
+        in: path
+        $ref: '#/components/parameters/accountIdParam'
+      - name: limit
+        in: query
+        description: Limits the number of returned statements
+        schema:
+          type: integer
+          minimum: 1
+          maximum: 100
+          default: 10
+          format: int32
+      - name: starting_after
+        in: query
+        description: 'A cursor for use in pagination. Unlike other list endpoints, this
+
+          takes the opaque `next_page_token` from the previous response rather
+
+          than a statement id. Omit it for the first page.
+
+          '
+        schema:
+          type: string
+      responses:
+        '200':
+          description: List of customer statements
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StatementListResponse'
+        '400':
+          description: '`starting_after` is not a token this endpoint issued. Page tokens are
+
+            opaque and are only valid as returned in a previous
+
+            `next_page_token`.
+
+            '
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InvalidRequestError'
+        '403':
+          description: API key is missing the required `ACCOUNT_READ` scope
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+        '404':
+          description: 'The customer was not found, or the account does not belong to them.
+
+            `type` distinguishes the two: `CUSTOMER_NOT_FOUND_ERROR` means we hold
+
+            no record of the customer, `ACCOUNT_NOT_FOUND_ERROR` means the
+
+            `account_id` is not one of theirs.
+
+            '
           content:
             application/json:
               schema:
@@ -145,7 +460,10 @@ paths:
       tags:
       - Customers
       summary: List customer's payment methods
+      description: '**Optional scope:** `PCI_DETAILS_READ`. Without it the request still succeeds, but `card.pci_details` (PAN, CVV, expiry) is omitted from the response.'
       operationId: getPaymentMethods
+      x-optional-scopes:
+      - PCI_DETAILS_READ
       parameters:
       - name: customer_id
         $ref: '#/components/parameters/customerIdParam'
@@ -172,7 +490,10 @@ paths:
       tags:
       - Customers
       summary: List customer's transaction intents
+      description: '**Required scope:** `TRANSACTION_INTENT_READ`'
       operationId: getTransactionIntents
+      x-required-scopes:
+      - TRANSACTION_INTENT_READ
       parameters:
       - name: customer_id
         in: path
@@ -189,6 +510,12 @@ paths:
                     type: array
                     items:
                       $ref: '#/components/schemas/TransactionIntent'
+        '403':
+          description: API key is missing the required `TRANSACTION_INTENT_READ` scope
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
         '404':
           description: Transaction not found
           content:
@@ -205,9 +532,18 @@ paths:
       - name: customer_id
         $ref: '#/components/parameters/customerIdParam'
       - name: limit
-        $ref: '#/components/parameters/limitParam'
+        in: query
+        description: Number of transactions to return, between 1 and 25. Values above 25 are capped at 25.
+        schema:
+          type: integer
+          minimum: 1
+          maximum: 25
+          default: 10
+          format: int32
       - name: starting_after
         $ref: '#/components/parameters/startingAfterParam'
+      - name: expand
+        $ref: '#/components/parameters/transactionExpandParam'
       responses:
         '200':
           description: List of customer transactions
@@ -224,6 +560,12 @@ paths:
                     type: boolean
                   total:
                     type: integer
+        '400':
+          description: Unsupported expand value
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InvalidRequestError'
         '404':
           description: Customer not found
           content:
@@ -268,96 +610,299 @@ paths:
                 $ref: '#/components/schemas/CustomerNotFoundError'
 components:
   schemas:
-    DateOfBirth:
+    RewardCategoriesResponse:
       type: object
-      description: Customer's date of birth
+      required:
+      - currency
+      - categories
+      - special_categories
       properties:
-        year:
-          type: integer
-          description: Year of birth
-          minimum: 1900
-          example: 1990
-        month:
-          type: integer
-          description: Month of birth
-          minimum: 1
-          maximum: 12
-          example: 1
-        day:
-          type: integer
-          description: Day of birth
-          minimum: 1
-          maximum: 31
-          example: 1
-    RewardCurrency:
-      type: string
-      description: The 3-character currency code of the amount in ISO 4217 format (e.g., "USD") or a reward unit (e.g., "POINTS")
-      example: POINTS
-    PurchaseMethod:
-      type: string
-      enum:
-      - CHIP
-      - CONTACTLESS
-      - KEYEDIN
-      - ONLINE
-      - SWIPE
-      - QRCODE
-      - OCR
-      - UNKNOWN
-      nullable: true
-      description: How the purchase was completed.
-      example: CHIP
-    Merchant:
-      type: object
-      properties:
-        network_id:
+        currency:
           type: string
-          description: Unique identifier of the merchant assigned by the payment network.
-          example: '234923454545'
-        name:
-          type: string
-          description: Name of the merchant where the transaction occurred.
-          example: Target
-        category:
-          type: string
-          nullable: true
-          description: Name of the merchant category.
-          example: Grocery Stores
-        category_code:
-          type: string
-          nullable: true
-          description: Code associated with the merchant category.
-          example: '5411'
-        address:
-          $ref: '#/components/schemas/Address'
-          type: object
-    CardType:
-      type: string
-      description: The type of card
-      enum:
-      - PHYSICAL
-      - VIRTUAL
-      - UNIFIED
-    CustomerListResponse:
-      type: object
-      properties:
-        data:
+          description: The reward currency configured for the account's program
+          example: FanCash
+        categories:
           type: array
+          description: Standard transaction earning categories in display order
           items:
-            $ref: '#/components/schemas/Customer'
-        has_more:
-          type: boolean
-        total:
-          type: integer
-    TransactionStatus:
+            $ref: '#/components/schemas/RewardCategory'
+        special_categories:
+          type: array
+          description: Active non-transaction categories, such as a signup bonus
+          items:
+            $ref: '#/components/schemas/SpecialRewardCategory'
+    TransactionIntentStatus:
       type: string
       enum:
-      - APPROVED
-      - UPDATED
-      - VOIDED
-      - CAPTURED
-      - REFUNDED
-      example: APPROVED
+      - CONFIRMED
+      - CANCELED
+      example: CONFIRMED
+    ApiError:
+      type: object
+      required:
+      - error
+      properties:
+        error:
+          type: object
+          required:
+          - type
+          - message
+          properties:
+            type:
+              type: string
+              description: The category of error being returned
+              example: BAD_REQUEST_ERROR
+            message:
+              type: string
+              description: A message describing the cause of the error
+              example: 'unsupported reward_type: INVALID, must be STATEMENT or DELAYED'
+    PartnerCustomerId:
+      type: string
+      minLength: 1
+      maxLength: 128
+      pattern: ^[\x20-\x7E]+$
+      description: 'The unique identifier for the customer in the partner''s system.
+
+
+        Compared byte-for-byte, so `PARTNER_USER_456` and `partner_user_456` are
+
+        two different customers. Send the same casing everywhere or a later
+
+        lookup silently returns no match.
+
+
+        Restricted to printable ASCII (`\x20`–`\x7E`) rather than arbitrary
+
+        UTF-8: the value is propagated between internal services as an HTTP/2
+
+        header, which cannot carry non-ASCII bytes. The bound is published
+
+        rather than discovered.
+
+        '
+      example: PARTNER_USER_456
+    Address:
+      type: object
+      description: Mailing address information
+      properties:
+        street_line1:
+          type: string
+          description: Primary street address
+          example: 123 Main St
+        street_line2:
+          type: string
+          description: Secondary street address (apartment, suite, etc.)
+          example: Apt 4B
+        city:
+          type: string
+          description: City name
+          example: San Francisco
+        state:
+          type: string
+          description: State or province
+          example: CA
+        postal_code:
+          type: string
+          examples:
+          - '94105'
+          - 94105-1234
+        country:
+          type: string
+          description: ISO-3166-1 alpha-3 Country Code
+          example: USA
+    AuthorizedUser:
+      type: object
+      description: An authorized user on a primary cardholder's account.
+      properties:
+        authorized_user_id:
+          type: string
+          description: Unique identifier for the authorized user. Stable for the lifetime of the authorized user record, and the identifier to store when reconciling with the Payment Method webhook. Note that removing and re-adding the same person creates a new authorized user record with a new identifier.
+          example: A1B2C3D4-5566-7788-99AA-BBCCDDEEFF00
+        first_name:
+          type: string
+          description: The authorized user's first name.
+          example: Jane
+        last_name:
+          type: string
+          description: The authorized user's last name.
+          example: Doe
+        email:
+          type: string
+          description: The authorized user's email address, as supplied by the primary cardholder when the authorized user was added. This value is not independently verified by Imprint.
+          example: jane.doe@email.com
+        phone:
+          type: string
+          description: The authorized user's phone number in E.164 format, as supplied by the primary cardholder when the authorized user was added. This value is not independently verified by Imprint.
+          example: '+15551234567'
+        date_of_birth:
+          $ref: '#/components/schemas/DateOfBirth'
+        postal_code:
+          type: string
+          description: The postal code of the authorized user's address.
+          example: '60601'
+        payment_method_id:
+          type: string
+          description: Identifier of the authorized user's current card. Omitted when no card is currently issued to them. This value changes when a card is reissued or replaced, so it should not be used as a durable key for the authorized user — use `authorized_user_id` instead.
+          example: DCBFC736-2286-42DD-897D-160DCA80AED3
+        status:
+          type: string
+          description: The authorized user's status on this account. `pending` means the authorized user has been added but is not yet activated. `inactive` means they are no longer active on this account.
+          enum:
+          - active
+          - pending
+          - inactive
+          example: active
+    AccountStatus:
+      type: string
+      description: "The lifecycle state of a customer's card account.\n\nTwo states mean \"approved but not usable yet\", and they are distinct:\n\n- `PENDING_FUNDING` is a secured account whose security deposit has not\n  been funded. The deposit is either still owed or a submitted payment\n  is settling, so no card has been issued and the account cannot be\n  spent on. It has no credit limit, balance or APR yet.\n- `INACTIVE` is an approved account whose card has not been activated\n  yet — for a secured account, one whose deposit has already settled.\n\n`PENDING_FUNDING` only ever appears on a secured-credit-card product.\n"
+      enum:
+      - OPEN
+      - INACTIVE
+      - PENDING_FUNDING
+      - CLOSED
+      - REVOKED
+      - CHARGE_OFF
+      - SOLD
+      example: OPEN
+    AccountType:
+      type: string
+      description: 'The type of product the account is. Absent when the product''s type could
+
+        not be determined.
+
+        '
+      enum:
+      - CREDITCARD
+      - SECUREDCREDITCARD
+      - INSTALLMENT_LOAN
+      - SPENDCARD
+      example: CREDITCARD
+    TransactionLifecycleEvent:
+      type: object
+      description: One step in a transaction's lifecycle, e.g. the authorization, a capture, a refund or a confirmed dispute.
+      required:
+      - event_id
+      - status
+      - amount
+      - created_at
+      properties:
+        event_id:
+          type: string
+          description: Unique identifier of this event. Matches the `event_id` in the Transaction Event Notification and the `transaction_event_id` on a Reward.
+          example: B2D4A1C9-7F3E-4C8A-9E61-2A5B8D0F4C17
+        status:
+          $ref: '#/components/schemas/TransactionStatus'
+        amount:
+          type: integer
+          description: Amount of this event in min units, e.g. the captured or refunded amount. Always non-negative.
+          example: 5000
+        created_at:
+          type: string
+          description: The RFC-3339 timestamp when the event was created
+          example: 2025-02-13 19:08:07+00:00
+        reward:
+          allOf:
+          - $ref: '#/components/schemas/Reward'
+          nullable: true
+          x-go-type: nullable.Nullable[Reward]
+          x-go-type-import:
+            path: github.com/oapi-codegen/nullable
+          x-go-type-skip-optional-pointer: true
+          description: The reward earned or deducted by this event, as returned by `GET /v2/rewards`. Present only when requested with `expand=events.reward`. Null when the event has no reward.
+    RewardStatus:
+      type: string
+      enum:
+      - PENDING
+      - AVAILABLE
+      - PENDING_DEDUCTION
+      - DEDUCTED
+      example: PENDING
+    Account:
+      type: object
+      description: 'A customer''s card account as of now. Amounts are integers in the
+
+        smallest currency unit and are always positive: they say what the
+
+        customer owes, so a paid-off or in-credit account reads as `0`.
+
+
+        Per-statement figures live in the statements API, not here.
+
+        '
+      required:
+      - customer_id
+      - account_id
+      - status
+      - as_of
+      properties:
+        customer_id:
+          type: string
+          description: The unique identifier for the customer
+          example: 2EE24580-B97B-4949-A65C-929CCB9B9B8D
+        account_id:
+          type: string
+          description: The unique identifier for the account
+          example: 7C1F9A34-2D6B-4E58-8A03-B15E7D9C4620
+        status:
+          $ref: '#/components/schemas/AccountStatus'
+        currency:
+          $ref: '#/components/schemas/TransactionCurrency'
+        credit_limit:
+          $ref: '#/components/schemas/CurrencyAmount'
+        available_credit:
+          $ref: '#/components/schemas/CurrencyAmount'
+        current_balance:
+          allOf:
+          - $ref: '#/components/schemas/CurrencyAmount'
+          description: 'Everything posted to the account, including activity since the last
+
+            statement closed.
+
+            '
+        overdue_amount:
+          allOf:
+          - $ref: '#/components/schemas/CurrencyAmount'
+          description: 'The amount past due — a minimum payment that was not made by its due
+
+            date and is still outstanding. Unlike the minimum due, this moves
+
+            during the cycle: a payment brings it down. `0` on an account that is
+
+            current.
+
+            '
+        statement_due_date:
+          type: string
+          description: 'RFC-3339 timestamp when payment for the most recently closed
+
+            statement is due. Absent on an account still in its first billing
+
+            cycle, which has no closed statement yet.
+
+            '
+          example: '2026-06-15T00:00:00Z'
+        apr_percentage:
+          type: number
+          description: The purchase APR as a percentage
+          example: 24.99
+        as_of:
+          type: string
+          description: 'RFC-3339 timestamp of when this snapshot was calculated, which is
+
+            when the request was served. Balances move continuously — a purchase
+
+            or a payment lands between one read and the next — so this is the
+
+            instant the figures above were true. Use it to label or expire a
+
+            cached copy, and to order two reads of the same account.
+
+            '
+          example: '2026-08-27T14:22:31Z'
+    TransactionCurrency:
+      type: string
+      description: The 3-character currency code of the amount in ISO 4217 format (e.g., "USD")
+      example: USD
     PaymentMethod:
       type: object
       required:
@@ -384,63 +929,13 @@ components:
           description: The `id` of the Imprint customer that the payment method belongs to.
           example: B40A789E-BD46-4BB9-B63E-F9919582694C
         card:
-          type: object
-          description: When payment method is a `CARD` type, this object will have card specific data.
-          required:
-          - last4
-          - brand
-          properties:
-            last4:
-              type: string
-              example: '1234'
-              minLength: 4
-              maxLength: 4
-              description: The last 4 digits of the card PAN
-            network:
-              type: string
-              description: Name of the card issuer
-              enum:
-              - VISA
-              - MASTERCARD
-              - AMEX
-              - ''
-            card_type:
-              $ref: '#/components/schemas/CardType'
-            card_design_id:
-              $ref: '#/components/schemas/CardDesignID'
-            exp_month:
-              type: string
-              description: The month the card expires (MM format).
-              example: '06'
-            exp_year:
-              type: string
-              description: The year the card expires (YYYY format).
-              example: '2027'
-            pci_details:
-              type: object
-              description: The pci details of the returned card. Only verified PCI compliant partners will be able to retrieve pci details in production environments.
-              properties:
-                pan:
-                  type: string
-                  description: The unique 16-digit number printed on the front of a payment card, used to identify the cardholder's account.
-                  example: '5105105105105100'
-                exp_month:
-                  type: string
-                  description: The month the card expires
-                  example: '06'
-                exp_year:
-                  type: string
-                  description: The year the card expires
-                  example: '26'
-                cvv:
-                  type: string
-                  description: A three- or four-digit security code used to verify card-not-present transactions and prevent fraud.
-                  example: '123'
-            tokens:
-              type: array
-              description: Payment method tokens that are defined by a third-party provider are included in this array by Imprint.
-              items:
-                $ref: '#/components/schemas/PaymentMethodToken'
+          allOf:
+          - $ref: '#/components/schemas/PaymentMethodCardDetails'
+          description: When the payment method is a non-secured `CARD` type, this object holds its card-specific data. Exactly one of `card` or `secured_credit_card` is present.
+        secured_credit_card:
+          allOf:
+          - $ref: '#/components/schemas/PaymentMethodCardDetails'
+          description: Card-specific data for a secured-credit-card product, emitted in place of `card` when the payment method's product is a secured credit card. Exactly one of `card` or `secured_credit_card` is present.
         bank_account:
           type: object
           description: When payment method is a `BANK_ACCOUNT` type, this object will have bank account specific data.
@@ -522,156 +1017,153 @@ components:
           description: Additional metadata for the payment method
           example:
             platform_version: 2.1.0
-    TransactionIntentStatus:
-      type: string
-      enum:
-      - CONFIRMED
-      - CANCELED
-      example: CONFIRMED
-    Reward:
+    RewardCategory:
       type: object
       required:
-      - id
-      - customer_id
-      - amount
-      - status
+      - name
+      - description
+      - earn_rate
       - type
-      - created_at
+      - merchants
       properties:
-        id:
+        name:
           type: string
-          example: 2EE24580-B97B-4949-A65C-929CCB9B9B8D
-        customer_id:
+          example: On-Merchant
+        description:
           type: string
-          example: 9B5E1EE0-2E1C-46E7-81B9-3C3917204BE4
-        transaction_event_id:
+          example: Purchases at Fanatics stores
+        earn_rate:
           type: string
-          description: transaction that generated this reward, if applicable.
-          example: E777214A-2D11-4CAD-9E8F-E1BD71D9FE67
-        amount:
-          type: integer
-          description: reward amount in min units.
+          description: 'Reward units earned per one transaction-currency unit, as a decimal
+
+            string in the currency named by the response''s `currency` field. The
+
+            number of decimal places is the precision the rate is configured
+
+            with, so `"10.00"` and `"10"` are the same rate configured at
+
+            different precisions.
+
+            '
+          pattern: ^-?\d+(\.\d+)?$
+          example: '10.00'
         type:
-          $ref: '#/components/schemas/RewardType'
-        currency:
-          $ref: '#/components/schemas/RewardCurrency'
-        status:
-          $ref: '#/components/schemas/RewardStatus'
-        created_at:
-          type: string
-          description: the RFC-3339 timestamp when the reward was created
-          example: 2025-02-13 19:08:07+00:00
-        updated_at:
-          type: string
-          description: the RFC-3339 timestamp when the reward was last updated
-          example: 2025-02-13 19:08:07+00:00
-        metadata:
-          type: object
-          additionalProperties: true
+          $ref: '#/components/schemas/RewardCategoryType'
+        merchants:
+          type: array
+          items:
+            type: string
           example:
-            platform_version: 2.1.0
-    RewardStatus:
-      type: string
-      enum:
-      - PENDING
-      - AVAILABLE
-      - PENDING_DEDUCTION
-      - DEDUCTED
-      example: PENDING
-    PaymentMethodToken:
+          - Fanatics
+          - NFL Shop
+          - NBA Store
+    DateOfBirth:
       type: object
-      required:
-      - type
-      - token
-      - created_at
-      - updated_at
+      description: Customer's date of birth
       properties:
-        type:
+        year:
+          type: integer
+          description: Year of birth
+          minimum: 1900
+          example: 1990
+        month:
+          type: integer
+          description: Month of birth
+          minimum: 1
+          maximum: 12
+          example: 1
+        day:
+          type: integer
+          description: Day of birth
+          minimum: 1
+          maximum: 31
+          example: 1
+    CardType:
+      type: string
+      description: The type of card
+      enum:
+      - PHYSICAL
+      - VIRTUAL
+      - UNIFIED
+    StatementListResponse:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/Statement'
+        has_more:
+          type: boolean
+        next_page_token:
           type: string
+          description: 'Opaque cursor for the next page, present only when `has_more` is
+
+            `true`. Pass it back as `starting_after` to fetch the following page.
+
+            Treat it as opaque — its contents are not a statement id and may
+
+            change.
+
+            '
+          example: eyJsYXN0X3N0YXRlbWVudF9pZCI6MTAzfQ
+    PaymentMethodCardDetails:
+      type: object
+      description: Card-specific data for a `CARD` payment method. Shared by the `card` and `secured_credit_card` properties on `PaymentMethod`; exactly one of those is present.
+      required:
+      - last4
+      - brand
+      properties:
+        last4:
+          type: string
+          example: '1234'
+          minLength: 4
+          maxLength: 4
+          description: The last 4 digits of the card PAN
+        network:
+          type: string
+          description: Name of the card issuer
           enum:
-          - ADYEN
-          - APPLE_WALLET
-          - CYBERSOURCE
-          - WORLDPAY
-        token:
+          - VISA
+          - MASTERCARD
+          - AMEX
+          - ''
+        card_type:
+          $ref: '#/components/schemas/CardType'
+        card_design_id:
+          $ref: '#/components/schemas/CardDesignID'
+        exp_month:
           type: string
-          description: The token, as defined by the processor
-        pan_reference_id:
+          description: The month the card expires (MM format).
+          example: '06'
+        exp_year:
           type: string
-          description: An ID that represents the PAN and is defined by the processor
-        created_at:
-          type: string
-          description: the RFC-3339 timestamp when the payment method was created
-          example: 2025-02-13 19:08:07+00:00
-        updated_at:
-          type: string
-          example: 2025-02-13 19:08:07+00:00
-          description: the RFC-3339 timestamp when the payment method was updated
-    Transaction:
-      type: object
-      required:
-      - id
-      - customer_id
-      - payment_method_id
-      - amount
-      - currency
-      - status
-      - network_transaction_id
-      - created_at
-      properties:
-        id:
-          type: string
-          example: E777214A-2D11-4CAD-9E8F-E1BD71D9FE67
-        intent_id:
-          type: string
-          description: Reference to the original transaction intent
-          example: 5B30532B-5B5B-4826-8DE2-429C57B705FD
-        customer_id:
-          type: string
-          description: The imprint customer ID for the transaction
-          example: 9B5E1EE0-2E1C-46E7-81B9-3C3917204BE4
-        authorization_code:
-          type: string
-          description: Code authorizing the transaction.
-          example: ABCD
-        payment_method_id:
-          type: string
-          description: Identifies the payment method used for the transaction
-          example: DCBFC736-2286-42DD-897D-160DCA80AED2
-        purchase_method:
-          $ref: '#/components/schemas/PurchaseMethod'
-        amount:
-          type: integer
-          description: Transaction amount in min units.
-        currency:
-          $ref: '#/components/schemas/TransactionCurrency'
-        status:
-          $ref: '#/components/schemas/TransactionStatus'
-        network_transaction_id:
-          type: string
-          description: The network's unique identifier for the transaction. Examples include Visa Transaction ID, Mastercard Trace ID, and American Express Network Reference ID
-        partner_transaction_id:
-          type: string
-          description: The partner's unique transaction id
-        created_at:
-          type: string
-          description: the RFC-3339 timestamp when the transaction was created
-          example: 2025-02-13 19:08:07+00:00
-        updated_at:
-          type: string
-          description: the RFC-3339 timestamp when the transaction was last updated
-          example: 2025-02-13 19:08:07+00:00
-        merchant:
-          $ref: '#/components/schemas/Merchant'
-        metadata:
+          description: The year the card expires (YYYY format).
+          example: '2027'
+        pci_details:
           type: object
-          additionalProperties: true
-          example:
-            platform_version: 2.1.0
-    TransactionCurrency:
-      type: string
-      description: The 3-character currency code of the amount in ISO 4217 format (e.g., "USD")
-      example: USD
+          description: The pci details of the returned card. Only verified PCI compliant partners will be able to retrieve pci details in production environments.
+          properties:
+            pan:
+              type: string
+              description: The unique 16-digit number printed on the front of a payment card, used to identify the member's account.
+              example: '5105105105105100'
+            exp_month:
+              type: string
+              description: The month the card expires
+              example: '06'
+            exp_year:
+              type: string
+              description: The year the card expires
+              example: '26'
+            cvv:
+              type: string
+              description: A three- or four-digit security code used to verify card-not-present transactions and prevent fraud.
+              example: '123'
+        tokens:
+          type: array
+          description: Payment method tokens that are defined by a third-party provider are included in this array by Imprint.
+          items:
+            $ref: '#/components/schemas/PaymentMethodToken'
     Customer:
       type: object
       description: Represents a customer in the Imprint system
@@ -734,62 +1226,37 @@ components:
           type: string
           description: the RFC-3339 date when the customer was created
           example: 2025-02-13 19:08:07+00:00
-    Address:
+        authorized_users:
+          type: array
+          description: 'The authorized users on this customer''s account for the requesting partner''s card program. Authorized users share the primary cardholder''s customer record, so they are returned here rather than as separate customers. Requires the `AUTHORIZED_USER_READ` scope; omitted entirely when the API key does not hold it.
+
+
+            Only returned by Retrieve Customer. The Search Customers endpoints share this schema but never populate this field.
+
+
+            The array is historical, not current: every authorized user ever added to the account is included, and those no longer on it carry `status: inactive`. Filter on `status` to get only the authorized users who can currently transact.'
+          items:
+            $ref: '#/components/schemas/AuthorizedUser'
+    CustomerListResponse:
       type: object
-      description: Mailing address information
       properties:
-        street_line1:
-          type: string
-          description: Primary street address
-          example: 123 Main St
-        street_line2:
-          type: string
-          description: Secondary street address (apartment, suite, etc.)
-          example: Apt 4B
-        city:
-          type: string
-          description: City name
-          example: San Francisco
-        state:
-          type: string
-          description: State or province
-          example: CA
-        postal_code:
-          type: string
-          description: ZIP or postal code
-          example: '94105'
-        country:
-          type: string
-          description: ISO-3166-1 alpha-3 Country Code
-          example: USA
-    CustomerProgramStatus:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/Customer'
+        has_more:
+          type: boolean
+        total:
+          type: integer
+    RewardType:
       type: string
-      description: Status of a customer within a card program.
       enum:
-      - OPEN
-      - CLOSED
-    CardDesignID:
-      type: string
-      description: Imprint ID for the graphic design printed on the card
-      example: 3b9c1f3e-52a0-44c1-b131-a7ab0099a214
-    TransactionNotFoundError:
-      type: object
-      required:
-      - type
-      - message
-      properties:
-        type:
-          type: string
-          description: The category of error being returned.
-          example: TRANSACTION_FOUND_ERROR
-        message:
-          type: string
-          description: A message describing the cause of the error.
-          example: 'Transaction intent not found for provided ID: txn_123'
-        param:
-          type: string
-          description: The param causing the error.
-          example: transaction_id
+      - OFFER
+      - TRANSACTION
+      - ONE_TIME
+      - STATEMENT
+      - REFERRAL
+      example: TRANSACTION
     CustomerNotFoundError:
       type: object
       required:
@@ -808,19 +1275,6 @@ components:
           type: string
           description: The param causing the error
           example: customer_id
-    PartnerCustomerId:
-      type: string
-      description: The unique identifier for the customer in the partner's system
-      example: PARTNER_USER_456
-    RewardType:
-      type: string
-      enum:
-      - OFFER
-      - TRANSACTION
-      - ONE_TIME
-      - STATEMENT
-      - REFERRAL
-      example: TRANSACTION
     TransactionIntent:
       type: object
       required:
@@ -869,6 +1323,457 @@ components:
           additionalProperties: true
           example:
             platform_version: 2.1.0
+    Reward:
+      type: object
+      required:
+      - id
+      - customer_id
+      - amount
+      - status
+      - type
+      - created_at
+      properties:
+        id:
+          type: string
+          example: 2EE24580-B97B-4949-A65C-929CCB9B9B8D
+        customer_id:
+          type: string
+          example: 9B5E1EE0-2E1C-46E7-81B9-3C3917204BE4
+        transaction_event_id:
+          type: string
+          description: transaction that generated this reward, if applicable.
+          example: E777214A-2D11-4CAD-9E8F-E1BD71D9FE67
+        amount:
+          type: integer
+          description: reward amount in min units.
+        type:
+          $ref: '#/components/schemas/RewardType'
+        currency:
+          $ref: '#/components/schemas/RewardCurrency'
+        status:
+          $ref: '#/components/schemas/RewardStatus'
+        created_at:
+          type: string
+          description: the RFC-3339 timestamp when the reward was created
+          example: 2025-02-13 19:08:07+00:00
+        updated_at:
+          type: string
+          description: the RFC-3339 timestamp when the reward was last updated
+          example: 2025-02-13 19:08:07+00:00
+        metadata:
+          type: object
+          additionalProperties: true
+          example:
+            platform_version: 2.1.0
+    CardDesignID:
+      type: string
+      description: Imprint ID for the graphic design printed on the card
+      example: 3b9c1f3e-52a0-44c1-b131-a7ab0099a214
+    PaymentMethodToken:
+      type: object
+      required:
+      - type
+      - token
+      - created_at
+      - updated_at
+      properties:
+        type:
+          type: string
+          enum:
+          - ADYEN
+          - APPLE_WALLET
+          - CYBERSOURCE
+          - WORLDPAY
+        token:
+          type: string
+          description: The token, as defined by the processor
+        pan_reference_id:
+          type: string
+          description: An ID that represents the PAN and is defined by the processor
+        expires_at:
+          type: string
+          description: Only present for tokens that expire. If this field is absent, the token has no expiration and no action is needed. When present, this is the RFC-3339 timestamp after which the token can no longer be used. A timestamp in the past means the token is stale and should not be used. Retrieving the payment method refreshes expired tokens where possible; if a newly retrieved token's `expires_at` is still in the past, it cannot be used.
+          example: 2025-02-14 19:08:07+00:00
+        created_at:
+          type: string
+          description: the RFC-3339 timestamp when the payment method was created
+          example: 2025-02-13 19:08:07+00:00
+        updated_at:
+          type: string
+          example: 2025-02-13 19:08:07+00:00
+          description: the RFC-3339 timestamp when the payment method was updated
+    TransactionExpand:
+      type: string
+      description: Related data that can be included on a transaction with the `expand` query parameter. `events` adds the transaction's lifecycle events; `events.reward` adds the events and, on each event, the reward it earned or deducted.
+      enum:
+      - events
+      - events.reward
+      example: events
+    Transaction:
+      type: object
+      required:
+      - id
+      - customer_id
+      - payment_method_id
+      - amount
+      - currency
+      - status
+      - network_transaction_id
+      - created_at
+      properties:
+        id:
+          type: string
+          example: E777214A-2D11-4CAD-9E8F-E1BD71D9FE67
+        intent_id:
+          type: string
+          description: Reference to the original transaction intent
+          example: 5B30532B-5B5B-4826-8DE2-429C57B705FD
+        customer_id:
+          type: string
+          description: The imprint customer ID for the transaction
+          example: 9B5E1EE0-2E1C-46E7-81B9-3C3917204BE4
+        authorization_code:
+          type: string
+          description: Code authorizing the transaction.
+          example: ABCD
+        payment_method_id:
+          type: string
+          description: Identifies the payment method used for the transaction
+          example: DCBFC736-2286-42DD-897D-160DCA80AED2
+        purchase_method:
+          $ref: '#/components/schemas/PurchaseMethod'
+        amount:
+          type: integer
+          description: Transaction amount in min units.
+        currency:
+          $ref: '#/components/schemas/TransactionCurrency'
+        status:
+          $ref: '#/components/schemas/TransactionStatus'
+        network_transaction_id:
+          type: string
+          description: The network's unique identifier for the transaction. Examples include Visa Transaction ID, Mastercard Trace ID, and American Express Network Reference ID
+        partner_transaction_id:
+          type: string
+          description: The partner's unique transaction id
+        created_at:
+          type: string
+          description: the RFC-3339 timestamp when the transaction was created
+          example: 2025-02-13 19:08:07+00:00
+        updated_at:
+          type: string
+          description: the RFC-3339 timestamp when the transaction was last updated
+          example: 2025-02-13 19:08:07+00:00
+        merchant:
+          $ref: '#/components/schemas/Merchant'
+        metadata:
+          type: object
+          additionalProperties: true
+          example:
+            platform_version: 2.1.0
+        events:
+          type: array
+          description: Events in the transaction's lifecycle, oldest first. Present only when requested with `expand=events`.
+          items:
+            $ref: '#/components/schemas/TransactionLifecycleEvent'
+    RewardCurrency:
+      type: string
+      description: The 3-character currency code of the amount in ISO 4217 format (e.g., "USD") or a reward unit (e.g., "POINTS")
+      example: POINTS
+    PurchaseMethod:
+      type: string
+      enum:
+      - CHIP
+      - CONTACTLESS
+      - KEYEDIN
+      - ONLINE
+      - SWIPE
+      - QRCODE
+      - OCR
+      - UNKNOWN
+      nullable: true
+      description: How the purchase was completed.
+      example: CHIP
+    Statement:
+      type: object
+      description: 'One closed billing cycle. Amounts are integers in the smallest currency
+
+        unit and are signed the way a card statement reads: charges to the
+
+        customer are positive, money credited back to them is negative.
+
+
+        Every amount is optional. Ledger records only the lines that had activity
+
+        in the cycle, so a quiet month omits most of them rather than reporting
+
+        them as `0`.
+
+        '
+      required:
+      - statement_id
+      - customer_id
+      - account_id
+      - as_of
+      properties:
+        statement_id:
+          type: string
+          description: The unique identifier for the statement
+          example: 8A31B2C0-4F6D-4A21-9E3B-5C1D0F7A2B84
+        customer_id:
+          type: string
+          description: The unique identifier for the customer
+          example: 2EE24580-B97B-4949-A65C-929CCB9B9B8D
+        account_id:
+          type: string
+          description: The unique identifier for the account the statement belongs to
+          example: 7C1F9A34-2D6B-4E58-8A03-B15E7D9C4620
+        period_start_date:
+          type: string
+          description: RFC-3339 timestamp of the first day of the billing cycle
+          example: '2026-05-16T00:00:00Z'
+        period_end_date:
+          type: string
+          description: 'RFC-3339 timestamp when the billing cycle closed. This is the
+
+            statement date.
+
+            '
+          example: '2026-06-15T00:00:00Z'
+        due_date:
+          type: string
+          description: RFC-3339 timestamp when payment for this statement is due
+          example: '2026-07-10T00:00:00Z'
+        pdf_url:
+          type: string
+          description: 'A pre-signed link to the statement PDF — the same document the
+
+            cardholder sees. The link expires one hour after this response is
+
+            issued, so treat it as a redirect target or an immediate download
+
+            rather than something to persist: a stored copy will stop working,
+
+            and re-reading the statement is how you get a fresh one.
+
+
+            Omitted when the document is not available. A statement''s PDF is
+
+            rendered shortly after its cycle closes, so the newest statement can
+
+            appear here before its document does; the rest of the statement is
+
+            still accurate.
+
+            '
+          example: https://imprint-statements.s3.us-east-1.amazonaws.com/statements/8A31B2C0.pdf?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Expires=3600
+        currency:
+          $ref: '#/components/schemas/TransactionCurrency'
+        statement_balance:
+          allOf:
+          - $ref: '#/components/schemas/CurrencyAmount'
+          description: 'The balance owed when the cycle closed. Negative if the customer had
+
+            paid ahead.
+
+            '
+        minimum_due:
+          allOf:
+          - $ref: '#/components/schemas/CurrencyAmount'
+          description: 'The minimum payment required by `due_date` to keep the account
+
+            current.
+
+            '
+        previous_balance:
+          allOf:
+          - $ref: '#/components/schemas/CurrencyAmount'
+          description: The balance carried over from the previous cycle.
+        purchases:
+          allOf:
+          - $ref: '#/components/schemas/CurrencyAmount'
+          description: Total purchases posted during the cycle.
+        payments:
+          allOf:
+          - $ref: '#/components/schemas/CurrencyAmount'
+          description: 'Total payments received during the cycle. Negative, because a payment
+
+            reduces what the customer owes.
+
+            '
+        credits:
+          allOf:
+          - $ref: '#/components/schemas/CurrencyAmount'
+          description: Total credits applied during the cycle. Negative.
+        refunds:
+          allOf:
+          - $ref: '#/components/schemas/CurrencyAmount'
+          description: Total refunds posted during the cycle. Negative.
+        interest:
+          allOf:
+          - $ref: '#/components/schemas/CurrencyAmount'
+          description: Interest charged during the cycle.
+        fees:
+          allOf:
+          - $ref: '#/components/schemas/CurrencyAmount'
+          description: Fees charged during the cycle.
+        overdue_amount:
+          allOf:
+          - $ref: '#/components/schemas/CurrencyAmount'
+          description: 'The portion of `statement_balance` that was already past due when the
+
+            cycle closed. `0` on a current account.
+
+            '
+        as_of:
+          type: string
+          description: 'RFC-3339 timestamp of when this statement was read, which is when the
+
+            request was served — not when the cycle closed (that is
+
+            `period_end_date`). Every statement in a page carries the same value.
+
+
+            A closed statement''s figures do not change, but two things about it
+
+            do: servicing can hide a statement, which drops it from later reads,
+
+            and `pdf_url` is only valid for an hour from this instant. Use it to
+
+            label or expire a cached copy.
+
+            '
+          example: '2026-08-27T14:22:31Z'
+    CurrencyAmount:
+      type: integer
+      description: Amount in the smallest currency unit (e.g., cents for USD)
+    SpecialRewardCategory:
+      type: object
+      required:
+      - name
+      - description
+      - amount
+      - type
+      properties:
+        name:
+          type: string
+          example: Signup Bonus
+        description:
+          type: string
+          example: One-time bonus after first purchase
+        amount:
+          type: string
+          description: Display-formatted reward amount (e.g. "$200", "10,000 points").
+          example: $200
+        type:
+          type: string
+          enum:
+          - SIGNUP
+    TransactionStatus:
+      type: string
+      enum:
+      - APPROVED
+      - UPDATED
+      - VOIDED
+      - CAPTURED
+      - REFUNDED
+      example: APPROVED
+    AccountSummary:
+      type: object
+      description: 'One account a customer holds with your program, identifying it and the
+
+        type of product it is. Read the full servicing snapshot with
+
+        `GET /v2/customers/{customer_id}/accounts/{account_id}`.
+
+        '
+      required:
+      - account_id
+      properties:
+        account_id:
+          type: string
+          description: The unique identifier for the account
+          example: 7C1F9A34-2D6B-4E58-8A03-B15E7D9C4620
+        account_type:
+          $ref: '#/components/schemas/AccountType'
+    TransactionNotFoundError:
+      type: object
+      required:
+      - type
+      - message
+      properties:
+        type:
+          type: string
+          description: The category of error being returned.
+          example: TRANSACTION_FOUND_ERROR
+        message:
+          type: string
+          description: A message describing the cause of the error.
+          example: 'Transaction intent not found for provided ID: txn_123'
+        param:
+          type: string
+          description: The param causing the error.
+          example: transaction_id
+    RewardCategoryType:
+      type: string
+      enum:
+      - ON_MERCHANT
+      - OFF_MERCHANT
+    Merchant:
+      type: object
+      properties:
+        network_id:
+          type: string
+          description: Unique identifier of the merchant assigned by the payment network.
+          example: '234923454545'
+        name:
+          type: string
+          description: Name of the merchant where the transaction occurred.
+          example: Target
+        category:
+          type: string
+          nullable: true
+          description: Name of the merchant category.
+          example: Grocery Stores
+        category_code:
+          type: string
+          nullable: true
+          description: Code associated with the merchant category.
+          example: '5411'
+        address:
+          $ref: '#/components/schemas/Address'
+          type: object
+    InvalidRequestError:
+      type: object
+      properties:
+        path:
+          type: string
+          description: The path of the endpoint returning the error
+          example: /v2/customers
+        details:
+          type: array
+          items:
+            type: string
+          description: The details of the error being returned
+          example:
+          - 'email: must be a well-formed email address'
+        error:
+          type: string
+          description: The category of error being returned
+          example: Bad Request
+        status:
+          type: integer
+          description: The HTTP status code of the error
+          example: 400
+        timestamp:
+          type: string
+          description: The timestamp that the error occurred
+          example: '2025-01-20T18:18:22.923+00:00'
+    CustomerProgramStatus:
+      type: string
+      description: Status of a customer within a card program.
+      enum:
+      - OPEN
+      - CLOSED
   parameters:
     startingAfterParam:
       name: starting_after
@@ -876,6 +1781,54 @@ components:
       description: A cursor for use in pagination. An id that defines your place in the list.
       schema:
         type: string
+    accountIdParam:
+      name: account_id
+      in: path
+      required: true
+      description: The unique identifier for the account, as returned by list accounts
+      schema:
+        type: string
+        example: 7C1F9A34-2D6B-4E58-8A03-B15E7D9C4620
+    localeParam:
+      name: locale
+      in: query
+      required: false
+      description: 'Locale for translated category copy. English (`en`) is used when omitted
+
+        or unsupported; Spanish (`es`) and regional variants such as `es-MX` are
+
+        also supported.
+
+        '
+      schema:
+        type: string
+        default: en
+      example: en
+    transactionExpandParam:
+      name: expand
+      in: query
+      required: false
+      style: form
+      explode: false
+      description: 'Related data to include on each transaction, as a comma-separated list. Supported values:
+
+        `events` — the transaction''s lifecycle events (authorization, captures, refunds, confirmed disputes),
+
+        each with the same `event_id` delivered in the Transaction Event Notification;
+
+        `events.reward` — the events, each with the `reward` it earned or deducted (implies `events`).
+
+        Omit to receive the transaction without events. Unknown values return 400. See
+
+        [Retrieve a transaction''s events](https://docs.imprint.co/guide-event-notifications#retrieve-a-transactions-events).
+
+        '
+      schema:
+        type: array
+        items:
+          $ref: '#/components/schemas/TransactionExpand'
+      example:
+      - events
     customerIdParam:
       name: customer_id
       in: path

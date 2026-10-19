@@ -16,8 +16,13 @@ paths:
       tags:
       - Orders
       summary: Retrieve orders
-      description: Get a list of orders
+      description: 'Get a list of orders.
+
+
+        **Required scope:** `ORDER_READ`'
       operationId: listOrders
+      x-required-scopes:
+      - ORDER_READ
       parameters:
       - name: id
         in: query
@@ -38,12 +43,23 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/OrdersResponse'
+        '403':
+          description: API key is missing the required `ORDER_READ` scope
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
     post:
       tags:
       - Orders
       summary: Create orders
-      description: Create new orders
+      description: 'Create new orders.
+
+
+        **Required scope:** `ORDER_WRITE`'
       operationId: createOrder
+      x-required-scopes:
+      - ORDER_WRITE
       requestBody:
         required: true
         content:
@@ -57,13 +73,24 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Order'
+        '403':
+          description: API key is missing the required `ORDER_WRITE` scope
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
   /v2/orders/{order_id}:
     put:
       tags:
       - Orders
       summary: Modify order
-      description: Modify an existing order
+      description: 'Modify an existing order.
+
+
+        **Required scope:** `ORDER_WRITE`'
       operationId: putOrder
+      x-required-scopes:
+      - ORDER_WRITE
       parameters:
       - name: order_id
         in: path
@@ -85,12 +112,23 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Order'
+        '403':
+          description: API key is missing the required `ORDER_WRITE` scope
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
     delete:
       tags:
       - Orders
       summary: Delete order
-      description: Delete an existing order
+      description: 'Delete an existing order.
+
+
+        **Required scope:** `ORDER_WRITE`'
       operationId: deleteOrder
+      x-required-scopes:
+      - ORDER_WRITE
       parameters:
       - name: order_id
         in: path
@@ -102,68 +140,14 @@ paths:
       responses:
         '204':
           description: Order deleted successfully
+        '403':
+          description: API key is missing the required `ORDER_WRITE` scope
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
 components:
   schemas:
-    CurrencyAmount:
-      type: integer
-      description: Amount in the smallest currency unit (e.g., cents for USD)
-    Address:
-      type: object
-      description: Mailing address information
-      properties:
-        street_line1:
-          type: string
-          description: Primary street address
-          example: 123 Main St
-        street_line2:
-          type: string
-          description: Secondary street address (apartment, suite, etc.)
-          example: Apt 4B
-        city:
-          type: string
-          description: City name
-          example: San Francisco
-        state:
-          type: string
-          description: State or province
-          example: CA
-        postal_code:
-          type: string
-          description: ZIP or postal code
-          example: '94105'
-        country:
-          type: string
-          description: ISO-3166-1 alpha-3 Country Code
-          example: USA
-    OrderLine:
-      type: object
-      required:
-      - name
-      - quantity
-      - rate
-      - rewards_rate
-      properties:
-        name:
-          type: string
-          description: Name of the order line item
-          example: Couch Supreme
-        product_url:
-          type: string
-          nullable: true
-          description: URL to the product
-          example: www.restassured.com/couch-supreme
-        quantity:
-          type: integer
-          description: Quantity of the item
-          example: 1
-        rate:
-          allOf:
-          - $ref: '#/components/schemas/CurrencyAmount'
-          - example: 274999
-        rewards_rate:
-          allOf:
-          - $ref: '#/components/schemas/CurrencyAmount'
-          - example: 2500
     OrdersResponse:
       type: object
       required:
@@ -174,9 +158,6 @@ components:
           items:
             $ref: '#/components/schemas/Order'
           description: List of orders
-    Order:
-      allOf:
-      - $ref: '#/components/schemas/OrderBase'
     OrderBase:
       type: object
       required:
@@ -198,7 +179,7 @@ components:
           example: 0144ea84-3c39-4382-a37a-03c699b77646
         partner_order_id:
           type: string
-          description: Partner's order identifier
+          description: Partner's order identifier. Within a product, the combination of `partner_order_id` and `payment_method_id` uniquely identifies an order. Submitting the same combination again when creating an order updates the existing order and returns its existing `id`. The same `partner_order_id` may be used with a different `payment_method_id` to create a separate order.
           example: o-c8a1fe46bbff4a18ba1d
         merchant_id:
           type: string
@@ -227,6 +208,7 @@ components:
           example:
           - name: Couch Supreme
             product_url: www.restassured.com/couch-supreme
+            image_url: https://cdn.restassured.com/couch-supreme.jpg
             quantity: 1
             rate: 274999
             rewards_rate: 2500
@@ -256,6 +238,94 @@ components:
           nullable: true
           description: The RFC-3339 timestamp when the order was last updated
           example: '2025-02-13T19:08:07Z'
+    ApiError:
+      type: object
+      required:
+      - error
+      properties:
+        error:
+          type: object
+          required:
+          - type
+          - message
+          properties:
+            type:
+              type: string
+              description: The category of error being returned
+              example: BAD_REQUEST_ERROR
+            message:
+              type: string
+              description: A message describing the cause of the error
+              example: 'unsupported reward_type: INVALID, must be STATEMENT or DELAYED'
+    CurrencyAmount:
+      type: integer
+      description: Amount in the smallest currency unit (e.g., cents for USD)
+    Address:
+      type: object
+      description: Mailing address information
+      properties:
+        street_line1:
+          type: string
+          description: Primary street address
+          example: 123 Main St
+        street_line2:
+          type: string
+          description: Secondary street address (apartment, suite, etc.)
+          example: Apt 4B
+        city:
+          type: string
+          description: City name
+          example: San Francisco
+        state:
+          type: string
+          description: State or province
+          example: CA
+        postal_code:
+          type: string
+          examples:
+          - '94105'
+          - 94105-1234
+        country:
+          type: string
+          description: ISO-3166-1 alpha-3 Country Code
+          example: USA
+    Order:
+      allOf:
+      - $ref: '#/components/schemas/OrderBase'
+    OrderLine:
+      type: object
+      required:
+      - name
+      - quantity
+      - rate
+      - rewards_rate
+      properties:
+        name:
+          type: string
+          description: Name of the order line item
+          example: Couch Supreme
+        product_url:
+          type: string
+          nullable: true
+          description: URL to the product
+          example: www.restassured.com/couch-supreme
+        image_url:
+          type: string
+          nullable: true
+          description: URL to an image of the product
+          example: https://cdn.restassured.com/couch-supreme.jpg
+        quantity:
+          type: integer
+          description: Quantity of the item
+          example: 1
+        rate:
+          allOf:
+          - $ref: '#/components/schemas/CurrencyAmount'
+          - example: 274999
+        rewards_rate:
+          allOf:
+          - $ref: '#/components/schemas/CurrencyAmount'
+          - example: 2500
   securitySchemes:
     basicAuth:
       type: http

@@ -16,8 +16,13 @@ paths:
       tags:
       - Order Events
       summary: Retrieve order events
-      description: Get a list of order events
+      description: 'Get a list of order events.
+
+
+        **Required scope:** `ORDER_READ`'
       operationId: listOrderEvents
+      x-required-scopes:
+      - ORDER_READ
       parameters:
       - name: order_event_id
         in: query
@@ -53,12 +58,23 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/OrderEventsResponse'
+        '403':
+          description: API key is missing the required `ORDER_READ` scope
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
     post:
       tags:
       - Order Events
       summary: Create order events
-      description: Create new order events
+      description: 'Create new order events.
+
+
+        **Required scope:** `ORDER_WRITE`'
       operationId: postOrderEvent
+      x-required-scopes:
+      - ORDER_WRITE
       requestBody:
         required: true
         content:
@@ -72,13 +88,24 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/OrderEvent'
+        '403':
+          description: API key is missing the required `ORDER_WRITE` scope
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
   /v2/order_events/{order_event_id}:
     delete:
       tags:
       - Order Events
       summary: Delete order event
-      description: Delete an existing order event
+      description: 'Delete an existing order event.
+
+
+        **Required scope:** `ORDER_WRITE`'
       operationId: deleteOrderEvent
+      x-required-scopes:
+      - ORDER_WRITE
       parameters:
       - name: order_event_id
         in: path
@@ -90,7 +117,29 @@ paths:
       responses:
         '204':
           description: Order event deleted successfully
+        '403':
+          description: API key is missing the required `ORDER_WRITE` scope
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
 components:
+  parameters:
+    startingAfterParam:
+      name: starting_after
+      in: query
+      description: A cursor for use in pagination. An id that defines your place in the list.
+      schema:
+        type: string
+    limitParam:
+      name: limit
+      in: query
+      description: Limits the number of returned results
+      schema:
+        type: integer
+        minimum: 1
+        default: 10
+        format: int32
   schemas:
     OrderEventBase:
       type: object
@@ -147,26 +196,32 @@ components:
           example:
           - name: Couch Supreme
             product_url: www.restassured.com/couch-supreme
+            image_url: https://cdn.restassured.com/couch-supreme.jpg
             quantity: 1
             rate: 274999
             rewards_rate: 2500
     CurrencyAmount:
       type: integer
       description: Amount in the smallest currency unit (e.g., cents for USD)
-    OrderEventsResponse:
+    ApiError:
       type: object
       required:
-      - data
+      - error
       properties:
-        data:
-          type: array
-          items:
-            $ref: '#/components/schemas/OrderEvent'
-          description: List of order events
-        has_more:
-          type: boolean
-        total:
-          type: integer
+        error:
+          type: object
+          required:
+          - type
+          - message
+          properties:
+            type:
+              type: string
+              description: The category of error being returned
+              example: BAD_REQUEST_ERROR
+            message:
+              type: string
+              description: A message describing the cause of the error
+              example: 'unsupported reward_type: INVALID, must be STATEMENT or DELAYED'
     OrderLine:
       type: object
       required:
@@ -184,6 +239,11 @@ components:
           nullable: true
           description: URL to the product
           example: www.restassured.com/couch-supreme
+        image_url:
+          type: string
+          nullable: true
+          description: URL to an image of the product
+          example: https://cdn.restassured.com/couch-supreme.jpg
         quantity:
           type: integer
           description: Quantity of the item
@@ -196,25 +256,23 @@ components:
           allOf:
           - $ref: '#/components/schemas/CurrencyAmount'
           - example: 2500
+    OrderEventsResponse:
+      type: object
+      required:
+      - data
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/OrderEvent'
+          description: List of order events
+        has_more:
+          type: boolean
+        total:
+          type: integer
     OrderEvent:
       allOf:
       - $ref: '#/components/schemas/OrderEventBase'
-  parameters:
-    limitParam:
-      name: limit
-      in: query
-      description: Limits the number of returned results
-      schema:
-        type: integer
-        minimum: 1
-        default: 10
-        format: int32
-    startingAfterParam:
-      name: starting_after
-      in: query
-      description: A cursor for use in pagination. An id that defines your place in the list.
-      schema:
-        type: string
   securitySchemes:
     basicAuth:
       type: http

@@ -16,8 +16,13 @@ paths:
       tags:
       - Transaction Intents
       summary: Create a transaction intent
-      description: Creates a transaction intent object that represents a pending financial transaction. Transaction intents are used to initiate, validate, and track the lifecycle of a transaction before it is finalized.
+      description: 'Creates a transaction intent object that represents a pending financial transaction. Transaction intents are used to initiate, validate, and track the lifecycle of a transaction before it is finalized.
+
+
+        **Required scope:** `TRANSACTION_INTENT_WRITE`'
       operationId: createTransactionIntent
+      x-required-scopes:
+      - TRANSACTION_INTENT_WRITE
       requestBody:
         required: true
         content:
@@ -76,6 +81,12 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/InvalidRequestError'
+        '403':
+          description: API key is missing the required `TRANSACTION_INTENT_WRITE` scope
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
     get:
       tags:
       - Transaction Intents
@@ -117,8 +128,13 @@ paths:
       tags:
       - Transaction Intents
       summary: Retrieve a transaction intent
-      description: Retrieves the details of an existing transaction intent by `id`.
+      description: 'Retrieves the details of an existing transaction intent by `id`.
+
+
+        **Required scope:** `TRANSACTION_INTENT_READ`'
       operationId: getTransactionIntent
+      x-required-scopes:
+      - TRANSACTION_INTENT_READ
       parameters:
       - name: intent_id
         in: path
@@ -134,6 +150,12 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/TransactionIntent'
+        '403':
+          description: API key is missing the required `TRANSACTION_INTENT_READ` scope
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
         '404':
           description: Transaction intent not found
           content:
@@ -144,8 +166,13 @@ paths:
       tags:
       - Transaction Intents
       summary: Update a transaction intent
-      description: Updates the details of the transaction intent associated with the supplied intent_id
+      description: 'Updates the details of the transaction intent associated with the supplied intent_id.
+
+
+        **Required scope:** `TRANSACTION_INTENT_WRITE`'
       operationId: updateTransactionIntent
+      x-required-scopes:
+      - TRANSACTION_INTENT_WRITE
       parameters:
       - name: intent_id
         in: path
@@ -201,8 +228,20 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/InvalidRequestError'
+        '403':
+          description: API key is missing the required `TRANSACTION_INTENT_WRITE` scope
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
 components:
   parameters:
+    startingAfterParam:
+      name: starting_after
+      in: query
+      description: A cursor for use in pagination. An id that defines your place in the list.
+      schema:
+        type: string
     limitParam:
       name: limit
       in: query
@@ -212,95 +251,32 @@ components:
         minimum: 1
         default: 10
         format: int32
-    startingAfterParam:
-      name: starting_after
-      in: query
-      description: A cursor for use in pagination. An id that defines your place in the list.
-      schema:
-        type: string
   schemas:
-    TransactionCurrency:
-      type: string
-      description: The 3-character currency code of the amount in ISO 4217 format (e.g., "USD")
-      example: USD
-    TransactionIntentFoundError:
-      type: object
-      required:
-      - type
-      - message
-      properties:
-        type:
-          type: string
-          description: The category of error being returned.
-          example: TRANSACTION_INTENT_FOUND_ERROR
-        message:
-          type: string
-          description: A message describing the cause of the error.
-          example: 'Transaction intent not found for provided ID: txint_123'
-        param:
-          type: string
-          description: The param causing the error.
-          example: intent_id
-    InvalidRequestError:
-      type: object
-      properties:
-        path:
-          type: string
-          description: The path of the endpoint returning the error
-          example: /v2/customers
-        details:
-          type: array
-          items:
-            type: string
-          description: The details of the error being returned
-          example:
-          - 'email: must be a well-formed email address'
-        error:
-          type: string
-          description: The category of error being returned
-          example: Bad Request
-        status:
-          type: integer
-          description: The HTTP status code of the error
-          example: 400
-        timestamp:
-          type: string
-          description: The timestamp that the error occurred
-          example: '2025-01-20T18:18:22.923+00:00'
     TransactionIntentStatus:
       type: string
       enum:
       - CONFIRMED
       - CANCELED
       example: CONFIRMED
-    Address:
+    ApiError:
       type: object
-      description: Mailing address information
+      required:
+      - error
       properties:
-        street_line1:
-          type: string
-          description: Primary street address
-          example: 123 Main St
-        street_line2:
-          type: string
-          description: Secondary street address (apartment, suite, etc.)
-          example: Apt 4B
-        city:
-          type: string
-          description: City name
-          example: San Francisco
-        state:
-          type: string
-          description: State or province
-          example: CA
-        postal_code:
-          type: string
-          description: ZIP or postal code
-          example: '94105'
-        country:
-          type: string
-          description: ISO-3166-1 alpha-3 Country Code
-          example: USA
+        error:
+          type: object
+          required:
+          - type
+          - message
+          properties:
+            type:
+              type: string
+              description: The category of error being returned
+              example: BAD_REQUEST_ERROR
+            message:
+              type: string
+              description: A message describing the cause of the error
+              example: 'unsupported reward_type: INVALID, must be STATEMENT or DELAYED'
     TransactionIntent:
       type: object
       required:
@@ -349,6 +325,83 @@ components:
           additionalProperties: true
           example:
             platform_version: 2.1.0
+    Address:
+      type: object
+      description: Mailing address information
+      properties:
+        street_line1:
+          type: string
+          description: Primary street address
+          example: 123 Main St
+        street_line2:
+          type: string
+          description: Secondary street address (apartment, suite, etc.)
+          example: Apt 4B
+        city:
+          type: string
+          description: City name
+          example: San Francisco
+        state:
+          type: string
+          description: State or province
+          example: CA
+        postal_code:
+          type: string
+          examples:
+          - '94105'
+          - 94105-1234
+        country:
+          type: string
+          description: ISO-3166-1 alpha-3 Country Code
+          example: USA
+    TransactionCurrency:
+      type: string
+      description: The 3-character currency code of the amount in ISO 4217 format (e.g., "USD")
+      example: USD
+    TransactionIntentFoundError:
+      type: object
+      required:
+      - type
+      - message
+      properties:
+        type:
+          type: string
+          description: The category of error being returned.
+          example: TRANSACTION_INTENT_FOUND_ERROR
+        message:
+          type: string
+          description: A message describing the cause of the error.
+          example: 'Transaction intent not found for provided ID: txint_123'
+        param:
+          type: string
+          description: The param causing the error.
+          example: intent_id
+    InvalidRequestError:
+      type: object
+      properties:
+        path:
+          type: string
+          description: The path of the endpoint returning the error
+          example: /v2/customers
+        details:
+          type: array
+          items:
+            type: string
+          description: The details of the error being returned
+          example:
+          - 'email: must be a well-formed email address'
+        error:
+          type: string
+          description: The category of error being returned
+          example: Bad Request
+        status:
+          type: integer
+          description: The HTTP status code of the error
+          example: 400
+        timestamp:
+          type: string
+          description: The timestamp that the error occurred
+          example: '2025-01-20T18:18:22.923+00:00'
   securitySchemes:
     basicAuth:
       type: http

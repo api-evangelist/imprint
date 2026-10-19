@@ -26,6 +26,8 @@ paths:
         schema:
           type: string
           example: 4E6FE207-53E5-4EC0-BF51-5923BE5CEE2F
+      - name: expand
+        $ref: '#/components/parameters/transactionExpandParam'
       responses:
         '200':
           description: Transaction retrieved successfully
@@ -33,6 +35,12 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Transaction'
+        '400':
+          description: Unsupported expand value
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InvalidRequestError'
         '404':
           description: Transaction not found
           content:
@@ -102,10 +110,78 @@ components:
           additionalProperties: true
           example:
             platform_version: 2.1.0
-    TransactionCurrency:
+        events:
+          type: array
+          description: Events in the transaction's lifecycle, oldest first. Present only when requested with `expand=events`.
+          items:
+            $ref: '#/components/schemas/TransactionLifecycleEvent'
+    TransactionLifecycleEvent:
+      type: object
+      description: One step in a transaction's lifecycle, e.g. the authorization, a capture, a refund or a confirmed dispute.
+      required:
+      - event_id
+      - status
+      - amount
+      - created_at
+      properties:
+        event_id:
+          type: string
+          description: Unique identifier of this event. Matches the `event_id` in the Transaction Event Notification and the `transaction_event_id` on a Reward.
+          example: B2D4A1C9-7F3E-4C8A-9E61-2A5B8D0F4C17
+        status:
+          $ref: '#/components/schemas/TransactionStatus'
+        amount:
+          type: integer
+          description: Amount of this event in min units, e.g. the captured or refunded amount. Always non-negative.
+          example: 5000
+        created_at:
+          type: string
+          description: The RFC-3339 timestamp when the event was created
+          example: 2025-02-13 19:08:07+00:00
+        reward:
+          allOf:
+          - $ref: '#/components/schemas/Reward'
+          nullable: true
+          x-go-type: nullable.Nullable[Reward]
+          x-go-type-import:
+            path: github.com/oapi-codegen/nullable
+          x-go-type-skip-optional-pointer: true
+          description: The reward earned or deducted by this event, as returned by `GET /v2/rewards`. Present only when requested with `expand=events.reward`. Null when the event has no reward.
+    RewardCurrency:
       type: string
-      description: The 3-character currency code of the amount in ISO 4217 format (e.g., "USD")
-      example: USD
+      description: The 3-character currency code of the amount in ISO 4217 format (e.g., "USD") or a reward unit (e.g., "POINTS")
+      example: POINTS
+    PurchaseMethod:
+      type: string
+      enum:
+      - CHIP
+      - CONTACTLESS
+      - KEYEDIN
+      - ONLINE
+      - SWIPE
+      - QRCODE
+      - OCR
+      - UNKNOWN
+      nullable: true
+      description: How the purchase was completed.
+      example: CHIP
+    RewardStatus:
+      type: string
+      enum:
+      - PENDING
+      - AVAILABLE
+      - PENDING_DEDUCTION
+      - DEDUCTED
+      example: PENDING
+    RewardType:
+      type: string
+      enum:
+      - OFFER
+      - TRANSACTION
+      - ONE_TIME
+      - STATEMENT
+      - REFERRAL
+      example: TRANSACTION
     Address:
       type: object
       description: Mailing address information
@@ -128,26 +204,86 @@ components:
           example: CA
         postal_code:
           type: string
-          description: ZIP or postal code
-          example: '94105'
+          examples:
+          - '94105'
+          - 94105-1234
         country:
           type: string
           description: ISO-3166-1 alpha-3 Country Code
           example: USA
-    PurchaseMethod:
+    TransactionStatus:
       type: string
       enum:
-      - CHIP
-      - CONTACTLESS
-      - KEYEDIN
-      - ONLINE
-      - SWIPE
-      - QRCODE
-      - OCR
-      - UNKNOWN
-      nullable: true
-      description: How the purchase was completed.
-      example: CHIP
+      - APPROVED
+      - UPDATED
+      - VOIDED
+      - CAPTURED
+      - REFUNDED
+      example: APPROVED
+    Reward:
+      type: object
+      required:
+      - id
+      - customer_id
+      - amount
+      - status
+      - type
+      - created_at
+      properties:
+        id:
+          type: string
+          example: 2EE24580-B97B-4949-A65C-929CCB9B9B8D
+        customer_id:
+          type: string
+          example: 9B5E1EE0-2E1C-46E7-81B9-3C3917204BE4
+        transaction_event_id:
+          type: string
+          description: transaction that generated this reward, if applicable.
+          example: E777214A-2D11-4CAD-9E8F-E1BD71D9FE67
+        amount:
+          type: integer
+          description: reward amount in min units.
+        type:
+          $ref: '#/components/schemas/RewardType'
+        currency:
+          $ref: '#/components/schemas/RewardCurrency'
+        status:
+          $ref: '#/components/schemas/RewardStatus'
+        created_at:
+          type: string
+          description: the RFC-3339 timestamp when the reward was created
+          example: 2025-02-13 19:08:07+00:00
+        updated_at:
+          type: string
+          description: the RFC-3339 timestamp when the reward was last updated
+          example: 2025-02-13 19:08:07+00:00
+        metadata:
+          type: object
+          additionalProperties: true
+          example:
+            platform_version: 2.1.0
+    TransactionCurrency:
+      type: string
+      description: The 3-character currency code of the amount in ISO 4217 format (e.g., "USD")
+      example: USD
+    TransactionNotFoundError:
+      type: object
+      required:
+      - type
+      - message
+      properties:
+        type:
+          type: string
+          description: The category of error being returned.
+          example: TRANSACTION_FOUND_ERROR
+        message:
+          type: string
+          description: A message describing the cause of the error.
+          example: 'Transaction intent not found for provided ID: txn_123'
+        param:
+          type: string
+          description: The param causing the error.
+          example: transaction_id
     Merchant:
       type: object
       properties:
@@ -172,33 +308,65 @@ components:
         address:
           $ref: '#/components/schemas/Address'
           type: object
-    TransactionNotFoundError:
+    InvalidRequestError:
       type: object
-      required:
-      - type
-      - message
       properties:
-        type:
+        path:
           type: string
-          description: The category of error being returned.
-          example: TRANSACTION_FOUND_ERROR
-        message:
+          description: The path of the endpoint returning the error
+          example: /v2/customers
+        details:
+          type: array
+          items:
+            type: string
+          description: The details of the error being returned
+          example:
+          - 'email: must be a well-formed email address'
+        error:
           type: string
-          description: A message describing the cause of the error.
-          example: 'Transaction intent not found for provided ID: txn_123'
-        param:
+          description: The category of error being returned
+          example: Bad Request
+        status:
+          type: integer
+          description: The HTTP status code of the error
+          example: 400
+        timestamp:
           type: string
-          description: The param causing the error.
-          example: transaction_id
-    TransactionStatus:
+          description: The timestamp that the error occurred
+          example: '2025-01-20T18:18:22.923+00:00'
+    TransactionExpand:
       type: string
+      description: Related data that can be included on a transaction with the `expand` query parameter. `events` adds the transaction's lifecycle events; `events.reward` adds the events and, on each event, the reward it earned or deducted.
       enum:
-      - APPROVED
-      - UPDATED
-      - VOIDED
-      - CAPTURED
-      - REFUNDED
-      example: APPROVED
+      - events
+      - events.reward
+      example: events
+  parameters:
+    transactionExpandParam:
+      name: expand
+      in: query
+      required: false
+      style: form
+      explode: false
+      description: 'Related data to include on each transaction, as a comma-separated list. Supported values:
+
+        `events` — the transaction''s lifecycle events (authorization, captures, refunds, confirmed disputes),
+
+        each with the same `event_id` delivered in the Transaction Event Notification;
+
+        `events.reward` — the events, each with the `reward` it earned or deducted (implies `events`).
+
+        Omit to receive the transaction without events. Unknown values return 400. See
+
+        [Retrieve a transaction''s events](https://docs.imprint.co/guide-event-notifications#retrieve-a-transactions-events).
+
+        '
+      schema:
+        type: array
+        items:
+          $ref: '#/components/schemas/TransactionExpand'
+      example:
+      - events
   securitySchemes:
     basicAuth:
       type: http

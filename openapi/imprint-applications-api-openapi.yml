@@ -1,0 +1,3208 @@
+openapi: 3.2.0
+info:
+  title: Public Imprint Applications API
+  version: '2.0'
+servers:
+- url: https://dev.sbx.imprint.co
+  description: Imprint public api sandbox
+security:
+- basicAuth: []
+- bearerAuth: []
+tags:
+- name: Applications
+paths:
+  /v2/application_configuration:
+    get:
+      tags:
+      - Applications
+      summary: Retrieve application configuration
+      x-excluded: true
+      description: 'Returns the field schema, disclosures, and verification modes for your
+
+        program. This is the *schema* half of the application contract: it
+
+        describes every field the program can ever ask for, so you can build
+
+        your application form at compile time.
+
+
+        The runtime half is `GET /v2/applications/{application_id}`, whose
+
+        `requirements` array says what is required for one specific application
+
+        right now. Two guarantees hold between them:
+
+
+        - An application never names a `key` that is absent from this response.
+
+        - This response never asserts what is required for a *given*
+
+        application — a `CONDITIONALLY_REQUIRED` field may or may not be
+
+        asked for, depending on that application''s state.
+
+
+        In short: configuration drives form *construction*, the application
+
+        drives form *progression*.
+
+
+        Fetch without `configuration_revision` for the current configuration. Applications
+
+        pin the returned `configuration_revision`; pass that value as
+
+        `configuration_revision` when resuming an
+
+        application so its requirements are interpreted against the same
+
+        configuration. Latest means the final entry in the effective product
+
+        configuration. A removed or unknown revision returns 404.
+
+        All configured translations are returned in localized content maps;
+
+        clients choose the language to display.
+
+
+        **Required scope:** `APPLICATION_WRITE`'
+      operationId: getApplicationConfiguration
+      x-required-scopes:
+      - APPLICATION_WRITE
+      parameters:
+      - $ref: '#/components/parameters/applicationMerchantKeyParam'
+      - name: configuration_revision
+        in: query
+        required: false
+        description: A configuration revision pinned by an existing application. Omit for current.
+        schema:
+          type: string
+          minLength: 1
+      responses:
+        '200':
+          description: Application configuration retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApplicationConfiguration'
+        '403':
+          description: The API key does not have application write access.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+        '400':
+          description: The configuration_revision query must not be blank.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+        '401':
+          description: Authentication or merchant-key authorization failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+        '404':
+          description: The requested configuration does not exist.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+        '500':
+          description: The stored configuration is invalid or could not be loaded.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+  /v2/applications:
+    post:
+      tags:
+      - Applications
+      summary: Create an application
+      x-excluded: true
+      description: 'Creates an application. Every applicant field is optional here — pass
+
+        whatever you already hold and fill the rest in with
+
+        `PATCH /v2/applications/{application_id}`.
+
+
+        Consent inputs are retained pending validation by Onboard application
+
+        configuration. The draft response currently returns an empty
+
+        `requirements` array and does not include `product_offers`.
+
+
+        Supply an `Idempotency-Key` to make retries safe; replaying a key
+
+        returns the original application rather than creating a second one.
+
+
+        **Required scope:** `APPLICATION_WRITE`'
+      operationId: createApplication
+      x-required-scopes:
+      - APPLICATION_WRITE
+      parameters:
+      - $ref: '#/components/parameters/applicationMerchantKeyParam'
+      - $ref: '#/components/parameters/idempotencyKeyParam'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateApplicationRequest'
+      responses:
+        '201':
+          description: Application created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Application'
+        '503':
+          description: Temporarily unavailable; retry with the same idempotency key.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+        '400':
+          description: 'Malformed JSON, unknown or disallowed fields, or wrong JSON types. Allowed fields that fail program validation are retained as editable candidates and returned with INVALID requirements.
+
+            '
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InvalidRequestError'
+        '403':
+          description: The API key does not have application write access.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+        '409':
+          description: '`IDEMPOTENCY_IN_PROGRESS` while the original create is unresolved, or `IDEMPOTENCY_KEY_REUSED` when the key identifies a different request.
+
+            '
+          headers:
+            Retry-After:
+              description: Seconds to wait when `type` is `IDEMPOTENCY_IN_PROGRESS`.
+              schema:
+                type: integer
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/IdempotencyConflictError'
+    get:
+      tags:
+      - Applications
+      summary: List applications
+      x-excluded: true
+      description: 'Returns the applications belonging to one of your customers, most
+
+        recently created first. `partner_customer_id` is required.
+
+
+        `partner_customer_id` is compared byte-for-byte and the cursor is an
+
+        application id from the same program and filtered collection. `total`
+
+        is the number of applications in this page.
+
+
+        A draft that was never submitted is left out once it passes its
+
+        `draft_expires_at`. Submitted applications are always listed.
+
+
+        **Required scope:** `APPLICATION_WRITE`'
+      operationId: listApplications
+      x-required-scopes:
+      - APPLICATION_WRITE
+      parameters:
+      - $ref: '#/components/parameters/applicationMerchantKeyParam'
+      - name: partner_customer_id
+        in: query
+        required: true
+        description: The unique identifier for the customer in the partner's system
+        schema:
+          $ref: '#/components/schemas/PartnerCustomerId'
+      - name: limit
+        $ref: '#/components/parameters/limitParam'
+      - name: starting_after
+        $ref: '#/components/parameters/startingAfterParam'
+      responses:
+        '200':
+          description: List of applications
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApplicationListResponse'
+        '400':
+          description: Invalid application list request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InvalidRequestError'
+        '403':
+          description: The API key does not have application write access.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+  /v2/applications/{application_id}:
+    get:
+      tags:
+      - Applications
+      summary: Retrieve an application
+      x-excluded: true
+      description: 'Returns the application, including the `requirements` array that drives
+
+        your form, the `status`, and — once decisioning finishes — each
+
+        product''s decision in `product_offers`.
+
+
+        This is the only endpoint you need to poll. When `poll_after_ms` is
+
+        present the application is mid-evaluation; wait that many milliseconds
+
+        before polling again rather than fixing your own interval.
+
+
+        If decisioning takes longer than usual the application stays `EVALUATING`
+
+        with `poll_after_ms` set. Poll for at most 30 seconds in the applicant''s
+
+        session; after that show an under-review state and take the result from
+
+        the application webhook or a background poll. No action is required and
+
+        the application must not be submitted again — Imprint completes delayed
+
+        evaluations on its side and the result arrives on the same application.
+
+
+        A draft that was never submitted returns `404` once it passes its
+
+        `draft_expires_at`. A submitted application stays retrievable.
+
+
+        **Required scope:** `APPLICATION_WRITE`'
+      operationId: getApplication
+      x-required-scopes:
+      - APPLICATION_WRITE
+      parameters:
+      - $ref: '#/components/parameters/applicationMerchantKeyParam'
+      - $ref: '#/components/parameters/applicationIdParam'
+      responses:
+        '200':
+          description: Application retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Application'
+        '400':
+          description: Invalid application request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InvalidRequestError'
+        '403':
+          description: The API key does not have application write access.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+        '404':
+          description: The application does not exist or is not owned by the caller.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApplicationNotFoundError'
+    patch:
+      tags:
+      - Applications
+      summary: Update an application
+      x-excluded: true
+      description: 'Updates applicant data, records disclosure consent, and selects a card
+
+        design.
+
+
+        Semantics are JSON merge-patch: omitted fields are left untouched, and
+
+        an explicit `null` clears a field. This lets a multi-page form send only
+
+        the current page''s delta without wiping earlier pages.
+
+
+        The full application is returned, so the refreshed `requirements` array
+
+        arrives with the write — you do not need to follow up with a `GET`.
+
+
+        This endpoint carries everything the applicant typed and could retype.
+
+        Anything with an external side effect or a one-way transition — sending
+
+        an SMS, verifying a code, writing a credential, committing a decision —
+
+        is a separate `POST` sub-resource.
+
+
+        **Required scope:** `APPLICATION_WRITE`'
+      operationId: updateApplication
+      x-required-scopes:
+      - APPLICATION_WRITE
+      parameters:
+      - $ref: '#/components/parameters/applicationMerchantKeyParam'
+      - $ref: '#/components/parameters/applicationIdParam'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateApplicationRequest'
+      responses:
+        '200':
+          description: Application updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Application'
+        '400':
+          description: 'Malformed JSON, unknown or disallowed fields, wrong JSON types, or `consents: null`; the application is not mutated. Allowed fields that fail program validation are retained as editable candidates and returned with INVALID requirements.
+
+            '
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InvalidRequestError'
+        '403':
+          description: The API key does not have application write access.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+        '404':
+          description: The application does not exist or is not owned by the caller.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApplicationNotFoundError'
+        '409':
+          description: 'The requested field is not editable in the current lifecycle phase, or the draft expired. Applicant data freezes at submit; card design remains editable through OFFERS_AVAILABLE and freezes at acceptance.
+
+            '
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConflictError'
+  /v2/applications/{application_id}/phone_verification:
+    post:
+      tags:
+      - Applications
+      summary: Verify the applicant's phone number
+      x-excluded: true
+      description: 'Drives the `phone_verification` requirement. One endpoint, three
+
+        actions:
+
+
+        - `SEND` — Imprint sends a one-time code by SMS. Requires the SMS
+
+        disclosure to be consented first; until it is, that disclosure
+
+        requirement carries `blocks: PHONE_VERIFICATION` and this returns
+
+        `409`.
+
+        - `VERIFY` — submit the code the applicant received.
+
+        - `ATTEST` — certify that *you* verified the phone number, skipping
+
+        Imprint''s SMS entirely. Available only when the program''s
+
+        `phone_verification.mode` is `PARTNER_ATTESTED`; otherwise `403`.
+
+
+        Which actions you may use is program configuration, not a property of
+
+        this route, so the contract is identical across partners. Read
+
+        `phone_verification.mode` from `GET /v2/application_configuration`.
+
+
+        On success this may surface an `account_ownership` requirement: when the
+
+        phone already belongs to an Imprint account, the applicant must prove
+
+        ownership before the application can be submitted. That requirement''s
+
+        `resolution_options` names the ways forward.
+
+
+        Resends are rate-limited. A `SEND` inside the cooldown returns `429`
+
+        with `retry_after_seconds` and a `Retry-After` header — every send is an
+
+        SMS the applicant receives and someone pays for. Disable your resend
+
+        control for `phone_verification.resend_after_ms` from
+
+        `GET /v2/application_configuration` so the applicant is not offered a
+
+        button that cannot work yet, but treat this `429` as authoritative: it
+
+        accounts for a code sent before your page loaded.
+
+
+        **Required scope:** `APPLICATION_WRITE`'
+      operationId: verifyApplicationPhone
+      x-required-scopes:
+      - APPLICATION_WRITE
+      parameters:
+      - $ref: '#/components/parameters/applicationMerchantKeyParam'
+      - $ref: '#/components/parameters/applicationIdParam'
+      - $ref: '#/components/parameters/idempotencyKeyParam'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PhoneVerificationRequest'
+      responses:
+        '200':
+          description: 'The action was accepted. For `SEND` the code is on its way; for `VERIFY` and `ATTEST` the requirement is now satisfied.
+
+            '
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Application'
+        '400':
+          description: Malformed body, or a missing phone number on the application.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InvalidRequestError'
+        '403':
+          description: 'The API key does not have application write access, or `ATTEST` was used on a program that is not configured for partner attestation.
+
+            '
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+        '404':
+          description: The application does not exist or is not owned by the caller.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApplicationNotFoundError'
+        '409':
+          description: '`SEND` was called before the SMS disclosure was consented, or the phone is already verified; alternatively an idempotent operation is still in progress or the key was reused for a different request.
+
+            '
+          headers:
+            Retry-After:
+              description: Seconds to wait when `type` is `IDEMPOTENCY_IN_PROGRESS`.
+              schema:
+                type: integer
+          content:
+            application/json:
+              schema:
+                anyOf:
+                - $ref: '#/components/schemas/ConflictError'
+                - $ref: '#/components/schemas/IdempotencyConflictError'
+        '422':
+          description: The code is incorrect or has expired.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+        '429':
+          description: 'A code was requested again before the cooldown elapsed (`RESEND_TOO_SOON`), or there were too many failed `VERIFY` attempts. `retry_after_seconds` rounds up, and is repeated in the `Retry-After` header.
+
+            '
+          headers:
+            Retry-After:
+              description: Seconds to wait before retrying.
+              schema:
+                type: integer
+              example: 9
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RateLimitedError'
+        '503':
+          description: The service is temporarily unavailable.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+  /v2/applications/{application_id}/prefill:
+    post:
+      tags:
+      - Applications
+      summary: Prefill applicant data
+      x-excluded: true
+      description: 'Looks the applicant up from their phone number and the last four digits
+
+        of their SSN, and returns whatever identity data can be retrieved.
+
+
+        The values are applied to the application *and* returned to you, so you
+
+        can render a confirm-and-edit screen. Present them for confirmation
+
+        rather than submitting silently — the applicant must be able to correct
+
+        a wrong line.
+
+
+        Requires a verified phone number.
+
+
+        A miss returns `404` with type `NO_PREFILL_MATCH`, and leaves the
+
+        application untouched — including the four digits it was asked about,
+
+        which a miss has nothing to confirm. Branch on the error `type` rather
+
+        than the status alone: `NO_PREFILL_MATCH` is an ordinary path to manual
+
+        entry, while `APPLICATION_NOT_FOUND` means the id was wrong and must not
+
+        be shown to the applicant as though their data went missing.
+
+
+        `ssn_last_four` is an input to this endpoint only; it is deliberately not
+
+        a field in `configuration.fields`. A hit does **not** satisfy the
+
+        `applicant.ssn` requirement — submit still requires all nine digits.
+
+        Four digits are guessable, and waiving the full number on that evidence
+
+        would make this an identity oracle.
+
+
+        **Required scope:** `APPLICATION_WRITE`'
+      operationId: prefillApplication
+      x-required-scopes:
+      - APPLICATION_WRITE
+      parameters:
+      - $ref: '#/components/parameters/applicationMerchantKeyParam'
+      - $ref: '#/components/parameters/applicationIdParam'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PrefillApplicationRequest'
+      responses:
+        '200':
+          description: 'A record matched. `prefilled` carries the values that were applied to the application, and is never empty on a `200`.
+
+            '
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PrefillApplicationResponse'
+        '400':
+          description: Malformed body or failed field validation.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InvalidRequestError'
+        '403':
+          description: The API key does not have application write access.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+        '404':
+          description: 'Either no record matched (`NO_PREFILL_MATCH` — an ordinary outcome; send the applicant to manual entry) or the application does not exist or is not owned by the caller (`APPLICATION_NOT_FOUND`). Distinguish them by `type`.
+
+            '
+          content:
+            application/json:
+              schema:
+                oneOf:
+                - $ref: '#/components/schemas/NoPrefillMatchError'
+                - $ref: '#/components/schemas/ApplicationNotFoundError'
+        '409':
+          description: 'The application''s phone number is not yet verified (`PHONE_NOT_VERIFIED`), or the application can no longer be edited or changed concurrently (`APPLICATION_CONFLICT`).
+
+            '
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConflictError'
+  /v2/applications/{application_id}/verify_account_ownership:
+    post:
+      tags:
+      - Applications
+      summary: Verify ownership of an existing Imprint account
+      x-excluded: true
+      description: 'Satisfies the `account_ownership` requirement when the applicant''s phone
+
+        already belongs to an Imprint account. The requirement advertises exactly
+
+        one route: `VERIFY_PASSWORD` when the account has a password (use
+
+        `PASSWORD`), or `VERIFY_PIN` when it has only a PIN (use `PIN`). Sending
+
+        the other credential type returns `409`.
+
+
+        Not to be confused with `phone_verification`, which verifies the phone
+
+        number itself. This endpoint proves the applicant is the person who owns
+
+        the Imprint account that number is already attached to.
+
+
+        An existing account with neither a password nor a PIN has no
+
+        `account_ownership` requirement; the customer sets a password through
+
+        `POST /v2/applications/{application_id}/authentication`.
+
+
+        `HOSTED` is reserved for an Imprint-hosted handoff that is not yet
+
+        available and currently returns `409` with
+
+        `OWNERSHIP_RESOLUTION_NOT_AVAILABLE`.
+
+
+        Credentials are forwarded to Imprint''s authentication service and are
+
+        never stored, logged or returned. Failed attempts count against the
+
+        customer''s Imprint app login lockout.
+
+
+        **Required scope:** `APPLICATION_WRITE`'
+      operationId: verifyApplicationAccountOwnership
+      x-required-scopes:
+      - APPLICATION_WRITE
+      parameters:
+      - $ref: '#/components/parameters/applicationMerchantKeyParam'
+      - $ref: '#/components/parameters/applicationIdParam'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/VerifyAccountOwnershipRequest'
+      responses:
+        '200':
+          description: 'Ownership is verified and `account_ownership` is `SATISFIED`. Repeating the call for an already-verified application returns the current application without re-checking the credential.
+
+            '
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Application'
+        '400':
+          description: 'Malformed body, a credential that does not match `type`, or both credentials sent at once.
+
+            '
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InvalidRequestError'
+        '403':
+          description: The API key does not have application write access.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+        '404':
+          description: The application does not exist or is not owned by the caller.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApplicationNotFoundError'
+        '409':
+          description: '`ACCOUNT_OWNERSHIP_NOT_REQUIRED` when the application has no `account_ownership` requirement; `OWNERSHIP_RESOLUTION_NOT_AVAILABLE` when the requested `type` is not the advertised route (including `HOSTED`); `APPLICATION_CONFLICT` when the application can no longer be edited or changed concurrently.
+
+            '
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConflictError'
+        '422':
+          description: 'The credential is incorrect. The message is deliberately the same whether or not an account exists on that phone number — this endpoint is reachable with only a phone number, so a distinguishable failure would make it an account-existence oracle.
+
+            '
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+        '429':
+          description: 'Too many failed attempts. Attempts are limited per application and per phone number; wait `retry_after_seconds` rather than retrying on a schedule of your own.
+
+            '
+          headers:
+            Retry-After:
+              description: Seconds to wait before retrying.
+              schema:
+                type: integer
+              example: 60
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RateLimitedError'
+        '503':
+          description: 'Imprint''s authentication service was unavailable; nothing was verified. Retry.
+
+            '
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+  /v2/applications/{application_id}/authentication:
+    post:
+      tags:
+      - Applications
+      summary: Establish authentication for the account
+      x-excluded: true
+      description: 'Sets how the customer will authenticate. This is a credential write, so
+
+        it is deliberately separate from `PATCH` — it gets its own audit trail
+
+        and is never replayable as form data.
+
+
+        Two types:
+
+
+        - `PASSWORD` — the customer sets an Imprint password. Application-API
+
+        integrations set a password rather than a PIN, because a
+
+        password-backed account stays recoverable without the partner.
+
+        - `PARTNER_MANAGED` — you own authentication end to end and the customer
+
+        has no Imprint login. Available only to programs with a full
+
+        Servicing-API integration. Should that customer later lose their
+
+        partner account, `POST /v2/customers/{customer_id}/offboard` migrates
+
+        them to a standalone Imprint account.
+
+
+        The `authentication` requirement carries `blocks: COMPLETION`: an
+
+        application can be submitted and an offer accepted before it is
+
+        satisfied, but the application does not reach `COMPLETED` until it is.
+
+        Call this at any point after the application is created. Before submit
+
+        the password is validated against `password_policy` and held, encrypted,
+
+        on the application; `authentication` reads `SATISFIED` and submit sets the
+
+        password on the customer''s Imprint account. Calling again before submit
+
+        replaces the held password. After submit the password is set
+
+        immediately. An approved application waits in `PENDING_AUTHENTICATION`
+
+        until the requirement is satisfied.
+
+
+        The password must satisfy the program''s `password_policy`. The server
+
+        also rejects passwords with four or more repeated or sequential
+
+        characters, common passwords, and passwords containing the applicant''s
+
+        personal information; those checks are not published as a pattern and,
+
+        for a password held before submit, run at submit. If they reject it the
+
+        submission still succeeds, `authentication` returns to `MISSING`, and
+
+        this endpoint must be called again with a different password.
+
+
+        `Idempotency-Key` is optional; when supplied it must be nonblank.
+
+        Completed requests replay their original response with the same key.
+
+        The password is never stored with the idempotency record.
+
+
+        **Required scope:** `APPLICATION_WRITE`'
+      operationId: createApplicationAuthentication
+      x-required-scopes:
+      - APPLICATION_WRITE
+      parameters:
+      - $ref: '#/components/parameters/applicationMerchantKeyParam'
+      - $ref: '#/components/parameters/applicationIdParam'
+      - $ref: '#/components/parameters/nonblankIdempotencyKeyParam'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateAuthenticationRequest'
+      responses:
+        '200':
+          description: Authentication established; the requirement is now satisfied.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Application'
+        '400':
+          description: 'Malformed body, a missing or unknown `type`, a missing `password`, a blank Idempotency-Key, or a password that does not meet the password policy (`details` contains `PASSWORD_POLICY_VIOLATION`).
+
+            '
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InvalidRequestError'
+        '403':
+          description: 'The API key does not have application write access, the program does not offer password authentication, or `PARTNER_MANAGED` was used on a program without a Servicing-API integration.
+
+            '
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+        '404':
+          description: The application does not exist or is not owned by the caller.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApplicationNotFoundError'
+        '409':
+          description: '`AUTHENTICATION_ALREADY_ESTABLISHED` when the customer already has an Imprint credential; `APPLICATION_CONFLICT` when the application has not been submitted, can no longer be authenticated, or does not support password authentication for this customer; alternatively an idempotent operation is in progress or its key was reused.
+
+            '
+          headers:
+            Retry-After:
+              description: Seconds to wait when `type` is `IDEMPOTENCY_IN_PROGRESS`.
+              schema:
+                type: integer
+          content:
+            application/json:
+              schema:
+                anyOf:
+                - $ref: '#/components/schemas/ConflictError'
+                - $ref: '#/components/schemas/IdempotencyConflictError'
+        '500':
+          description: An unexpected error prevented authentication.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+        '503':
+          description: Authentication is temporarily unavailable; retry with the same idempotency key.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+  /v2/applications/{application_id}/submit:
+    post:
+      tags:
+      - Applications
+      summary: Submit an application for decisioning
+      x-excluded: true
+      description: 'Submits the application. Everything with `blocks: PHONE_VERIFICATION` or
+
+        `blocks: SUBMIT` in `requirements` must be satisfied first. Outstanding
+
+        requirements return `409` and the response body names exactly what is blocking, so
+
+        you can route the applicant back to the right screen.
+
+
+        On success the application moves to `EVALUATING`. Decisioning is
+
+        asynchronous: poll `GET /v2/applications/{application_id}`, honouring
+
+        `poll_after_ms`, or wait for the application webhook. The terminal
+
+        states are `OFFERS_AVAILABLE`, `REJECTED`, and
+
+        the intermediate `IDV_REQUIRED` / `PENDING_REVIEW`.
+
+
+        `Idempotency-Key` is optional; when supplied it must be nonblank.
+
+        Completed requests replay their original response with the same key.
+
+        A request without a key is treated as a new key. An unexpired,
+
+        unaccepted `FROZEN` application can be resubmitted with a new key after
+
+        the applicant unfreezes their credit file. This reuses the existing
+
+        application and restarts evaluation.
+
+        Other already submitted applications return `409` with
+
+        `APPLICATION_ALREADY_SUBMITTED` for a new key: the earlier submission
+
+        took effect, so poll `GET /v2/applications/{application_id}` for its
+
+        progress instead of retrying. Replaying an earlier key does not restart
+
+        evaluation. This includes an application that has stayed `EVALUATING`
+
+        longer than usual: Imprint completes delayed evaluations on its side,
+
+        so wait for the result rather than resubmitting.
+
+        Successful responses return an empty `product_offers` array. The first
+
+        submit sets `expires_at`; a later resubmit does not move it.
+
+
+        **Required scope:** `APPLICATION_WRITE`'
+      operationId: submitApplication
+      x-required-scopes:
+      - APPLICATION_WRITE
+      parameters:
+      - $ref: '#/components/parameters/applicationMerchantKeyParam'
+      - $ref: '#/components/parameters/applicationIdParam'
+      - $ref: '#/components/parameters/nonblankIdempotencyKeyParam'
+      responses:
+        '200':
+          description: Application submitted; decisioning is under way.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Application'
+        '400':
+          description: Invalid application request or blank Idempotency-Key.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InvalidRequestError'
+        '403':
+          description: The API key does not have application write access.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+        '404':
+          description: The application does not exist or is not owned by the caller.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApplicationNotFoundError'
+        '409':
+          description: 'Requirements that block submission are unsatisfied, or the application was already submitted; alternatively an idempotent operation is in progress or its key was reused. `blocking_requirements` is present for `SUBMIT_BLOCKED`. `APPLICATION_ALREADY_SUBMITTED` means the submission already took effect; poll Get Application for its progress.
+
+            '
+          headers:
+            Retry-After:
+              description: Seconds to wait when `type` is `IDEMPOTENCY_IN_PROGRESS`.
+              schema:
+                type: integer
+          content:
+            application/json:
+              schema:
+                anyOf:
+                - $ref: '#/components/schemas/SubmitBlockedError'
+                - $ref: '#/components/schemas/ConflictError'
+                - $ref: '#/components/schemas/IdempotencyConflictError'
+        '500':
+          description: An unexpected error prevented submission.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+        '503':
+          description: Submission is temporarily unavailable; retry with the same idempotency key.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+  /v2/applications/{application_id}/idv:
+    post:
+      tags:
+      - Applications
+      summary: Start identity verification
+      x-excluded: true
+      description: 'Returns the hosted identity-verification URL for an application in
+
+        `IDV_REQUIRED`. Send the applicant there to verify their identity.
+
+
+        When they finish, decisioning resumes and the application moves from
+
+        `IDV_REQUIRED` to `OFFERS_AVAILABLE`, `PENDING_REVIEW`, or `REJECTED`.
+
+        A successful IDV is not itself an approval. Poll or wait for the
+
+        webhook as you would after submitting.
+
+
+        The verification is created when the application enters
+
+        `IDV_REQUIRED`, and every call returns a URL for that same
+
+        verification. Calling again is safe, and an applicant who leaves
+
+        partway through picks up where they left off.
+
+
+        **Required scope:** `APPLICATION_WRITE`'
+      operationId: createApplicationIdv
+      x-required-scopes:
+      - APPLICATION_WRITE
+      parameters:
+      - $ref: '#/components/parameters/applicationMerchantKeyParam'
+      - $ref: '#/components/parameters/applicationIdParam'
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateIdvRequest'
+      responses:
+        '200':
+          description: The identity-verification URL for the application.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/IdvSession'
+        '400':
+          description: 'Malformed body, or a `redirect_url` that is not on your program''s redirect allowlist.
+
+            '
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InvalidRequestError'
+        '403':
+          description: The API key does not have application write access.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+        '404':
+          description: The application does not exist or is not owned by the caller.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApplicationNotFoundError'
+        '409':
+          description: 'Identity verification is not open on this application. `type` is `IDV_ALREADY_COMPLETED` if the applicant has already finished — stop asking and poll for the decision — or `IDV_NOT_REQUIRED` if the application never needed it, which means the caller reached this endpoint without an `IDV_REQUIRED` status and has a bug. The two are separated because one is a race the applicant already won and the other is a dead end.
+
+            '
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConflictError'
+  /v2/applications/{application_id}/accept:
+    post:
+      tags:
+      - Applications
+      summary: Accept an offer
+      x-excluded: true
+      description: 'Accepts one `OFFER_READY` entry of `product_offers` — pass its `id` as
+
+        `product_offer_id`. This is the commitment point: the account is created
+
+        from here. The response carries the accepted entry as `product_offer`.
+
+
+        Pass `card_design_id` to choose the design for this product offer.
+
+        Each product has its own designs: list them with
+
+        `GET /v2/card_designs` for the entry''s `product_id`. When omitted, the
+
+        design selected on the application via `PATCH` is used, falling back
+
+        to the configuration''s `card_design.default_card_design_id`; both
+
+        apply only to single-product applications.
+
+
+        Once acceptance is committed the response may be `OFFER_ACCEPTED` while
+
+        provisioning continues; `customer_id` remains null and callers poll.
+
+        Once the account exists, `customer_id` is populated on the application.
+
+        If authentication is not yet established the application waits in
+
+        `PENDING_AUTHENTICATION`; establish it to reach `COMPLETED`.
+
+
+        `Idempotency-Key` is optional; when supplied it must be nonblank. Retry the
+
+        same request with the same key to replay the original result. A request
+
+        without a key is treated as a new key. Once an offer has been accepted, a
+
+        new key returns `409` with `APPLICATION_CONFLICT`: the earlier acceptance
+
+        took effect, so poll `GET /v2/applications/{application_id}` for its
+
+        progress instead of retrying.
+
+        Successful responses include the application, its complete requirements, and
+
+        the accepted product offer. Historical replays may omit
+
+        product_offer; they are not enriched with current data.
+
+        Poll Get Application for later progress; Accept does not return `poll_after_ms`.
+
+
+        **Required scope:** `APPLICATION_WRITE`'
+      operationId: acceptApplication
+      x-required-scopes:
+      - APPLICATION_WRITE
+      parameters:
+      - $ref: '#/components/parameters/applicationMerchantKeyParam'
+      - $ref: '#/components/parameters/applicationIdParam'
+      - $ref: '#/components/parameters/nonblankIdempotencyKeyParam'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AcceptOfferRequest'
+      responses:
+        '200':
+          description: Offer accepted.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Application'
+        '400':
+          description: Malformed body or failed field validation.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InvalidRequestError'
+        '403':
+          description: The API key does not have application write access.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+        '404':
+          description: 'The application does not exist, is not owned by the caller, or `product_offer_id` is not the `id` of an `OFFER_READY` entry in this application''s `product_offers`.
+
+            '
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApplicationNotFoundError'
+        '409':
+          description: 'The application has no offers available, an offer has already been accepted, or the offer has expired; alternatively an idempotent operation is still in progress or its key was reused. When an offer has already been accepted, the acceptance already took effect; poll Get Application for its progress.
+
+            '
+          headers:
+            Retry-After:
+              description: Seconds to wait when `type` is `IDEMPOTENCY_IN_PROGRESS`.
+              schema:
+                type: integer
+          content:
+            application/json:
+              schema:
+                anyOf:
+                - $ref: '#/components/schemas/ConflictError'
+                - $ref: '#/components/schemas/IdempotencyConflictError'
+        '503':
+          description: Temporarily unavailable. Retry the same request with the same idempotency key.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+components:
+  schemas:
+    CreateAuthenticationRequest:
+      type: object
+      required:
+      - type
+      properties:
+        type:
+          type: string
+          description: '`PASSWORD` — the customer sets an Imprint password; requires
+
+            `password`.
+
+            `PARTNER_MANAGED` — you own authentication and the customer has no
+
+            Imprint login. Restricted to programs with a full Servicing-API
+
+            integration.
+
+            '
+          enum:
+          - PASSWORD
+          - PARTNER_MANAGED
+          example: PASSWORD
+        password:
+          type: string
+          description: 'The password to set, for `PASSWORD`. Must satisfy the program''s `password_policy`. Write-only, and never returned by any endpoint.
+
+            '
+          example: Correct horse battery 9
+    ApiError:
+      type: object
+      required:
+      - error
+      properties:
+        error:
+          type: object
+          required:
+          - type
+          - message
+          properties:
+            type:
+              type: string
+              description: The category of error being returned
+              example: BAD_REQUEST_ERROR
+            message:
+              type: string
+              description: A message describing the cause of the error
+              example: 'unsupported reward_type: INVALID, must be STATEMENT or DELAYED'
+    PhoneVerificationRequest:
+      type: object
+      required:
+      - action
+      properties:
+        action:
+          type: string
+          description: '`SEND` — Imprint sends a code by SMS.
+
+            `VERIFY` — submit the code the applicant received; requires `code`.
+
+            `ATTEST` — certify you verified the phone yourself; requires
+
+            `verified_at` and `method`, and is available only when the program''s
+
+            `phone_verification.mode` is `PARTNER_ATTESTED`.
+
+            '
+          enum:
+          - SEND
+          - VERIFY
+          - ATTEST
+          example: SEND
+        code:
+          type: string
+          description: The one-time code, for `VERIFY`.
+          example: '123456'
+        verified_at:
+          type: string
+          description: 'The RFC-3339 timestamp at which you verified the phone number, for `ATTEST`. Must be recent.
+
+            '
+          example: '2026-08-02T19:04:11Z'
+        method:
+          type: string
+          description: How you verified the phone number, for `ATTEST`.
+          enum:
+          - SMS_OTP
+          - VOICE_OTP
+          example: SMS_OTP
+    PartnerCustomerId:
+      type: string
+      minLength: 1
+      maxLength: 128
+      pattern: ^[\x20-\x7E]+$
+      description: 'The unique identifier for the customer in the partner''s system.
+
+
+        Compared byte-for-byte, so `PARTNER_USER_456` and `partner_user_456` are
+
+        two different customers. Send the same casing everywhere or a later
+
+        lookup silently returns no match.
+
+
+        Restricted to printable ASCII (`\x20`–`\x7E`) rather than arbitrary
+
+        UTF-8: the value is propagated between internal services as an HTTP/2
+
+        header, which cannot carry non-ASCII bytes. The bound is published
+
+        rather than discovered.
+
+        '
+      example: PARTNER_USER_456
+    Address:
+      type: object
+      description: Mailing address information
+      properties:
+        street_line1:
+          type: string
+          description: Primary street address
+          example: 123 Main St
+        street_line2:
+          type: string
+          description: Secondary street address (apartment, suite, etc.)
+          example: Apt 4B
+        city:
+          type: string
+          description: City name
+          example: San Francisco
+        state:
+          type: string
+          description: State or province
+          example: CA
+        postal_code:
+          type: string
+          examples:
+          - '94105'
+          - 94105-1234
+        country:
+          type: string
+          description: ISO-3166-1 alpha-3 Country Code
+          example: USA
+    ApplicationConfiguration:
+      type: object
+      description: 'The program''s application schema — every field that can ever be asked
+
+        for, the disclosures that must be consented, and the verification and
+
+        authentication modes in effect.
+
+        '
+      required:
+      - configuration_revision
+      - fields
+      - disclosures
+      - requirement_definitions
+      properties:
+        configuration_revision:
+          type: string
+          description: 'Identifier for this configuration entry. Applications retain this
+
+            value so callers can request the matching entry when resuming.
+
+            Operators can edit or remove entries; revisions are not immutable snapshots.
+
+            '
+          example: ACFG-2026-08-02-1
+        fields:
+          type: array
+          description: 'Every applicant field the program can ask for. Use this to build
+
+            your form; use the application''s `requirements` to decide what to
+
+            show for a given applicant.
+
+            '
+          items:
+            $ref: '#/components/schemas/ApplicationFieldSchema'
+        disclosures:
+          type: array
+          description: The disclosures this program requires consent to.
+          items:
+            $ref: '#/components/schemas/DisclosureSchema'
+        requirement_definitions:
+          type: array
+          description: 'Every non-field, non-disclosure requirement key this program can
+
+            emit. FIELD keys are defined by `fields`; DISCLOSURE keys are
+
+            defined by `disclosures`. Together these collections define every
+
+            requirement key an application can return.
+
+            '
+          items:
+            $ref: '#/components/schemas/ApplicationRequirementDefinition'
+        legal_documents:
+          type: array
+          description: 'Every document the program publishes, whether or not a disclosure
+
+            references it. A program has documents no single consent covers — a
+
+            rewards program''s terms, a fee schedule — and an applicant is
+
+            entitled to read all of them, so the full set is published rather
+
+            than only the consent-reachable subset.
+
+
+            This is not consent: nothing here needs acknowledging. Render it as
+
+            a documents or terms section, separately from `disclosures`.
+
+            '
+          items:
+            $ref: '#/components/schemas/LegalDocumentSchema'
+        phone_verification:
+          $ref: '#/components/schemas/ApplicationPhoneVerification'
+        authentication:
+          $ref: '#/components/schemas/ApplicationAuthentication'
+        card_design:
+          $ref: '#/components/schemas/ApplicationCardDesign'
+    SubmitBlockedError:
+      type: object
+      description: 'Returned when submission is attempted with outstanding requirements. `blocking_requirements` is the subset of the application''s requirements that is holding up submission.
+
+        '
+      required:
+      - type
+      - message
+      - blocking_requirements
+      properties:
+        type:
+          type: string
+          example: SUBMIT_BLOCKED
+        message:
+          type: string
+          example: 2 requirements must be satisfied before this application can be submitted
+        blocking_requirements:
+          type: array
+          items:
+            $ref: '#/components/schemas/ApplicationRequirement'
+    LegalDocumentSchema:
+      type: object
+      description: A published document with all configured translations, keyed by locale.
+      required:
+      - id
+      - content
+      properties:
+        id:
+          type: string
+          example: DOC-cardholder-agreement-v1
+        content:
+          type: object
+          additionalProperties:
+            $ref: '#/components/schemas/ApplicationLegalDocumentContent'
+    ApplicantInput:
+      type: object
+      description: 'Writable applicant fields. Only fields present in the program''s
+
+        configuration are accepted; anything else is a `400`.
+
+        '
+      properties:
+        first_name:
+          type: string
+          example: Jane
+        last_name:
+          type: string
+          example: Doe
+        email:
+          type: string
+          format: email
+          example: jane@doe.com
+        phone:
+          type: string
+          description: E.164 format. Cannot be changed once verified.
+          example: '+15125550143'
+        address:
+          $ref: '#/components/schemas/Address'
+        date_of_birth:
+          $ref: '#/components/schemas/DateOfBirth'
+        ssn:
+          type: string
+          description: 'The applicant''s full SSN, without hyphens. Write-only — never returned.
+
+            '
+          example: '123456789'
+        annual_income:
+          type: integer
+          multipleOf: 100
+          minimum: 0
+          maximum: 999999900
+          description: 'Gross annual income in cents (the smallest currency unit). Must be
+
+            a whole-dollar amount (a multiple of 100) between 0 and 999999900
+
+            ($9,999,999.00); `8500000` is $85,000.00. A value outside these
+
+            bounds cannot be submitted.
+
+            '
+          example: 8500000
+        income_type:
+          type: string
+          example: SALARY
+        housing_cost:
+          type: integer
+          multipleOf: 100
+          minimum: 0
+          maximum: 999999900
+          description: 'Monthly housing cost in cents (the smallest currency unit). Must be
+
+            a whole-dollar amount (a multiple of 100) between 0 and 999999900
+
+            ($9,999,999.00); `220000` is $2,200.00. A value outside these
+
+            bounds cannot be submitted.
+
+            '
+          example: 220000
+        housing_type:
+          type: string
+          example: RENT
+        language:
+          type: string
+          description: IETF language tag for applicant-facing content
+          example: en-US
+    LocalizedMessage:
+      type: object
+      description: 'Applicant-facing text, keyed by IETF BCP 47 locale tag.
+
+
+        A dictionary rather than a server-resolved string because the caller
+
+        knows which locale to render and the server does not: an applicant who
+
+        switches language mid-application would otherwise need every requirement
+
+        refetched, and resolving server-side means resolving against a language
+
+        preference the applicant may not have set yet.
+
+
+        Callers should fall back to `en-US`, and then to any present locale — a
+
+        missing translation should degrade to readable copy in the wrong
+
+        language rather than to a blank where the applicant most needs to be
+
+        told something.
+
+        '
+      additionalProperties:
+        type: string
+      example:
+        en-US: At least 8 characters, including a letter and a number.
+        es-US: Al menos 8 caracteres, incluyendo una letra y un número.
+    ApplicationPhoneVerification:
+      type: object
+      required:
+      - mode
+      properties:
+        mode:
+          type: string
+          description: '`IMPRINT_OTP` — Imprint sends and verifies the code.
+
+            `PARTNER_ATTESTED` — you may instead certify that you verified
+
+            the phone number yourself, via the `ATTEST` action.
+
+            '
+          enum:
+          - IMPRINT_OTP
+          - PARTNER_ATTESTED
+          example: IMPRINT_OTP
+        code_length:
+          type: integer
+          description: 'How many digits the code has, so an input can be sized before a
+
+            code is ever sent. Present when `mode` is `IMPRINT_OTP`.
+
+            '
+          example: 6
+        resend_after_ms:
+          type: integer
+          description: 'How long to wait between `SEND` actions. Lets a caller disable
+
+            its own resend control before being rejected; the `429` from the
+
+            endpoint remains authoritative, since it accounts for a code
+
+            sent before the current page was loaded.
+
+            '
+          example: 15000
+    ApplicationAddressPatch:
+      type: object
+      properties:
+        street_line1:
+          type: string
+          nullable: true
+          x-go-type: nullable.Nullable[string]
+          x-go-type-import:
+            path: github.com/oapi-codegen/nullable
+          x-go-type-skip-optional-pointer: true
+        street_line2:
+          type: string
+          nullable: true
+          x-go-type: nullable.Nullable[string]
+          x-go-type-import:
+            path: github.com/oapi-codegen/nullable
+          x-go-type-skip-optional-pointer: true
+        city:
+          type: string
+          nullable: true
+          x-go-type: nullable.Nullable[string]
+          x-go-type-import:
+            path: github.com/oapi-codegen/nullable
+          x-go-type-skip-optional-pointer: true
+        state:
+          type: string
+          nullable: true
+          x-go-type: nullable.Nullable[string]
+          x-go-type-import:
+            path: github.com/oapi-codegen/nullable
+          x-go-type-skip-optional-pointer: true
+        postal_code:
+          type: string
+          nullable: true
+          x-go-type: nullable.Nullable[string]
+          x-go-type-import:
+            path: github.com/oapi-codegen/nullable
+          x-go-type-skip-optional-pointer: true
+        country:
+          type: string
+          nullable: true
+          x-go-type: nullable.Nullable[string]
+          x-go-type-import:
+            path: github.com/oapi-codegen/nullable
+          x-go-type-skip-optional-pointer: true
+    ApplicationLegalDocumentContent:
+      type: object
+      required:
+      - display_name
+      - url
+      properties:
+        display_name:
+          type: string
+        url:
+          type: string
+    VerifyAccountOwnershipRequest:
+      type: object
+      required:
+      - type
+      properties:
+        type:
+          type: string
+          description: '`PASSWORD` presents the existing account password (advertised by
+
+            `VERIFY_PASSWORD`) and requires `password`. `PIN` presents the
+
+            existing account PIN (advertised by `VERIFY_PIN`) and requires
+
+            `pin`. `HOSTED` is reserved for the Imprint-owned handoff, must omit
+
+            both credentials, and currently returns `409`.
+
+            '
+          enum:
+          - PASSWORD
+          - PIN
+          - HOSTED
+          example: PASSWORD
+        password:
+          type: string
+          description: 'The password on the applicant''s existing Imprint account. Required for `PASSWORD`; forbidden for `PIN` and `HOSTED`. Write-only.
+
+            '
+          example: correct-horse-battery-staple
+        pin:
+          type: string
+          description: 'The PIN on the applicant''s existing Imprint account. Required for `PIN`; forbidden for `PASSWORD` and `HOSTED`. Write-only.
+
+            '
+          pattern: ^[0-9]{4,12}$
+          example: '482913'
+    ApplicationCardDesign:
+      type: object
+      description: How card-design selection behaves for this program.
+      properties:
+        default_card_design_id:
+          type: string
+          format: uuid
+          nullable: true
+          x-go-type: nullable.Nullable[string]
+          x-go-type-import:
+            path: github.com/oapi-codegen/nullable
+          x-go-type-skip-optional-pointer: true
+          description: 'The default card design for single-product applications, applied
+
+            when the applicant does not choose one. When present, the
+
+            `card_design` requirement starts satisfied and a selection is an
+
+            override. Multi-product applications choose a design per product
+
+            offer on accept instead.
+
+            '
+          example: 8a2f41c6-90be-4d77-b1e3-5c7092da6f84
+    ApplicationFieldSchema:
+      type: object
+      description: 'The schema for one applicant field: how to render and validate it, and
+
+        whether the program can ever require it.
+
+
+        No label is published. What a field is *called* belongs to the surface it
+
+        appears on — it changes with that surface and needs translating alongside
+
+        the rest of the page. Validation is published because the program
+
+        enforces it server-side, and a caller inventing its own would reject
+
+        input the program accepts.
+
+        '
+      required:
+      - key
+      - type
+      - necessity
+      properties:
+        key:
+          type: string
+          description: 'The field''s stable identifier, also used as the `key` of a
+
+            `FIELD` requirement and as the path to set in `PATCH`.
+
+            '
+          example: applicant.email
+        type:
+          type: string
+          description: The field's data type, which determines the JSON shape accepted by `PATCH`.
+          enum:
+          - string
+          - email
+          - phone
+          - integer
+          - date
+          - address
+          - enum
+          example: email
+        necessity:
+          type: string
+          description: '`ALWAYS_REQUIRED` — every application will require this field.
+
+            `CONDITIONALLY_REQUIRED` — some applications will, depending on
+
+            their state; only the application''s `requirements` can tell you.
+
+            `OPTIONAL` — never blocks progress.
+
+
+            This describes what the program *can* ask for. It never tells you
+
+            what a given application requires right now.
+
+            '
+          enum:
+          - ALWAYS_REQUIRED
+          - CONDITIONALLY_REQUIRED
+          - OPTIONAL
+          example: ALWAYS_REQUIRED
+        pattern:
+          type: string
+          description: A regular expression the value must match.
+          example: ^\d{9}$
+        min_length:
+          type: integer
+          example: 1
+        max_length:
+          type: integer
+          example: 254
+        allowed_values:
+          type: array
+          description: For `enum` fields, the permitted values.
+          items:
+            type: string
+          example:
+          - EMPLOYED
+          - SELFEMPLOYED
+          - OTHER
+        minimum:
+          type: integer
+          format: int64
+          description: For `integer` fields, the smallest permitted value, inclusive.
+          example: 0
+        maximum:
+          type: integer
+          format: int64
+          description: For `integer` fields, the largest permitted value, inclusive.
+          example: 999999900
+        multiple_of:
+          type: integer
+          format: int64
+          description: 'For `integer` fields, the value must be an exact multiple of this
+
+            number. Currency fields use `100` to require whole dollars.
+
+            '
+          example: 100
+    ApplicationDateOfBirthPatch:
+      type: object
+      properties:
+        year:
+          type: integer
+          nullable: true
+          x-go-type: nullable.Nullable[int]
+          x-go-type-import:
+            path: github.com/oapi-codegen/nullable
+          x-go-type-skip-optional-pointer: true
+        month:
+          type: integer
+          nullable: true
+          x-go-type: nullable.Nullable[int]
+          x-go-type-import:
+            path: github.com/oapi-codegen/nullable
+          x-go-type-skip-optional-pointer: true
+        day:
+          type: integer
+          nullable: true
+          x-go-type: nullable.Nullable[int]
+          x-go-type-import:
+            path: github.com/oapi-codegen/nullable
+          x-go-type-skip-optional-pointer: true
+    CreateApplicationRequest:
+      type: object
+      description: 'Every field is optional — send what you have. `partner_customer_id` is
+
+        strongly recommended so the application can be reconciled against your
+
+        own records and found later without storing our id.
+
+
+        The program is identified by the `x-imprint-merchant-key` header, not by
+
+        a field in this body.
+
+        '
+      properties:
+        consents:
+          type: array
+          nullable: true
+          x-go-type: '[]string'
+          description: 'Disclosure IDs the applicant has consented to after viewing the
+
+            disclosures. Inputs are retained pending validation by Onboard
+
+            application configuration. Omission, null, and an empty array add none.
+
+            '
+          items:
+            type: string
+            format: uuid
+        partner_customer_id:
+          $ref: '#/components/schemas/PartnerCustomerId'
+        applicant:
+          $ref: '#/components/schemas/ApplicantInput'
+        card_design_id:
+          type: string
+          format: uuid
+          description: An early card-design selection, changeable until the application completes.
+          example: 8a2f41c6-90be-4d77-b1e3-5c7092da6f84
+        metadata:
+          type: object
+          description: A set of key-value pairs to attach to the application.
+          additionalProperties:
+            type: string
+          example:
+            loyalty_id: '840012345678'
+            campaign: summer-2026
+    UpdateApplicationRequest:
+      type: object
+      description: 'A merge-patch. Omitted fields are untouched; an explicit `null` clears a
+
+        field. This applies recursively to applicant address/date fields and to
+
+        metadata. `consents` is additive — consent is never withdrawn by
+
+        omission, and `consents: null` is invalid rather than revoking consent.
+
+        '
+      properties:
+        applicant:
+          allOf:
+          - $ref: '#/components/schemas/ApplicantPatch'
+          nullable: true
+          x-go-type: nullable.Nullable[ApplicantPatch]
+          x-go-type-import:
+            path: github.com/oapi-codegen/nullable
+          x-go-type-skip-optional-pointer: true
+          description: A nested merge-patch, or `null` to clear all editable applicant data.
+        consents:
+          type: array
+          x-go-type: nullable.Nullable[[]string]
+          x-go-type-import:
+            path: github.com/oapi-codegen/nullable
+          x-go-type-skip-optional-pointer: true
+          description: 'Disclosure ids the applicant has consented to, from the
+
+            configuration''s `disclosures`. Record consent only after the
+
+            disclosure has actually been displayed. Omit to add none; an empty
+
+            array is a no-op; `null` is rejected.
+
+            '
+          items:
+            type: string
+            format: uuid
+          example:
+          - 0e5d62df-8b26-4cd5-b7f0-ecc8221e6134
+        card_design_id:
+          type: string
+          format: uuid
+          nullable: true
+          x-go-type: nullable.Nullable[string]
+          x-go-type-import:
+            path: github.com/oapi-codegen/nullable
+          x-go-type-skip-optional-pointer: true
+          description: The selected card design, or `null` to clear the selection.
+          example: 8a2f41c6-90be-4d77-b1e3-5c7092da6f84
+        partner_customer_id:
+          type: string
+          nullable: true
+          minLength: 1
+          maxLength: 128
+          pattern: ^[\x20-\x7E]+$
+          x-go-type: nullable.Nullable[string]
+          x-go-type-import:
+            path: github.com/oapi-codegen/nullable
+          x-go-type-skip-optional-pointer: true
+          description: The byte-exact partner customer id, or `null` to clear it.
+        metadata:
+          type: object
+          nullable: true
+          x-go-type: nullable.Nullable[ApplicationMetadataPatch]
+          x-go-type-import:
+            path: github.com/oapi-codegen/nullable
+          x-go-type-skip-optional-pointer: true
+          description: 'A set of key-value pairs to attach to the application. Merges with existing metadata; a key set to `null` is removed. Set the whole object to `null` to clear all metadata.
+
+            '
+          additionalProperties:
+            type: string
+            nullable: true
+    DisclosureSchema:
+      type: object
+      description: A disclosure with all configured translations, keyed by locale.
+      required:
+      - id
+      - version
+      - content
+      - gates
+      properties:
+        id:
+          type: string
+          description: Stable opaque disclosure identifier used when recording consent.
+          example: DISC-esign-v1
+        version:
+          type: string
+          example: '1'
+        content:
+          type: object
+          additionalProperties:
+            $ref: '#/components/schemas/ApplicationDisclosureContent'
+        gates:
+          type: string
+          description: The milestone this disclosure blocks until consented.
+          enum:
+          - PHONE_VERIFICATION
+          - SUBMIT
+          - OFFER_ACCEPTANCE
+          - COMPLETION
+    DateOfBirth:
+      type: object
+      description: Customer's date of birth
+      properties:
+        year:
+          type: integer
+          description: Year of birth
+          minimum: 1900
+          example: 1990
+        month:
+          type: integer
+          description: Month of birth
+          minimum: 1
+          maximum: 12
+          example: 1
+        day:
+          type: integer
+          description: Day of birth
+          minimum: 1
+          maximum: 31
+          example: 1
+    AcceptOfferRequest:
+      type: object
+      required:
+      - product_offer_id
+      properties:
+        product_offer_id:
+          type: string
+          format: uuid
+          description: The `id` of an `OFFER_READY` entry in the application's `product_offers`.
+          example: 31d9a0c4-77e2-4b58-9f16-8c3e5a2b0d74
+        card_design_id:
+          type: string
+          format: uuid
+          description: 'The card design for this product offer, from the designs available to the entry''s `product_id`. For a single-product application it may be omitted in favor of the design selected via `PATCH` or the configuration''s `default_card_design_id`.
+
+            '
+          example: 8a2f41c6-90be-4d77-b1e3-5c7092da6f84
+    OwnershipSession:
+      type: object
+      required:
+      - url
+      - expires_at
+      properties:
+        url:
+          type: string
+          description: The short-lived Imprint-hosted account ownership and authentication URL.
+          example: https://authenticate.imprint.co/s/eyJhbGciOiJIUzI1NiJ9
+        expires_at:
+          type: string
+          format: date-time
+          description: The RFC-3339 timestamp after which the URL is no longer valid.
+          example: '2026-08-02T20:08:07Z'
+    ApplicationNotFoundError:
+      type: object
+      required:
+      - type
+      - message
+      properties:
+        type:
+          type: string
+          example: APPLICATION_NOT_FOUND
+        message:
+          type: string
+          example: No application found with id 7f3c1e20-4b8a-4e11-9c6d-2a5f0b7d3e91
+    PrefillApplicationRequest:
+      type: object
+      required:
+      - ssn_last_four
+      properties:
+        ssn_last_four:
+          type: string
+          description: 'The last four digits of the applicant''s SSN. Combined with the verified phone number on the application to find their record.
+
+            '
+          example: '1234'
+    ApplicationListResponse:
+      type: object
+      required:
+      - data
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/Application'
+          description: List of applications
+        has_more:
+          type: boolean
+        total:
+          type: integer
+    NoPrefillMatchError:
+      type: object
+      description: 'No identity record matched the verified phone number and the four SSN digits supplied. This is an expected outcome, not a fault: send the applicant to manual entry. The application is unchanged.
+
+        '
+      required:
+      - type
+      - message
+      properties:
+        type:
+          type: string
+          example: NO_PREFILL_MATCH
+        message:
+          type: string
+          example: No prefill record matched the supplied details
+    CreateIdvRequest:
+      type: object
+      properties:
+        redirect_url:
+          type: string
+          description: 'Where to send the applicant when identity verification completes or fails. Must be on your program''s redirect allowlist, which Imprint configures with its verification provider; ask Imprint to add a URL before using it. A URL that is not allowlisted is rejected with `400`. Omit it to leave the applicant on the verification page when they finish. Query parameters added to this URL on arrival are not a decision: read the outcome from the application or its webhook.
+
+            '
+          example: https://partner.example.com/apply/idv-complete
+    ApplicationStatus:
+      type: string
+      description: 'The application''s lifecycle status. The application webhook reports
+
+        this same status: Imprint computes it from the application''s current
+
+        decisioning state on every read, and sends the webhook only after that
+
+        state changes, so a `GET /v2/applications/{application_id}` made after
+
+        a webhook returns that webhook''s `status` or a later one, never an
+
+        earlier one.
+
+
+        Branch on `status`, not on
+
+        `product_offers[].result`, when choosing what to render: in a
+
+        multi-product application some products can be `REJECTED` while the
+
+        application is `OFFERS_AVAILABLE`.
+
+
+        `IDV_REQUIRED`, `FROZEN`, and `PENDING_REVIEW` are application statuses,
+
+        not product offer results; `product_offers` is empty while the
+
+        application is in one of them. `IDV_REQUIRED` means the applicant must
+
+        complete IDV; `FROZEN` means the applicant must lift the credit freeze
+
+        with the bureau before the application is resubmitted.
+
+
+        `EVALUATING` means Imprint is decisioning the application. It normally
+
+        lasts seconds but can occasionally persist longer while Imprint
+
+        completes a delayed evaluation; no action is required and the
+
+        application cannot be submitted again from this status.
+
+
+        `OFFER_ACCEPTED` means acceptance is durably committed and provisioning
+
+        is still running. `PENDING_AUTHENTICATION` means the account exists but
+
+        required authentication is outstanding. `COMPLETED` requires both.
+
+        `ACCOUNT_FUNDED` is shared webhook vocabulary for funding products; the
+
+        first Application API release has no secured funding operation and does
+
+        not originate it.
+
+        '
+      enum:
+      - IN_PROGRESS
+      - EVALUATING
+      - IDV_REQUIRED
+      - PENDING_REVIEW
+      - FROZEN
+      - OFFERS_AVAILABLE
+      - REJECTED
+      - OFFER_ACCEPTED
+      - ACCOUNT_FUNDED
+      - PENDING_AUTHENTICATION
+      - COMPLETED
+      - EXPIRED
+      example: IN_PROGRESS
+    PasswordPolicy:
+      type: object
+      description: 'The password rule this program enforces, published so a caller can
+
+        validate before submitting rather than inventing its own rule and
+
+        rejecting input the program would have accepted.
+
+
+        This is the inline-checkable subset of the Imprint default password
+
+        policy: 10 to 128 Unicode code points with at least one uppercase
+
+        letter, one lowercase letter and one digit. The server additionally
+
+        rejects four-character sequential or repeated runs, common passwords,
+
+        and passwords containing the applicant''s email name, phone digits or
+
+        date of birth; none of those can be expressed here, so a password that
+
+        satisfies this object can still be rejected with
+
+        `PASSWORD_POLICY_VIOLATION`. See the Password policy section of the
+
+        Application APIs guide for the full table.
+
+
+        The vocabulary is deliberately the same as `ApplicationFieldSchema`''s —
+
+        `pattern`, `min_length`, `max_length` — rather than a second one for the
+
+        same job.
+
+        '
+      properties:
+        min_length:
+          type: integer
+          example: 10
+        max_length:
+          type: integer
+          description: 'Real policy rather than an oversight: hashing unbounded input is a
+
+            cheap denial of service, so the bound is published rather than
+
+            discovered.
+
+            '
+          example: 128
+        pattern:
+          type: string
+          description: 'A regular expression the password must match.
+
+
+            This pattern must compile in every engine that reads it, which rules
+
+            out the two constructs most likely to be reached for first:
+
+            lookahead (`(?=...)`) is unsupported by Go''s RE2, and the `(?s)`
+
+            flag is a syntax error in JavaScript. The portable form of "an
+
+            uppercase letter, a lowercase letter and a digit, in any order" is an
+
+            alternation over the six orderings, as in the example.
+
+
+            Unicode classes are used rather than ASCII ranges because programs
+
+            publish non-English copy, and `[A-Za-z]` would reject a valid
+
+            password such as `contraseña1` for containing no letters. Callers
+
+            compiling this in a browser must pass the `u` flag: without it
+
+            JavaScript reads `\p{L}` as a literal `p` instead of failing, and
+
+            silently enforces a rule the program never published.
+
+
+            A caller that cannot compile the pattern should treat the password as
+
+            acceptable and let the server reject it. The program enforces the
+
+            rule regardless, and a form that can never be submitted is worse
+
+            than a rejection that explains itself.
+
+            '
+          example: ^(?:[\s\S]*\p{Lu}[\s\S]*\p{Ll}[\s\S]*\p{Nd}|[\s\S]*\p{Lu}[\s\S]*\p{Nd}[\s\S]*\p{Ll}|[\s\S]*\p{Ll}[\s\S]*\p{Lu}[\s\S]*\p{Nd}|[\s\S]*\p{Ll}[\s\S]*\p{Nd}[\s\S]*\p{Lu}|[\s\S]*\p{Nd}[\s\S]*\p{Lu}[\s\S]*\p{Ll}|[\s\S]*\p{Nd}[\s\S]*\p{Ll}[\s\S]*\p{Lu})[\s\S]*$
+    ProductOffer:
+      type: object
+      description: 'One product''s decision and, when approved, its offer.
+
+
+        `credit_limit`, `apr_percentage`, `expires_at`, and
+
+        `cardholder_agreement_url` are present only on an `OFFER_READY`,
+
+        `ACCEPTED`, `ACCEPTED_PENDING_ACTION`, or `COMPLETED` entry.
+
+        `card_design_id` is present once the entry is accepted. A `REJECTED`
+
+        entry carries its reasons and, when required, an adverse action
+
+        notice.
+
+        '
+      required:
+      - id
+      - product_id
+      - result
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: The id to pass as `product_offer_id` when accepting.
+          example: 6db3f865-e2ea-4cf0-a77d-4330a1b2c3d4
+        product_id:
+          type: string
+          description: The product this decision is for
+          example: daff06e9-143f-4318-81db-42d47e9bb388
+        result:
+          $ref: '#/components/schemas/ProductOfferResult'
+        reason_code:
+          type: string
+          description: 'The primary machine-readable reason. This vocabulary only ever
+
+            grows — codes are never repurposed — so treat an unrecognised code
+
+            as an unhandled default rather than an error.
+
+            '
+          example: INSUFFICIENT_CREDIT_HISTORY
+        reasons:
+          type: array
+          description: All contributing reasons, most significant first.
+          items:
+            type: object
+            required:
+            - code
+            properties:
+              code:
+                type: string
+                example: INSUFFICIENT_CREDIT_HISTORY
+              message:
+                allOf:
+                - $ref: '#/components/schemas/LocalizedMessage'
+                description: 'Applicant-facing explanation of this reason, safe to display.
+
+                  '
+                example:
+                  en-US: Not enough credit history
+                  es-US: Historial de crédito insuficiente
+        adverse_action_notice_url:
+          type: string
+          description: 'Where the adverse action notice can be retrieved, when one is required for this decision.
+
+            '
+          example: https://disclosures.imprint.co/aan/7f3c1e20-4b8a-4e11-9c6d-2a5f0b7d3e91.pdf
+        cardholder_agreement_url:
+          type: string
+          description: 'Where this product offer''s cardholder agreement can be retrieved. It is generated for this product with this product offer''s terms, so each acceptable entry has its own. Present on an `OFFER_READY`, `ACCEPTED`, `ACCEPTED_PENDING_ACTION`, or `COMPLETED` entry once the agreement has been generated. Presigned and short-lived: do not cache, log, or persist it.
+
+            '
+          example: https://disclosures.imprint.co/cardholder-agreement/APLN-v1-650E5076-F94C-4E6C-9583-9DED76DB3F86/agreement.pdf
+        card_design_id:
+          type: string
+          format: uuid
+          description: 'The card design committed for this product when the product offer was accepted, and the design used for issuance. Absent until the entry is accepted, or when no design was selected.
+
+            '
+          example: 3b9c1f3e-52a0-44c1-b131-a7ab0099a214
+        credit_limit:
+          $ref: '#/components/schemas/CurrencyAmount'
+        apr_percentage:
+          type: number
+          description: The purchase APR as a percentage
+          example: 24.99
+        expires_at:
+          type: string
+          description: The RFC-3339 timestamp after which this offer can no longer be accepted
+          example: '2026-08-20T12:00:04Z'
+    ApplicationRequirement:
+      type: object
+      description: 'One thing the application needs. `kind` says what sort of thing it is,
+
+        `status` whether it is done, and `blocks` which milestone it holds up.
+
+
+        Modelling fields, disclosures, and actions in one list means a new
+
+        requirement is an added array entry rather than a new response field —
+
+        so handle unknown `kind` and `key` values by ignoring them rather than
+
+        failing.
+
+        '
+      required:
+      - key
+      - kind
+      - status
+      properties:
+        key:
+          type: string
+          description: 'Stable identifier. For `FIELD` requirements this matches a `key` in
+
+            the application configuration''s `fields`.
+
+            '
+          example: applicant.address
+        kind:
+          type: string
+          description: '`FIELD` — applicant data, set via `PATCH`.
+
+            `DISCLOSURE` — consent recorded via `PATCH`.
+
+            `SELECTION` — a choice among options, such as a card design.
+
+            `ACTION` — something with a side effect, satisfied by its own
+
+            `POST` endpoint.
+
+            '
+          enum:
+          - FIELD
+          - DISCLOSURE
+          - SELECTION
+          - ACTION
+          example: FIELD
+        status:
+          type: string
+          description: '`MISSING` — not yet provided.
+
+            `PENDING` — provided or started, awaiting completion elsewhere
+
+            (an OTP sent but unverified, an IDV session in progress).
+
+            `SATISFIED` — done.
+
+            `INVALID` — provided but rejected; `message` explains why.
+
+            '
+          enum:
+          - MISSING
+          - PENDING
+          - SATISFIED
+          - INVALID
+          example: MISSING
+        blocks:
+          type: string
+          nullable: true
+          description: 'The milestone this requirement holds up, or `null` if it blocks
+
+            nothing.
+
+
+            `blocks` names the *earliest* milestone gated, not the only one, so
+
+            the milestones nest: `PHONE_VERIFICATION` requirements block
+
+            submission as well, because nothing can be submitted before the
+
+            phone is verified. To find what is holding up submit, take every
+
+            unsatisfied requirement whose `blocks` is `PHONE_VERIFICATION` or
+
+            `SUBMIT` — which is what `SUBMIT_BLOCKED`''s `blocking_requirements`
+
+            reports. `OFFER_ACCEPTANCE` and `COMPLETION` requirements do not
+
+            block submission: `authentication` can be satisfied after an offer is
+
+            accepted.
+
+            '
+          enum:
+          - PHONE_VERIFICATION
+          - SUBMIT
+          - OFFER_ACCEPTANCE
+          - COMPLETION
+          example: SUBMIT
+        message:
+          allOf:
+          - $ref: '#/components/schemas/LocalizedMessage'
+          description: 'Why the value was rejected, present when `status` is `INVALID`. Applicant-facing and safe to display.
+
+            '
+          example:
+            en-US: Address could not be verified
+            es-US: No se pudo verificar la dirección
+        disclosure:
+          $ref: '#/components/schemas/DisclosureSchema'
+        resolution_options:
+          type: array
+          description: 'For an unsatisfied `ACTION`, the route or routes by which it can be
+
+            resolved. Present whenever the caller must choose a dedicated
+
+            resolution route, even if only one is currently available.
+
+            '
+          items:
+            $ref: '#/components/schemas/RequirementResolutionOption'
+    ApplicationDisclosureContent:
+      type: object
+      required:
+      - url
+      properties:
+        url:
+          type: string
+          description: Where the disclosure content can be retrieved for display.
+        body:
+          type: array
+          items:
+            type: string
+        acknowledgement:
+          type: string
+    ConflictError:
+      type: object
+      description: object's current state prevents the requested update
+      properties:
+        type:
+          type: string
+        message:
+          type: string
+    ApplicationAuthentication:
+      type: object
+      required:
+      - supported_types
+      properties:
+        supported_types:
+          type: array
+          description: 'The authentication types this program accepts.
+
+            `PARTNER_MANAGED` is present only for programs with a full
+
+            Servicing-API integration.
+
+            '
+          items:
+            type: string
+            enum:
+            - PASSWORD
+            - PARTNER_MANAGED
+          example:
+          - PASSWORD
+        password_policy:
+          $ref: '#/components/schemas/PasswordPolicy'
+    IdvSession:
+      type: object
+      required:
+      - url
+      properties:
+        url:
+          type: string
+          description: 'The hosted identity-verification URL to send the applicant to. It points at the application''s one verification and stays the same until identity verification is finished, apart from the `redirect_url` you pass, which is included in it.
+
+            '
+          example: https://imprint.withpersona.com/verify?inquiry-id=inq_2CVZ4HvXFPVgjxM9ZwSm1ZbV&redirect-uri=https%3A%2F%2Fpartner.example.com%2Fapply%2Fidv-complete
+    CurrencyAmount:
+      type: integer
+      description: Amount in the smallest currency unit (e.g., cents for USD)
+    Applicant:
+      type: object
+      description: 'The applicant data held on the application. Fields absent from the
+
+        program''s configuration are never populated. Sensitive values are
+
+        returned masked or omitted.
+
+        '
+      properties:
+        first_name:
+          type: string
+          example: Jane
+        last_name:
+          type: string
+          example: Doe
+        email:
+          type: string
+          format: email
+          example: jane@doe.com
+        phone:
+          type: string
+          description: E.164 format
+          example: '+15125550143'
+        address:
+          $ref: '#/components/schemas/Address'
+        date_of_birth:
+          $ref: '#/components/schemas/DateOfBirth'
+        ssn_last_four:
+          type: string
+          description: 'The last four digits of the SSN. The full value is never returned.
+
+            '
+          example: '1234'
+        annual_income:
+          type: integer
+          description: 'Gross annual income in cents (the smallest currency unit). Must be
+
+            a whole-dollar amount (a multiple of 100) between 0 and 999999900
+
+            ($9,999,999.00); `8500000` is $85,000.00. A value outside these
+
+            bounds cannot be submitted.
+
+            '
+          example: 8500000
+        income_type:
+          type: string
+          example: SALARY
+        housing_cost:
+          type: integer
+          description: 'Monthly housing cost in cents (the smallest currency unit). Must be
+
+            a whole-dollar amount (a multiple of 100) between 0 and 999999900
+
+            ($9,999,999.00); `220000` is $2,200.00. A value outside these
+
+            bounds cannot be submitted.
+
+            '
+          example: 220000
+        housing_type:
+          type: string
+          example: RENT
+        language:
+          type: string
+          description: IETF language tag for applicant-facing content
+          example: en-US
+    ApplicationRequirementDefinition:
+      type: object
+      description: A non-field requirement key the program may emit.
+      required:
+      - key
+      - kind
+      - blocks
+      properties:
+        key:
+          type: string
+          example: account_ownership
+        kind:
+          type: string
+          enum:
+          - ACTION
+          - SELECTION
+          example: ACTION
+        blocks:
+          type: string
+          enum:
+          - PHONE_VERIFICATION
+          - SUBMIT
+          - OFFER_ACCEPTANCE
+          - COMPLETION
+          example: SUBMIT
+        resolution_options:
+          type: array
+          description: The resolution routes this requirement may advertise when unsatisfied.
+          items:
+            $ref: '#/components/schemas/RequirementResolutionOption'
+    RateLimitedError:
+      type: object
+      description: 'An action was requested again too soon. `retry_after_seconds` rounds up — truncating would report `0` with time still on the clock and send the caller straight into another rejection. The same value is on the `Retry-After` header; it is in the body as well so a client that already parses the JSON error can render a countdown without reaching for response headers.
+
+        '
+      required:
+      - type
+      - message
+      - retry_after_seconds
+      properties:
+        type:
+          type: string
+          example: RESEND_TOO_SOON
+        message:
+          type: string
+          example: A verification code was already sent; retry in 9 seconds
+        retry_after_seconds:
+          type: integer
+          example: 9
+    RequirementResolutionOption:
+      type: object
+      description: One way to satisfy a requirement.
+      required:
+      - type
+      properties:
+        type:
+          type: string
+          description: 'Identifies the route to take. These name *routes*, and are a
+
+            different vocabulary from the credential `type` the routes accept —
+
+            do not pass one of these values through as a request field:
+
+
+            | This option | Call | With `type` |
+
+            |---|---|---|
+
+            | `VERIFY_PASSWORD` | `POST .../verify_account_ownership` | `PASSWORD` |
+
+            | `VERIFY_PIN` | `POST .../verify_account_ownership` | `PIN` |
+
+            | `HOSTED_AUTHENTICATION` | `POST .../verify_account_ownership` | `HOSTED` |
+
+            | `SET_PASSWORD` | `POST .../authentication` | `PASSWORD` |
+
+            | `IDV` | `POST .../idv` | — |
+
+
+            `HOSTED_AUTHENTICATION` is reserved and not advertised today.
+
+            `UNFREEZE_CREDIT` has no endpoint: the applicant must lift the
+
+            freeze with the bureau, then the application can be resubmitted.
+
+            '
+          enum:
+          - VERIFY_PASSWORD
+          - VERIFY_PIN
+          - HOSTED_AUTHENTICATION
+          - SET_PASSWORD
+          - IDV
+          - UNFREEZE_CREDIT
+          example: VERIFY_PASSWORD
+        message:
+          allOf:
+          - $ref: '#/components/schemas/LocalizedMessage'
+          description: Applicant-facing detail about this option.
+          example:
+            en-US: Verify the password on the existing Imprint account
+            es-US: Verifique la contraseña de su cuenta Imprint existente
+    Application:
+      type: object
+      description: 'An application in progress or complete. `requirements` is the driver:
+
+        it tells you what to collect next and what is blocking each milestone.
+
+        '
+      required:
+      - id
+      - configuration_revision
+      - status
+      - requirements
+      - created_at
+      - updated_at
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: Stable opaque application id, unchanged in reads and API-origin webhooks.
+          example: 7f3c1e20-4b8a-4e11-9c6d-2a5f0b7d3e91
+        configuration_revision:
+          type: string
+          description: 'The configuration revision currently assigned to this application.
+
+            Initially pinned at create and unchanged by routine configuration
+
+            updates. If a legal revision is revoked, the server assigns its
+
+            replacement while preserving candidate and consent history, and
+
+            returns the replacement disclosure as unsatisfied.
+
+            '
+          example: ACFG-2026-08-02-1
+        status:
+          $ref: '#/components/schemas/ApplicationStatus'
+        partner_customer_id:
+          $ref: '#/components/schemas/PartnerCustomerId'
+        customer_id:
+          type: string
+          nullable: true
+          x-go-type: nullable.Nullable[string]
+          x-go-type-import:
+            path: github.com/oapi-codegen/nullable
+          x-go-type-skip-optional-pointer: true
+          description: 'The existing external Imprint customer identifier used by the
+
+            servicing APIs. Populated once offer acceptance provisions the
+
+            account; `null` before then. It is not a separate application-only
+
+            identifier.
+
+            '
+          example: 2EE24580-B97B-4949-A65C-929CCB9B9B8D
+        requirements:
+          type: array
+          description: 'Everything outstanding or satisfied for this application, in
+
+            recommended order. Iterate this list rather than reading individual
+
+            status flags — new requirement kinds are added here over time.
+
+            '
+          items:
+            $ref: '#/components/schemas/ApplicationRequirement'
+        poll_after_ms:
+          type: integer
+          nullable: true
+          x-go-type: nullable.Nullable[int]
+          x-go-type-import:
+            path: github.com/oapi-codegen/nullable
+          x-go-type-skip-optional-pointer: true
+          description: 'When present, the application is mid-evaluation — wait this many
+
+            milliseconds before polling again. `null` means no evaluation is in
+
+            flight and polling will not change the result. It can remain set for
+
+            longer than usual while Imprint completes a delayed evaluation; that
+
+            is not an error. Poll for at most 30 seconds in the applicant''s
+
+            session, then rely on the application webhook.
+
+            '
+          example: 2000
+        applicant:
+          $ref: '#/components/schemas/Applicant'
+        metadata:
+          type: object
+          description: Application metadata after applying create and merge-patch updates.
+          additionalProperties:
+            type: string
+        card_design_id:
+          type: string
+          format: uuid
+          nullable: true
+          x-go-type: nullable.Nullable[string]
+          x-go-type-import:
+            path: github.com/oapi-codegen/nullable
+          x-go-type-skip-optional-pointer: true
+          description: 'The card design selected on the application. Applies only to
+
+            single-product applications. Writable via `PATCH` through
+
+            `OFFERS_AVAILABLE`, and used when accepting the product offer
+
+            without a `card_design_id`.
+
+            The design each accepted product offer actually committed is
+
+            `product_offers[].card_design_id`.
+
+            '
+          example: 8a2f41c6-90be-4d77-b1e3-5c7092da6f84
+        product_offers:
+          type: array
+          description: 'One entry per product on the application: that product''s decision
+
+            and, when approved, its offer. Empty until decisioning finishes, and
+
+            empty while the application is `IDV_REQUIRED`, `FROZEN`, or
+
+            `PENDING_REVIEW`. Only an `OFFER_READY`, `ACCEPTED`,
+
+            `ACCEPTED_PENDING_ACTION`, or `COMPLETED` entry carries offer terms.
+
+            '
+          items:
+            $ref: '#/components/schemas/ProductOffer'
+        product_offer:
+          allOf:
+          - $ref: '#/components/schemas/ProductOffer'
+          description: 'The accepted product offer. Present only on the accept response.
+
+            '
+        ownership_session:
+          allOf:
+          - $ref: '#/components/schemas/OwnershipSession'
+          description: 'Reserved for the Imprint-hosted account-ownership handoff, which is
+
+            not yet available; never present today. When it ships it appears
+
+            only in the response that initiates `HOSTED` verification and is
+
+            omitted from ordinary reads. Do not persist its URL.
+
+            '
+        created_at:
+          type: string
+          description: The RFC-3339 timestamp when the application was created
+          example: '2026-08-02T19:08:07Z'
+        updated_at:
+          type: string
+          description: The RFC-3339 timestamp when the application was last updated
+          example: '2026-08-02T19:12:44Z'
+        draft_expires_at:
+          type: string
+          description: 'The RFC-3339 timestamp, set at creation, by which the application must be submitted. An application that has not been submitted by then is removed: `GET` returns `404` and the list omits it. Has no effect once the application is submitted.
+
+            '
+          example: '2026-08-30T19:08:07Z'
+        expires_at:
+          type: string
+          nullable: true
+          x-go-type: nullable.Nullable[string]
+          x-go-type-import:
+            path: github.com/oapi-codegen/nullable
+          x-go-type-skip-optional-pointer: true
+          description: 'The RFC-3339 timestamp, set at the first submit, by which an offer must be accepted. `null` until then; a later resubmit does not move it. If no offer has been accepted by this time, including while the application is still being decided, the application becomes `EXPIRED`. Each `OFFER_READY` entry in `product_offers` also carries its own `expires_at`, which can be earlier.
+
+            '
+          example: '2026-08-27T19:08:07Z'
+    ApplicantPatch:
+      type: object
+      description: 'Recursive merge-patch for applicant data. Omission preserves and null
+
+        clears at every level. A verified phone cannot be changed or cleared.
+
+        '
+      properties:
+        first_name:
+          type: string
+          nullable: true
+          x-go-type: nullable.Nullable[string]
+          x-go-type-import:
+            path: github.com/oapi-codegen/nullable
+          x-go-type-skip-optional-pointer: true
+        last_name:
+          type: string
+          nullable: true
+          x-go-type: nullable.Nullable[string]
+          x-go-type-import:
+            path: github.com/oapi-codegen/nullable
+          x-go-type-skip-optional-pointer: true
+        email:
+          type: string
+          format: email
+          nullable: true
+          x-go-type: nullable.Nullable[string]
+          x-go-type-import:
+            path: github.com/oapi-codegen/nullable
+          x-go-type-skip-optional-pointer: true
+        phone:
+          type: string
+          nullable: true
+          x-go-type: nullable.Nullable[string]
+          x-go-type-import:
+            path: github.com/oapi-codegen/nullable
+          x-go-type-skip-optional-pointer: true
+          description: E.164 format. Cannot be changed or cleared once verified.
+        address:
+          allOf:
+          - $ref: '#/components/schemas/ApplicationAddressPatch'
+          nullable: true
+          x-go-type: nullable.Nullable[ApplicationAddressPatch]
+          x-go-type-import:
+            path: github.com/oapi-codegen/nullable
+          x-go-type-skip-optional-pointer: true
+        date_of_birth:
+          allOf:
+          - $ref: '#/components/schemas/ApplicationDateOfBirthPatch'
+          nullable: true
+          x-go-type: nullable.Nullable[ApplicationDateOfBirthPatch]
+          x-go-type-import:
+            path: github.com/oapi-codegen/nullable
+          x-go-type-skip-optional-pointer: true
+        ssn:
+          type: string
+          nullable: true
+          x-go-type: nullable.Nullable[string]
+          x-go-type-import:
+            path: github.com/oapi-codegen/nullable
+          x-go-type-skip-optional-pointer: true
+          description: The full nine-digit SSN. Write-only and never returned.
+        annual_income:
+          type: integer
+          nullable: true
+          x-go-type: nullable.Nullable[int]
+          x-go-type-import:
+            path: github.com/oapi-codegen/nullable
+          x-go-type-skip-optional-pointer: true
+          multipleOf: 100
+          minimum: 0
+          maximum: 999999900
+          description: 'Gross annual income in cents (the smallest currency unit). Must be
+
+            a whole-dollar amount (a multiple of 100) between 0 and 999999900
+
+            ($9,999,999.00); `8500000` is $85,000.00. A value outside these
+
+            bounds cannot be submitted. `null` clears the value.
+
+            '
+        income_type:
+          type: string
+          nullable: true
+          x-go-type: nullable.Nullable[string]
+          x-go-type-import:
+            path: github.com/oapi-codegen/nullable
+          x-go-type-skip-optional-pointer: true
+        housing_cost:
+          type: integer
+          nullable: true
+          x-go-type: nullable.Nullable[int]
+          x-go-type-import:
+            path: github.com/oapi-codegen/nullable
+          x-go-type-skip-optional-pointer: true
+          multipleOf: 100
+          minimum: 0
+          maximum: 999999900
+          description: 'Monthly housing cost in cents (the smallest currency unit). Must be
+
+            a whole-dollar amount (a multiple of 100) between 0 and 999999900
+
+            ($9,999,999.00); `220000` is $2,200.00. A value outside these
+
+            bounds cannot be submitted. `null` clears the value.
+
+            '
+        housing_type:
+          type: string
+          nullable: true
+          x-go-type: nullable.Nullable[string]
+          x-go-type-import:
+            path: github.com/oapi-codegen/nullable
+          x-go-type-skip-optional-pointer: true
+        language:
+          type: string
+          nullable: true
+          x-go-type: nullable.Nullable[string]
+          x-go-type-import:
+            path: github.com/oapi-codegen/nullable
+          x-go-type-skip-optional-pointer: true
+    PrefillApplicationResponse:
+      type: object
+      required:
+      - prefilled
+      - application
+      properties:
+        prefilled:
+          type: object
+          description: 'The fields that were found and applied, keyed by field `key`. Show
+
+            these for confirmation and let the applicant correct them. Never
+
+            empty — a miss is a `404 NO_PREFILL_MATCH`, so a client does not have
+
+            to measure this map to learn whether the call found anything.
+
+            '
+          additionalProperties: true
+          example:
+            applicant.first_name: Jane
+            applicant.last_name: Doe
+            applicant.address:
+              street_line1: 123 Main St
+              city: Austin
+              state: TX
+              postal_code: '78701'
+              country: USA
+            applicant.date_of_birth:
+              year: 1990
+              month: 4
+              day: 12
+        application:
+          $ref: '#/components/schemas/Application'
+    InvalidRequestError:
+      type: object
+      properties:
+        path:
+          type: string
+          description: The path of the endpoint returning the error
+          example: /v2/customers
+        details:
+          type: array
+          items:
+            type: string
+          description: The details of the error being returned
+          example:
+          - 'email: must be a well-formed email address'
+        error:
+          type: string
+          description: The category of error being returned
+          example: Bad Request
+        status:
+          type: integer
+          description: The HTTP status code of the error
+          example: 400
+        timestamp:
+          type: string
+          description: The timestamp that the error occurred
+          example: '2025-01-20T18:18:22.923+00:00'
+    IdempotencyConflictError:
+      type: object
+      description: 'A keyed operation could not yet be replayed. Reuse the same key and
+
+        request after `retry_after_seconds` for `IDEMPOTENCY_IN_PROGRESS`.
+
+        `IDEMPOTENCY_KEY_REUSED` means the key was previously reserved for a
+
+        different method, operation, target, action, or canonical request body;
+
+        retry only with a new key for the genuinely new operation.
+
+        '
+      required:
+      - type
+      - message
+      properties:
+        type:
+          type: string
+          enum:
+          - IDEMPOTENCY_IN_PROGRESS
+          - IDEMPOTENCY_KEY_REUSED
+          example: IDEMPOTENCY_IN_PROGRESS
+        message:
+          type: string
+          example: The operation for this idempotency key is still in progress
+        retry_after_seconds:
+          type: integer
+          description: Present only for `IDEMPOTENCY_IN_PROGRESS`; matches the Retry-After header.
+          example: 2
+    ProductOfferResult:
+      type: string
+      description: "One product's decision.\n\n- `OFFER_READY`: approved for this product; the offer can be accepted.\n- `ACCEPTED`: the offer was accepted and the account is being provisioned.\n- `ACCEPTED_PENDING_ACTION`: the offer was accepted and a required\n  action, such as funding a security deposit, must complete first.\n- `COMPLETED`: the account for this product is provisioned.\n- `REJECTED`: declined for this product.\n- `EXPIRED`: the offer was not accepted in time, or an accepted offer's\n  required action did not complete in time.\n\n`COMPLETED`, `REJECTED`, and `EXPIRED` are final.\n"
+      enum:
+      - OFFER_READY
+      - ACCEPTED
+      - ACCEPTED_PENDING_ACTION
+      - COMPLETED
+      - REJECTED
+      - EXPIRED
+      example: OFFER_READY
+  parameters:
+    startingAfterParam:
+      name: starting_after
+      in: query
+      description: A cursor for use in pagination. An id that defines your place in the list.
+      schema:
+        type: string
+    applicationMerchantKeyParam:
+      name: x-imprint-merchant-key
+      in: header
+      required: true
+      description: 'Identifies the product/program for this application operation. The API
+
+        key must be authorized for the named program. Send this header on every
+
+        request; a key already bound to one product does not make it optional.
+
+        '
+      schema:
+        type: string
+    idempotencyKeyParam:
+      name: Idempotency-Key
+      in: header
+      required: false
+      description: 'A client-generated key that makes this request safe to retry. Replaying a
+
+        key returns the original result instead of performing the action twice.
+
+        Keys are scoped to your program and retained for 24 hours.
+
+        '
+      schema:
+        type: string
+        example: a1b2c3d4-e5f6-4a7b-8c9d-0e1f2a3b4c5d
+    nonblankIdempotencyKeyParam:
+      name: Idempotency-Key
+      in: header
+      required: false
+      description: 'An optional client-generated key that makes this request safe to retry.
+
+        Replaying a key returns the original result instead of performing the
+
+        action twice. When supplied it must be nonblank. Keys are scoped to your
+
+        program and retained for 24 hours.
+
+        '
+      schema:
+        type: string
+        minLength: 1
+        pattern: \S
+        example: a1b2c3d4-e5f6-4a7b-8c9d-0e1f2a3b4c5d
+    applicationIdParam:
+      name: application_id
+      in: path
+      required: true
+      description: The unique identifier for the application
+      schema:
+        type: string
+        format: uuid
+        example: 7f3c1e20-4b8a-4e11-9c6d-2a5f0b7d3e91
+    limitParam:
+      name: limit
+      in: query
+      description: Limits the number of returned results
+      schema:
+        type: integer
+        minimum: 1
+        default: 10
+        format: int32
+  securitySchemes:
+    basicAuth:
+      type: http
+      scheme: basic
+      description: 'Basic HTTP authentication. Allowed headers-- Authorization: Basic <base64(api_key_id:api_key_secret)>'
+    bearerAuth:
+      bearerFormat: auth-scheme
+      description: 'Bearer HTTP authentication. Allowed headers-- Authorization: Bearer <api_key>'
+      scheme: bearer
+      type: http

@@ -16,7 +16,7 @@ paths:
       tags:
       - Keys
       summary: Create an API Key
-      description: Creates a new API key
+      description: Creates a new API key. The new key is granted the same permissions as the API key that authenticates this request.
       operationId: createKey
       responses:
         '200':

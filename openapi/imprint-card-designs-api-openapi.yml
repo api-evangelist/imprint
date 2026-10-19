@@ -1,0 +1,235 @@
+openapi: 3.2.0
+info:
+  title: Public Imprint Card Designs API
+  version: '2.0'
+servers:
+- url: https://dev.sbx.imprint.co
+  description: Imprint public api sandbox
+security:
+- basicAuth: []
+- bearerAuth: []
+tags:
+- name: Card Designs
+paths:
+  /v2/card_designs:
+    get:
+      tags:
+      - Card Designs
+      summary: List card designs
+      operationId: listCardDesigns
+      description: 'Returns the card designs available for your program.
+
+
+        Designs gated behind a loyalty tier are included, with their requirement exposed
+
+        via `access_min_rank`. Pass `customer_id` to restrict the list to designs that
+
+        customer is eligible to select; omit it (for example, on a pre-signup teaser
+
+        screen) to receive every design the program offers.
+
+
+        If your program defines no designs of its own, the designs configured for your
+
+        partner are returned instead.
+
+
+        Results are paginated. When `has_more` is `true`, pass the response''s
+
+        `next_page_token` back as `starting_after` to retrieve the next page.'
+      parameters:
+      - name: customer_id
+        in: query
+        description: 'Restrict results to designs this customer is eligible for, based on their
+
+          loyalty tier.
+
+          '
+        schema:
+          type: string
+          example: 2EE24580-B97B-4949-A65C-929CCB9B9B8D
+      - name: search_term
+        in: query
+        description: Filters designs by name
+        schema:
+          type: string
+          example: Midnight
+      - name: starting_after
+        in: query
+        description: 'A cursor for use in pagination. Unlike other list endpoints, this takes the
+
+          opaque `next_page_token` from the previous response rather than a card design
+
+          id. Omit it for the first page.
+
+          '
+        schema:
+          type: string
+      responses:
+        '200':
+          description: List of card designs
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CardDesignListResponse'
+        '404':
+          description: Customer not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CustomerNotFoundError'
+components:
+  schemas:
+    CardDesignStatus:
+      type: string
+      description: 'Availability of the design. Only `ACTIVE` designs can be selected.
+
+        '
+      enum:
+      - UNSPECIFIED
+      - ACTIVE
+      - INACTIVE
+      - DELETED
+      example: ACTIVE
+    CardDesignListResponse:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/CardDesign'
+        has_more:
+          type: boolean
+        total:
+          type: integer
+        next_page_token:
+          type: string
+          description: 'Opaque cursor for the next page, present only when `has_more` is `true`.
+
+            Pass it back as `starting_after` to fetch the following page. Treat it as
+
+            opaque — its contents are not a card design id and may change.
+
+            '
+          example: eyJsIjoyNSwiYyI6eyJpZCI6MTAzfX0=
+    CardDesignOrientation:
+      type: string
+      description: Orientation of the card design artwork
+      enum:
+      - UNSPECIFIED
+      - VERTICAL
+      - HORIZONTAL
+      example: VERTICAL
+    CustomerNotFoundError:
+      type: object
+      required:
+      - type
+      - message
+      properties:
+        type:
+          type: string
+          description: The category of error being returned
+          example: CUSTOMER_NOT_FOUND_ERROR
+        message:
+          type: string
+          description: A message describing the cause of the error
+          example: 'Customer not found for provided ID: CSMR-v1-123'
+        param:
+          type: string
+          description: The param causing the error
+          example: customer_id
+    CardDesignID:
+      type: string
+      description: Imprint ID for the graphic design printed on the card
+      example: 3b9c1f3e-52a0-44c1-b131-a7ab0099a214
+    CardDesignType:
+      type: string
+      description: 'Whether this is the program''s default design or one of its selectable alternates.
+
+        '
+      enum:
+      - UNSPECIFIED
+      - DEFAULT
+      - REGULAR
+      example: REGULAR
+    CardDesign:
+      type: object
+      required:
+      - id
+      - name
+      - access_min_rank
+      - type
+      - status
+      properties:
+        id:
+          $ref: '#/components/schemas/CardDesignID'
+        name:
+          type: string
+          description: Human-readable name of the card design
+          example: Midnight Black
+        access_min_rank:
+          type: integer
+          format: int64
+          description: 'Minimum loyalty tier rank a customer must hold to select this design. `0`
+
+            means available to everyone. A design with a rank above the customer''s own
+
+            tier is returned but cannot be selected by them.
+
+            '
+          example: 0
+        loyalty_tier_name:
+          type: string
+          description: 'Name of the loyalty tier corresponding to `access_min_rank`. Currently always
+
+            omitted; use `access_min_rank` to determine gating.
+
+            '
+          example: GOLD
+        categories:
+          type: object
+          additionalProperties:
+            type: string
+          description: Partner-defined key/value labels for grouping designs
+        image_orientation:
+          $ref: '#/components/schemas/CardDesignOrientation'
+        type:
+          $ref: '#/components/schemas/CardDesignType'
+        status:
+          $ref: '#/components/schemas/CardDesignStatus'
+        light_asset_url_path:
+          type: string
+          description: 'Absolute URL of the card design artwork for light mode. Artwork is served
+
+            from `https://assets.imprint.co` or `https://app.imprint.co` depending on
+
+            where it was uploaded.
+
+            '
+          example: https://assets.imprint.co/brand-assets/card-designs/light/midnight-black.svg
+        dark_asset_url_path:
+          type: string
+          description: 'Absolute URL of the card design artwork for dark mode. Artwork is served
+
+            from `https://assets.imprint.co` or `https://app.imprint.co` depending on
+
+            where it was uploaded.
+
+            '
+          example: https://assets.imprint.co/brand-assets/card-designs/dark/midnight-black.svg
+        virtual_digital_card_art_id:
+          type: string
+          description: Processor-side art identifier for the virtual card
+        physical_digital_card_art_id:
+          type: string
+          description: Processor-side art identifier for the physical card
+  securitySchemes:
+    basicAuth:
+      type: http
+      scheme: basic
+      description: 'Basic HTTP authentication. Allowed headers-- Authorization: Basic <base64(api_key_id:api_key_secret)>'
+    bearerAuth:
+      bearerFormat: auth-scheme
+      description: 'Bearer HTTP authentication. Allowed headers-- Authorization: Bearer <api_key>'
+      scheme: bearer
+      type: http

@@ -320,6 +320,26 @@ apis:
   properties:
   - type: OpenAPI
     url: openapi/imprint-webhooks-api-openapi.yml
+- aid: imprint:imprint-applications-api
+  name: Imprint Applications API
+  description: The Applications API from Imprint — 10 operation(s) for applications.
+  humanURL: https://docs.imprint.co/
+  baseURL: https://dev.imprint.co
+  tags:
+  - Applications
+  properties:
+  - type: OpenAPI
+    url: openapi/imprint-applications-api-openapi.yml
+- aid: imprint:imprint-card-designs-api
+  name: Imprint Card Designs API
+  description: The Card Designs API from Imprint — 1 operation(s) for card designs.
+  humanURL: https://docs.imprint.co/
+  baseURL: https://dev.imprint.co
+  tags:
+  - Card Designs
+  properties:
+  - type: OpenAPI
+    url: openapi/imprint-card-designs-api-openapi.yml
 maintainers:
 - FN: Kin Lane
   email: kin@apievangelist.com

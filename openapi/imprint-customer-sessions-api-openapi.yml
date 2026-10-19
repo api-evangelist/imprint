@@ -24,14 +24,8 @@ paths:
             schema:
               type: object
               properties:
-                customer_id:
-                  type: string
-                  description: Unique identifier for the Imprint customer, if creating a customer session for a known imprint customer that the id is available for
-                  example: AD87A18A-A4BE-49FF-BC46-BF6F0779DBAA
                 partner_customer_id:
-                  type: string
-                  description: The unique identifier for the customer in the partner's system
-                  example: CUST_03476998
+                  $ref: '#/components/schemas/PartnerCustomerId'
                 transaction_amount:
                   type: integer
                   description: The current transaction amount, if the session is currently executing a transaction. integer value in the min currency unit (cents for USD)
@@ -44,7 +38,38 @@ paths:
                   $ref: '#/components/schemas/CustomerAccountHistory'
                 source:
                   type: string
-                  description: The source where the session is initiated
+                  description: The marketing source that referred the customer.
+                  example: web_signup
+                utm_medium:
+                  type: string
+                  description: The marketing medium that referred the customer.
+                  example: cpc
+                utm_channel:
+                  type: string
+                  description: The marketing channel that referred the customer.
+                  example: paid_social
+                utm_campaign:
+                  type: string
+                  description: The marketing campaign that referred the customer.
+                  example: spring_card_launch
+                utm_content:
+                  type: string
+                  description: The specific creative or placement that referred the customer.
+                  example: hero_banner_v2
+                utm_term:
+                  type: string
+                  description: The paid search keyword that referred the customer.
+                  example: rewards+credit+card
+                utm_owner:
+                  type: string
+                  description: The team or owner accountable for the campaign that produced this session.
+                  example: growth
+                application_origin:
+                  $ref: '#/components/schemas/ApplicationOrigin'
+                origin_location_id:
+                  type: string
+                  description: Your own store or location code identifying where the application originated.
+                  example: STORE-4417
                 metadata:
                   type: object
                   description: Additional linking metadata
@@ -99,6 +124,10 @@ paths:
                 $ref: '#/components/schemas/SessionNotFoundError'
 components:
   schemas:
+    ApplicationOrigin:
+      type: string
+      description: Where the application originated. Free-form, so campaign and channel origins can be introduced without an API change. In-store applications use one of `in_store_associate`, `in_store_kiosk`, or `in_store_signage`; a server-verified in-store application overrides whatever value you supply.
+      example: in_store_kiosk
     CustomerSession:
       type: object
       description: Represents a session created on behalf of an Imprint customer
@@ -135,8 +164,76 @@ components:
             membership_tier: gold
         source:
           type: string
-          description: The source where the session was initiated
+          description: The marketing source that referred the customer.
           example: web_signup
+        utm_medium:
+          type: string
+          description: The marketing medium that referred the customer.
+          example: cpc
+        utm_channel:
+          type: string
+          description: The marketing channel that referred the customer.
+          example: paid_social
+        utm_campaign:
+          type: string
+          description: The marketing campaign that referred the customer.
+          example: spring_card_launch
+        utm_content:
+          type: string
+          description: The specific creative or placement that referred the customer.
+          example: hero_banner_v2
+        utm_term:
+          type: string
+          description: The paid search keyword that referred the customer.
+          example: rewards+credit+card
+        utm_owner:
+          type: string
+          description: The team or owner accountable for the campaign that produced this session.
+          example: growth
+        application_origin:
+          $ref: '#/components/schemas/ApplicationOrigin'
+        origin_location_id:
+          type: string
+          description: Your own store or location code identifying where the application originated.
+          example: STORE-4417
+        partner_customer_id:
+          $ref: '#/components/schemas/PartnerCustomerId'
+        transaction_amount:
+          type: integer
+          format: int64
+          description: The current transaction amount, in the min currency unit (cents for USD)
+          example: 34000
+        transaction_currency:
+          type: string
+          description: The 3 char currency code of the amount in iso-4217
+          example: USD
+        customer_history:
+          $ref: '#/components/schemas/CustomerAccountHistory'
+    PartnerCustomerId:
+      type: string
+      minLength: 1
+      maxLength: 128
+      pattern: ^[\x20-\x7E]+$
+      description: 'The unique identifier for the customer in the partner''s system.
+
+
+        Compared byte-for-byte, so `PARTNER_USER_456` and `partner_user_456` are
+
+        two different customers. Send the same casing everywhere or a later
+
+        lookup silently returns no match.
+
+
+        Restricted to printable ASCII (`\x20`–`\x7E`) rather than arbitrary
+
+        UTF-8: the value is propagated between internal services as an HTTP/2
+
+        header, which cannot carry non-ASCII bytes. The bound is published
+
+        rather than discovered.
+
+        '
+      example: PARTNER_USER_456
     Address:
       type: object
       description: Mailing address information
@@ -159,38 +256,13 @@ components:
           example: CA
         postal_code:
           type: string
-          description: ZIP or postal code
-          example: '94105'
+          examples:
+          - '94105'
+          - 94105-1234
         country:
           type: string
           description: ISO-3166-1 alpha-3 Country Code
           example: USA
-    InvalidRequestError:
-      type: object
-      properties:
-        path:
-          type: string
-          description: The path of the endpoint returning the error
-          example: /v2/customers
-        details:
-          type: array
-          items:
-            type: string
-          description: The details of the error being returned
-          example:
-          - 'email: must be a well-formed email address'
-        error:
-          type: string
-          description: The category of error being returned
-          example: Bad Request
-        status:
-          type: integer
-          description: The HTTP status code of the error
-          example: 400
-        timestamp:
-          type: string
-          description: The timestamp that the error occurred
-          example: '2025-01-20T18:18:22.923+00:00'
     SessionNotFoundError:
       type: object
       required:
@@ -260,6 +332,32 @@ components:
           type: integer
           description: The number of lifetime transactions the customer has made with the partner
           example: 100
+    InvalidRequestError:
+      type: object
+      properties:
+        path:
+          type: string
+          description: The path of the endpoint returning the error
+          example: /v2/customers
+        details:
+          type: array
+          items:
+            type: string
+          description: The details of the error being returned
+          example:
+          - 'email: must be a well-formed email address'
+        error:
+          type: string
+          description: The category of error being returned
+          example: Bad Request
+        status:
+          type: integer
+          description: The HTTP status code of the error
+          example: 400
+        timestamp:
+          type: string
+          description: The timestamp that the error occurred
+          example: '2025-01-20T18:18:22.923+00:00'
   securitySchemes:
     basicAuth:
       type: http
